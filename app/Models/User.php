@@ -29,4 +29,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the pegawai associated with the user.
+     */
+    public function pegawai()
+    {
+        return $this->hasOne(Pegawai::class, 'email', 'email');
+    }
 }
