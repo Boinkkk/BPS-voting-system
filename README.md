@@ -1,58 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Penilaian & Ranking Pegawai BPS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi berbasis web ini digunakan untuk mengelola rekap absensi bulanan dan penilaian kinerja pegawai, serta secara otomatis menghitung dan merangking 10 Kandidat Pegawai Terbaik berdasarkan algoritma yang telah ditentukan (perpaduan rata-rata kinerja bulanan dikurangi dengan skor penalti absensi kedisiplinan).
 
-## About Laravel
+Aplikasi ini dibangun menggunakan kerangka kerja **Laravel** (PHP) dan disajikan dengan antarmuka yang modern.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Persyaratan Sistem (Prerequisites)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sebelum menjalankan proyek ini, pastikan komputer/server Anda telah terpasang perangkat lunak berikut:
 
-## Learning Laravel
+1. **PHP** (Minimal versi 8.2 atau lebih baru)
+2. **Composer** (Untuk mengelola dependensi PHP)
+3. **Node.js & npm** (Untuk mengompilasi aset *frontend* seperti Tailwind CSS dan Vite)
+4. **MySQL / MariaDB** (Untuk sistem *database*)
+5. **Git** (Opsional, untuk melakukan *clone* repositori)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🚀 Panduan Instalasi & Menjalankan Aplikasi
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Ikuti langkah-langkah di bawah ini secara berurutan untuk menjalankan aplikasi dari nol:
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+### 1. Clone Repositori
+Langkah pertama adalah mengunduh (*clone*) *source code* ke komputer lokal Anda:
 ```bash
-composer require laravel/boost --dev
+git clone <URL_REPOSITORY_ANDA>
+cd web
+```
+*(Pastikan Anda masuk ke dalam *directory* proyek utama, di mana *file* `composer.json` berada).*
 
-php artisan boost:install
+### 2. Install Dependensi PHP (Composer)
+Unduh seluruh pustaka (*library*) backend yang dibutuhkan Laravel:
+```bash
+composer install
+```
+*(Proses ini akan mengunduh banyak file ke dalam folder `/vendor`. Pastikan koneksi internet Anda stabil).*
+
+### 3. Install Dependensi Frontend (NPM)
+Unduh seluruh *library frontend* (seperti Tailwind CSS, Alpine.js) yang dibutuhkan:
+```bash
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 4. Konfigurasi Environment (File `.env`)
+Salin file konfigurasi bawaan menjadi file konfigurasi rahasia (*environment*) Anda:
+```bash
+cp .env.example .env
+```
+Setelah itu, buka file `.env` di teks editor (seperti VS Code atau Notepad), dan sesuaikan pengaturan koneksi *database* Anda:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bps_ranking_karyawan   # Ganti dengan nama database Anda
+DB_USERNAME=root                   # Ganti dengan username MySQL Anda
+DB_PASSWORD=                       # Ganti dengan password MySQL Anda (kosongkan jika tidak ada)
+```
 
-## Contributing
+### 5. Generate Application Key
+Buat kunci unik (*App Key*) untuk mengamankan enkripsi data aplikasi Anda:
+```bash
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 6. Persiapan Database
+Pastikan Anda sudah membuat *database* kosong di MySQL dengan nama yang persis sama dengan yang Anda isi di `DB_DATABASE` (misal: `bps_ranking_karyawan`).
 
-## Code of Conduct
+### 7. Migrasi & Seeding Database
+Jalankan perintah ini untuk membuat semua tabel ke dalam database Anda sekaligus mengisi data-data bawaan (Akun admin, Master Data Pegawai dari file CSV, Bobot Penalti, dll):
+```bash
+php artisan migrate:fresh --seed
+```
+*Catatan: Karena data pegawai diambil dari file `data/data_pegawai.csv`, pastikan file tersebut berada di posisinya agar data pegawai tersinkronisasi.*
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 8. Compile Aset Frontend (Vite)
+Bangun aset CSS dan Javascript agar tampilan situs menjadi rapi dan modern:
+```bash
+npm run build
+```
+*(Atau gunakan `npm run dev` jika Anda ingin menjalankannya dalam mode *development* sambil mengedit kode).*
 
-## Security Vulnerabilities
+### 9. Jalankan Server Lokal
+Nyalakan server internal Laravel:
+```bash
+php artisan serve
+```
+Aplikasi kini siap diakses! Buka *browser* Anda dan kunjungi URL berikut:  
+👉 **http://localhost:8000**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🔑 Akun Demo (Testing)
+Jika Anda menggunakan *seeder* bawaan, berikut adalah beberapa akun pengujian yang bisa Anda gunakan untuk masuk (Login):
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**1. Administrator (Admin Sistem)**
+- **Email**: `admin@bps.go.id`
+- **Password**: `password123`
+- *Fungsi: Mengelola data pegawai, mengatur bobot penalti, mengunggah rekap Excel.*
+
+**2. Kepala BPS**
+- **Email**: `kepala@bps.go.id`
+- **Password**: `password123`
+- *Fungsi: Memantau dan melihat hasil 10 Kandidat Terbaik.*
+
+**3. Pegawai**
+- **Email**: `pegawai@bps.go.id`
+- **Password**: `password123`
+- *Fungsi: Hanya melihat penilaian kinerja pribadi (Dashboard khusus pegawai).*
+
+---
+
+## 📝 Catatan Penting Penggunaan
+1. **Upload File Excel**: Pastikan saat Admin mengunggah rekapitulasi absensi atau kinerja, Anda **wajib menggunakan Template Excel resmi** yang disediakan dengan cara mengklik tombol "Download Template Excel" pada masing-masing halaman.
+2. **Perhitungan Otomatis**: Setiap kali data Kinerja atau data Absensi baru diunggah, sistem akan **otomatis melakukan perhitungan ulang** dan menyusun daftar 10 Kandidat Terbaik saat itu juga.
+3. **Pengaturan Bobot**: Angka potongan indisipliner (seperti Terlambat, Pulang Cepat, atau KJK) bisa diubah secara dinamis langsung dari menu "Absensi Pegawai" dengan login sebagai Admin.
+
+Selamat mencoba aplikasi BPS Ranking Karyawan!
