@@ -29,4 +29,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/pegawai', [\App\Http\Controllers\PegawaiAdminController::class, 'store'])->name('admin.pegawai.store');
     Route::put('/admin/pegawai/{id}', [\App\Http\Controllers\PegawaiAdminController::class, 'update'])->name('admin.pegawai.update');
     Route::put('/admin/pegawai/{id}/password', [\App\Http\Controllers\PegawaiAdminController::class, 'updatePassword'])->name('admin.pegawai.password');
+
+    // Admin Absensi Management
+    Route::get('/admin/absensi', [\App\Http\Controllers\AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
+    Route::post('/admin/absensi/tipe', [\App\Http\Controllers\AbsensiAdminController::class, 'storeTipe'])->name('admin.absensi.tipe.store');
+    Route::put('/admin/absensi/tipe/{id}', [\App\Http\Controllers\AbsensiAdminController::class, 'updateTipe'])->name('admin.absensi.tipe.update');
+
+    // Admin Kandidat Management
+    Route::get('/admin/kandidat', [\App\Http\Controllers\KandidatAdminController::class, 'index'])->name('admin.kandidat.index');
+    Route::post('/admin/kandidat/generate', [\App\Http\Controllers\KandidatAdminController::class, 'generate'])->name('admin.kandidat.generate');
 });

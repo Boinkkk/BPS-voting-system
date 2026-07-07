@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class Kandidat extends Model
+{
+    use HasUuids;
+
+    protected $table = 'kandidat';
+
+    protected $fillable = [
+        'periode_id',
+        'pegawai_id',
+        'skor',
+        'ranking_sistem',
+        'status',
+    ];
+
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'pegawai_id');
+    }
+
+    public function periode()
+    {
+        return $this->belongsTo(PeriodePenilaian::class, 'periode_id');
+    }
+}

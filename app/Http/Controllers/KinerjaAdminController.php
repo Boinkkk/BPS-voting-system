@@ -63,7 +63,11 @@ class KinerjaAdminController extends Controller
             }
 
             Excel::import(new KinerjaImport($realPeriodeId), $request->file('file'));
-            return redirect()->back()->with('success', 'Data kinerja berhasil diunggah dan diekstrak.');
+            
+            // Trigger otomatis perhitungan 10 kandidat
+            \App\Services\KandidatService::generateTop10Kandidat($realPeriodeId);
+            
+            return redirect()->back()->with('success', 'Data kinerja berhasil diunggah dan diekstrak. 10 Kandidat otomatis dikalkulasi ulang.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah: ' . $e->getMessage());
         }
@@ -102,7 +106,10 @@ class KinerjaAdminController extends Controller
                 ]
             );
 
-            return redirect()->back()->with('success', 'Data kinerja manual berhasil ditambahkan.');
+            // Trigger otomatis perhitungan 10 kandidat
+            \App\Services\KandidatService::generateTop10Kandidat($realPeriodeId);
+
+            return redirect()->back()->with('success', 'Data kinerja manual berhasil ditambahkan. 10 Kandidat otomatis dikalkulasi ulang.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
