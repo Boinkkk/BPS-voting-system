@@ -11,8 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Memanggil seeder khusus pegawai dari Excel / Screenshot
-        // Ini akan secara otomatis membuat Role, Departemen, dan Pegawai beserta Akun Testing dengan UUID
-        $this->call(PegawaiSeeder::class);
+        $this->call([
+            PegawaiSeeder::class,
+            BobotPenaltiSeeder::class,
+        ]);
     }
 }

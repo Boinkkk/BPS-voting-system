@@ -70,70 +70,45 @@ class PegawaiSeeder extends Seeder
             ]
         );
 
-        // 2. Insert Original Employees from Image
-        $pegawaiData = [
-            ["Afysha Diadara S.Tr.Stat.", "Pelaksana"],
-            ["Agung Tika Wicaksono S.Tr.Stat", "Statistisi Ahli Pertama"],
-            ["Amir Rifa'i", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Amoi Sandra Lesmana A.Md.Stat", "Pelaksana"],
-            ["Amyroh Sintia Dewi A.Md.Stat.", "Pelaksana"],
-            ["Ardin Feri Syukur Gultom S.Tr.Stat.", "Statistisi Ahli Pertama"],
-            ["Daryatno", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Dicki Prayogi A.Md.Stat.", "Pelaksana"],
-            ["Didit Kurniawan A.Md", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Dino Asmono S.Ak.", "Statistisi Ahli Pertama"],
-            ["Elfira Meirosa", "Pelaksana"],
-            ["Erlina Nur Syamsiyah S.Tr.Stat.", "Pelaksana"],
-            ["Fajar Maulana", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Farikha Fia Fatmawati S.Tr.Stat", "Statistisi Ahli Pertama"],
-            ["Fathanya Puja Anggaresa S.Tr.Stat.", "Statistisi Ahli Pertama"],
-            ["Gideon Marpaung S.Tr.Stat.", "Statistisi Ahli Pertama"],
-            ["Irfan Satriadi S.Si", "Statistisi Ahli Muda"],
-            ["Joko", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Jovanka Marya Sitompul A.Md.Stat.", "Statistisi Pelaksana/Terampil"],
-            ["Mohd. Arief Fadillah", "Statistisi Pelaksana/Terampil"],
-            ["Muhammad Hafizh Eka Putra S.Tr.Stat.", "Pranata Komputer Ahli Pertama"],
-            ["Mutia Hanifah A.Md.Stat.", "Statistisi Pelaksana/Terampil"],
-            ["Nana Fitriana SST", "Pranata Komputer Ahli Muda"],
-            ["Poernawan Zuhri", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Radhitya Noor Adhyaksani S.Tr.Stat.", "Statistisi Ahli Pertama"],
-            ["Rahmadathul Wisdawati A.Md.Stat.", "Statistisi Pelaksana/Terampil"],
-            ["Razali", "Statistisi Pelaksana Lanjutan/Mahir"],
-            ["Rizka Mei Wulan SST", "Kepala Subbagian Umum"],
-            ["Saor Hasudungan Sitompul SE", "Statistisi Ahli Muda"],
-            ["Ulil Amri A.Md.Kom", "Pranata Komputer Pelaksana/Terampil"],
-            ["Yudika Simatupang S.Tr.Stat.", "Statistisi Ahli Pertama"]
-        ];
-
-        foreach ($pegawaiData as $index => $p) {
-            $nama = $p[0];
-            $jabatan = $p[1];
+        // 2. Read from CSV data_pegawai.csv
+        $csvPath = base_path('data/data_pegawai.csv');
+        if (file_exists($csvPath)) {
+            $file = fopen($csvPath, 'r');
+            $header = fgetcsv($file); // Read header: NIP, Nama
             
-            // Map to department
-            $deptId = $deptStatistik->id;
-            if (strpos(strtolower($jabatan), 'pranata komputer') !== false) {
-                $deptId = $deptIT->id;
-            } elseif (strpos(strtolower($jabatan), 'umum') !== false || $jabatan === 'Pelaksana') {
+            $index = 0;
+            while (($row = fgetcsv($file)) !== false) {
+                if (count($row) < 2) continue;
+                
+                $nip = trim($row[0]);
+                $nama = trim($row[1]);
+                $jabatan = 'Pelaksana'; // Default jabatan since CSV only has NIP and Nama
+                
+                // Map to department
                 $deptId = $deptUmum->id;
+
+                // Generate Email
+                $email = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $nama)[0])) . ($index + 1) . '@bps.go.id';
+
+                Pegawai::updateOrCreate(
+                    ['nip' => $nip], // Match by NIP now since it's the real one
+                    [
+                        'email' => $email,
+                        'role_id' => $rolePegawai->id,
+                        'departemen_id' => $deptId,
+                        'jabatan' => $jabatan,
+                        'nama' => $nama,
+                        'password' => $password,
+                        'tanggal_masuk' => '2023-01-01',
+                        'status_pegawai' => 'aktif',
+                    ]
+                );
+                
+                $index++;
             }
-
-            // Generate dummy NIP and Email
-            $nip = '19' . rand(70, 99) . '010120' . str_pad($index + 1, 4, '0', STR_PAD_LEFT);
-            $email = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $nama)[0])) . ($index + 1) . '@bps.go.id';
-
-            Pegawai::updateOrCreate(
-                ['email' => $email],
-                [
-                    'role_id' => $rolePegawai->id,
-                    'departemen_id' => $deptId,
-                    'jabatan' => $jabatan,
-                    'nama' => $nama,
-                    'nip' => $nip,
-                    'password' => $password,
-                    'tanggal_masuk' => '2023-01-01',
-                    'status_pegawai' => 'aktif',
-                ]
-            );
+            fclose($file);
+        } else {
+            $this->command->error('File data_pegawai.csv tidak ditemukan di ' . $csvPath);
         }
     }
 }

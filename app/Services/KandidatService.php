@@ -39,12 +39,23 @@ class KandidatService
                 $totalSkorBulan += $skorSatuBulan;
             }
 
-            // Rata-rata dari seluruh bulan yang ada
+            // Rata-rata dari seluruh bulan yang ada (Skor Kinerja)
             $rataRataKeseluruhan = $jumlahBulan > 0 ? ($totalSkorBulan / $jumlahBulan) : 0;
             
-            // Bobot absensi diset 0 untuk saat ini (akan ditambahkan nanti)
+            // Hitung Bobot Absensi (Total Penalti)
             $bobotAbsensi = 0;
+            
+            // Ambil data absensi pegawai ini pada periode yang sama
+            $rekapsAbsen = \App\Models\AbsensiPegawai::where('periode_id', $periodeId)
+                                ->where('pegawai_id', $idPegawai)
+                                ->get();
+                                
+            foreach ($rekapsAbsen as $absen) {
+                // Gunakan accessor getPenaltiAttribute
+                $bobotAbsensi += $absen->penalti;
+            }
 
+            // Skor Akhir = Nilai Kinerja (0-100) dikurangi penalti absensi
             $skorAkhir = $rataRataKeseluruhan + $bobotAbsensi;
 
             $scores[] = [

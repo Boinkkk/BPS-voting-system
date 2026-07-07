@@ -13,22 +13,64 @@ class AbsensiPegawai extends Model
 
     protected $fillable = [
         'periode_id',
-        'id_pegawai',
-        'id_tipe_absensi',
-        'waktu_absensi',
-    ];
-
-    protected $casts = [
-        'waktu_absensi' => 'datetime',
+        'pegawai_id',
+        'bulan',
+        'hk', 'hd', 'tk', 'tl', 'tb', 'pd', 'dk', 'kn', 
+        'psw', 'psw1', 'psw2', 'psw3', 'psw4', 
+        'ht', 'tl1', 'tl2', 'tl3', 'tl4', 
+        'cb', 'cl', 'cm', 'cp', 'cs', 'ct10', 'ct11', 'ct12', 
+        'cst1', 'cst2', 'cs1', 'cp1', 'cm1', 'cb1', 
+        'kjk_ht', 'kjk_pc', 'kjk'
     ];
 
     public function pegawai()
     {
-        return $this->belongsTo(Pegawai::class, 'id_pegawai');
+        return $this->belongsTo(Pegawai::class, 'pegawai_id');
     }
 
-    public function tipeAbsen()
+    public function periode()
     {
-        return $this->belongsTo(TipeAbsen::class, 'id_tipe_absensi');
+        return $this->belongsTo(PeriodePenilaian::class, 'periode_id');
+    }
+
+    /**
+     * Hitung total skor penalti absensi per bulan ini.
+     * Mengambil nilai bobot secara dinamis dari tabel bobot_penalti (dengan cache).
+     */
+    public function getPenaltiAttribute()
+    {
+        $penalti = 0;
+
+        // Ambil bobot dari cache atau DB
+        $bobot = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
+            return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
+        });
+
+        // Helper untuk memanggil bobot atau default jika terhapus
+        $getBobot = function ($kode, $default) use ($bobot) {
+            return isset($bobot[$kode]) ? (float)$bobot[$kode] : $default;
+        };
+
+        // Penalti Ringan
+        $penalti -= $this->tl1 * $getBobot('TL1', 0.5);
+        $penalti -= $this->tl2 * $getBobot('TL2', 0.5);
+        $penalti -= $this->psw1 * $getBobot('PSW1', 0.5);
+        $penalti -= $this->psw2 * $getBobot('PSW2', 0.5);
+        
+        // Penalti Sedang
+        $penalti -= $this->tl3 * $getBobot('TL3', 1.0);
+        $penalti -= $this->psw3 * $getBobot('PSW3', 1.0);
+        
+        // Penalti Berat
+        $penalti -= $this->tk * $getBobot('TK', 2.5);
+        $penalti -= $this->tl4 * $getBobot('TL4', 2.5);
+        $penalti -= $this->psw4 * $getBobot('PSW4', 2.5);
+        
+        // KJK
+        if ($this->kjk > 0) {
+            $penalti -= ($this->kjk / 60) * $getBobot('KJK_PER_JAM', 0.5);
+        }
+
+        return $penalti;
     }
 }

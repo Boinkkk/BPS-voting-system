@@ -32,8 +32,9 @@ Route::middleware('auth')->group(function () {
 
     // Admin Absensi Management
     Route::get('/admin/absensi', [\App\Http\Controllers\AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
-    Route::post('/admin/absensi/tipe', [\App\Http\Controllers\AbsensiAdminController::class, 'storeTipe'])->name('admin.absensi.tipe.store');
-    Route::put('/admin/absensi/tipe/{id}', [\App\Http\Controllers\AbsensiAdminController::class, 'updateTipe'])->name('admin.absensi.tipe.update');
+    Route::get('/admin/absensi/template', [\App\Http\Controllers\AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
+    Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload');
+    Route::post('/admin/absensi/bobot', [\App\Http\Controllers\AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
 
     // Admin Kandidat Management
     Route::get('/admin/kandidat', [\App\Http\Controllers\KandidatAdminController::class, 'index'])->name('admin.kandidat.index');

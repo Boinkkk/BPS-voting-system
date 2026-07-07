@@ -2,7 +2,7 @@
 
 @section('header')
 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-    Manajemen Absensi Pegawai
+    Rekap Absensi Bulanan Pegawai
 </h2>
 @endsection
 
@@ -23,7 +23,7 @@
             </div>
         @endif
 
-        @if ($errors->any())
+        @if ($errors->any() || session('error'))
             <div class="mb-4 rounded-md bg-red-50 p-4 border border-red-200">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -31,6 +31,7 @@
                     </div>
                     <div class="ml-3">
                         <ul class="text-sm text-red-700 list-disc list-inside">
+                            @if(session('error')) <li>{{ session('error') }}</li> @endif
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -40,120 +41,152 @@
             </div>
         @endif
 
-        <!-- Layout Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Pengaturan Tipe Absen -->
-            <div class="lg:col-span-1">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-gray-900">Tipe Absen & Bobot</h3>
-                        <button onclick="document.getElementById('modalTambahTipe').classList.remove('hidden')" class="px-3 py-1 bg-[#0091d5] text-white text-xs font-medium rounded-md hover:bg-blue-600">
-                            + Tambah
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
+            <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">Upload Data Rekap Absensi (Excel)</h3>
+                    <p class="text-sm text-gray-500">Unggah file excel berisi rekap absen per bulan.</p>
+                </div>
+                <a href="{{ route('admin.absensi.template') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                    ⬇️ Download Template Excel
+                </a>
+            </div>
+            <div class="p-6">
+                <form action="{{ route('admin.absensi.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row items-end space-y-4 md:space-y-0 md:space-x-4">
+                    @csrf
+                    <div class="w-full md:w-1/3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Periode Penilaian</label>
+                        <select name="periode_id" required class="w-full text-sm border-gray-300 rounded-md">
+                            @foreach ($periodes as $p)
+                                <option value="{{ $p->id }}" {{ $periode_id == $p->id ? 'selected' : '' }}>
+                                    {{ $p->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="w-full md:w-1/4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bulan (1-12)</label>
+                        <select name="bulan" required class="w-full text-sm border-gray-300 rounded-md">
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>Bulan {{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="w-full md:w-1/3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">File Excel (.xlsx)</label>
+                        <input type="file" name="file" accept=".xlsx,.xls" required class="w-full text-sm border border-gray-300 rounded-md p-1.5">
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <button type="submit" class="w-full px-4 py-2.5 bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600">
+                            Upload & Proses
                         </button>
                     </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Form Pengaturan Bobot -->
+            <div class="lg:col-span-1">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
+                    <div class="p-4 border-b bg-gray-50">
+                        <h3 class="text-lg font-medium text-gray-900">Pengaturan Bobot Penalti</h3>
+                        <p class="text-xs text-gray-500 mt-1">Sesuaikan besaran potongan poin untuk setiap jenis absensi.</p>
+                    </div>
                     <div class="p-4">
-                        <div class="space-y-4">
-                            @foreach($tipeAbsens as $tipe)
-                            <form action="{{ route('admin.absensi.tipe.update', $tipe->id) }}" method="POST" class="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50">
-                                @csrf
-                                @method('PUT')
-                                <div class="flex-1">
-                                    <input type="text" name="status" value="{{ $tipe->status }}" class="w-full text-sm border-gray-300 rounded-md py-1" required>
+                        <form action="{{ route('admin.absensi.bobot') }}" method="POST" class="space-y-4">
+                            @csrf
+                            
+                            @php
+                                $groupedBobots = $bobots->groupBy('kategori');
+                            @endphp
+                            
+                            @foreach($groupedBobots as $kategori => $items)
+                                <div>
+                                    <h4 class="font-semibold text-sm text-gray-700 border-b pb-1 mb-2">Penalti {{ $kategori }}</h4>
+                                    @foreach($items as $bobot)
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex-1">
+                                            <label class="block text-xs font-medium text-gray-700" title="{{ $bobot->keterangan }}">{{ $bobot->kode_absen }}</label>
+                                        </div>
+                                        <div class="w-16">
+                                            <input type="number" step="0.01" min="0" name="bobots[{{ $bobot->id }}]" value="{{ $bobot->bobot }}" class="w-full text-xs border-gray-300 rounded py-1 px-2 text-right focus:ring-sky-500 focus:border-sky-500">
+                                        </div>
+                                    </div>
+                                    @endforeach
                                 </div>
-                                <div class="w-20">
-                                    <input type="number" step="0.01" name="bobot" value="{{ $tipe->bobot }}" class="w-full text-sm border-gray-300 rounded-md py-1 text-center" required>
-                                </div>
-                                <button type="submit" class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded" title="Simpan Perubahan">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                </button>
-                            </form>
                             @endforeach
-                        </div>
+                            
+                            <div class="pt-2 border-t">
+                                <button type="submit" class="w-full px-3 py-2 bg-amber-500 text-white text-sm font-medium rounded hover:bg-amber-600 transition-colors">
+                                    Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabel Histori Absensi -->
-            <div class="lg:col-span-2">
+            <!-- Data Absensi -->
+            <div class="lg:col-span-3">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-                    <div class="p-4 border-b bg-gray-50">
-                        <h3 class="text-lg font-medium text-gray-900">Data Riwayat Absensi</h3>
-                        <p class="text-sm text-gray-500">Histori kehadiran pegawai yang telah terekam di sistem.</p>
+                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">Data Absensi Tersimpan</h3>
+                        
+                        <form action="{{ route('admin.absensi.index') }}" method="GET" class="flex space-x-2">
+                            <select name="periode_id" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
+                                @foreach ($periodes as $p)
+                                    <option value="{{ $p->id }}" {{ $periode_id == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
+                                @endforeach
+                            </select>
+                            <select name="bulan" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
+                                @for($i = 1; $i <= 12; $i++)
+                                    <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>Bulan {{ $i }}</option>
+                                @endfor
+                            </select>
+                        </form>
                     </div>
                     
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse whitespace-nowrap">
                             <thead>
                                 <tr class="bg-gray-100 border-b">
-                                    <th class="p-3 font-semibold text-sm">Waktu Absensi</th>
                                     <th class="p-3 font-semibold text-sm">Nama Pegawai</th>
-                                    <th class="p-3 font-semibold text-sm">Tipe Absen</th>
-                                    <th class="p-3 font-semibold text-sm text-center">Bobot</th>
+                                    <th class="p-3 font-semibold text-sm text-center">HK</th>
+                                    <th class="p-3 font-semibold text-sm text-center">HD</th>
+                                    <th class="p-3 font-semibold text-sm text-center text-red-600">TK</th>
+                                    <th class="p-3 font-semibold text-sm text-center">TL</th>
+                                    <th class="p-3 font-semibold text-sm text-center">PSW (Total)</th>
+                                    <th class="p-3 font-semibold text-sm text-center text-red-600">KJK (Menit)</th>
+                                    <th class="p-3 font-semibold text-sm text-center text-amber-600">Skor Absensi (Penalti)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($absensis as $absen)
                                     <tr class="border-b hover:bg-gray-50">
-                                        <td class="p-3 text-sm text-gray-600">{{ $absen->waktu_absensi->format('d M Y, H:i') }}</td>
                                         <td class="p-3 text-sm font-medium">{{ $absen->pegawai->nama }}</td>
-                                        <td class="p-3 text-sm">
-                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{{ $absen->tipeAbsen->status }}</span>
+                                        <td class="p-3 text-sm text-center">{{ $absen->hk }}</td>
+                                        <td class="p-3 text-sm text-center font-bold text-green-600">{{ $absen->hd }}</td>
+                                        <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->tk }}</td>
+                                        <td class="p-3 text-sm text-center">{{ $absen->tl }}</td>
+                                        <td class="p-3 text-sm text-center">{{ $absen->psw }}</td>
+                                        <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->kjk }}</td>
+                                        <td class="p-3 text-sm text-center font-bold {{ $absen->penalti < 0 ? 'text-red-600' : 'text-green-600' }}">
+                                            {{ number_format($absen->penalti, 2) }}
                                         </td>
-                                        <td class="p-3 text-sm text-center font-bold">{{ $absen->tipeAbsen->bobot }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="p-4 text-center text-sm text-gray-500">Belum ada data absensi.</td>
+                                        <td colspan="8" class="p-8 text-center text-sm text-gray-500">Belum ada data absensi untuk periode dan bulan ini.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-                    @if($absensis->hasPages())
-                    <div class="p-4 border-t">
-                        {{ $absensis->links() }}
-                    </div>
-                    @endif
                 </div>
             </div>
-
         </div>
-    </div>
-</div>
 
-<!-- Modal Tambah Tipe Absen -->
-<div id="modalTambahTipe" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
-        <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
-            <h3 class="text-lg font-medium text-gray-900">Tambah Tipe Absen</h3>
-            <button onclick="document.getElementById('modalTambahTipe').classList.add('hidden')" class="text-gray-400 hover:text-gray-500">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-        <form action="{{ route('admin.absensi.tipe.store') }}" method="POST">
-            @csrf
-            <div class="px-6 py-4 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Nama Tipe (Status)</label>
-                    <input type="text" name="status" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
-                    <p class="mt-1 text-xs text-gray-500">Contoh: Cuti, Dinas Luar</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Bobot Nilai</label>
-                    <input type="number" step="0.01" name="bobot" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
-                    <p class="mt-1 text-xs text-gray-500">Desimal dengan titik (misal: 0.5 atau 1.0)</p>
-                </div>
-            </div>
-            <div class="px-6 py-4 bg-gray-50 text-right border-t">
-                <button type="button" onclick="document.getElementById('modalTambahTipe').classList.add('hidden')" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 mr-2">
-                    Batal
-                </button>
-                <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600">
-                    Simpan Tipe
-                </button>
-            </div>
-        </form>
     </div>
 </div>
 @endsection
