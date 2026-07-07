@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('status_voting', function (Blueprint $table) {
             $table->id();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('pegawai')->cascadeOnDelete();
             $table->boolean('sudah_voting')->default(false);
             $table->timestamp('waktu_voting')->nullable();
             

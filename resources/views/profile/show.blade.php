@@ -11,16 +11,16 @@
         <div class="flex justify-between items-end -mt-16 mb-4">
             <div class="flex items-end">
                 <div class="w-32 h-32 rounded-xl bg-white p-1 shadow-md border border-gray-100 z-10">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=EBF4FF&color=0D8ABC&size=128" alt="Profile" class="w-full h-full rounded-lg object-cover">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->nama) }}&background=EBF4FF&color=0D8ABC&size=128" alt="Profile" class="w-full h-full rounded-lg object-cover">
                 </div>
                 
                 <div class="ml-6 mb-2">
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $user->name }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ $user->nama }}</h1>
                     <div class="flex items-center text-gray-500 mt-1">
                         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                         </svg>
-                        <span class="text-sm font-medium">NIP: {{ $user->pegawai ? $user->pegawai->nip : '-' }}</span>
+                        <span class="text-sm font-medium">NIP: {{ $user->nip ?? '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -48,12 +48,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 mb-6 border-b border-gray-100 pb-6">
             <div>
                 <p class="text-xs text-gray-500 font-medium mb-1">Position</p>
-                <p class="text-sm font-semibold text-gray-900">{{ $user->pegawai ? $user->pegawai->jabatan : '-' }}</p>
+                <p class="text-sm font-semibold text-gray-900">{{ $user->jabatan ?? '-' }}</p>
             </div>
             
             <div>
                 <p class="text-xs text-gray-500 font-medium mb-1">Department</p>
-                <p class="text-sm font-semibold text-gray-900">{{ $user->pegawai && $user->pegawai->departemen ? $user->pegawai->departemen->nama : '-' }}</p>
+                <p class="text-sm font-semibold text-gray-900">{{ $user->departemen ? $user->departemen->nama : '-' }}</p>
             </div>
             
             <div>

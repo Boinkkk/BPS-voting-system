@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('jawaban_survei', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignId('session_id')->constrained('voting_session')->cascadeOnDelete();
-            $table->foreignId('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
-            $table->foreignId('pertanyaan_id')->constrained('pertanyaan_survei')->cascadeOnDelete();
+            $table->foreignUuid('session_id')->constrained('voting_session')->cascadeOnDelete();
+            $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
+            $table->foreignUuid('pertanyaan_id')->constrained('pertanyaan_survei')->cascadeOnDelete();
             $table->integer('nilai');
             $table->timestamp('waktu_jawab')->useCurrent();
             

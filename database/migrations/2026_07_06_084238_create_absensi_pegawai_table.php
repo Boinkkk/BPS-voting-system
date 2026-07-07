@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('absensi_pegawai', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignId('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignUuid('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('id_tipe_absensi')->constrained('tipe_absen')->restrictOnDelete();
             $table->timestamp('waktu_absensi');
             $table->timestamps();

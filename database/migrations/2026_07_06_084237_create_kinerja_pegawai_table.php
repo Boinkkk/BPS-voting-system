@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kinerja_pegawai', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignId('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignUuid('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
             $table->decimal('rata_rata_hasil_kerja', 4, 2);
             $table->decimal('rata_rata_perilaku', 4, 2);
             $table->decimal('nilai_kjk', 4, 2)->nullable();

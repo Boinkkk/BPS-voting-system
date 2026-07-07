@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('voting_session', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('pegawai')->cascadeOnDelete();
             $table->string('session_code', 64)->unique();
             $table->boolean('sudah_selesai')->default(false);
             $table->timestamp('waktu_mulai')->useCurrent();

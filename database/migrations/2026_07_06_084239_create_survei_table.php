@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('survei', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
             $table->string('nama', 150);
             $table->enum('tipe', ['voting_terbaik', 'kepuasan', 'lainnya'])->default('voting_terbaik');

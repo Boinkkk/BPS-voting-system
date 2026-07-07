@@ -15,7 +15,7 @@ class DashboardController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $user->load('pegawai.departemen', 'pegawai.role');
+        $user->load('departemen', 'role');
         
         return view('profile.show', compact('user'));
     }

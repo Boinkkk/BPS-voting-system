@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Pegawai extends Model
+class Pegawai extends Authenticatable
 {
+    use HasUuids;
+
     protected $table = 'pegawai';
 
     protected $fillable = [
@@ -16,9 +19,22 @@ class Pegawai extends Model
         'nama',
         'nip',
         'email',
+        'password',
         'tanggal_masuk',
         'status_pegawai',
     ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 
     public function role(): BelongsTo
     {

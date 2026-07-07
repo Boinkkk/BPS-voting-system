@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hasil_akhir', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignId('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
+            $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
             $table->integer('ranking_final');
-            $table->foreignId('dipilih_oleh')->constrained('pegawai')->restrictOnDelete();
+            $table->foreignUuid('dipilih_oleh')->constrained('pegawai')->restrictOnDelete();
             $table->timestamp('waktu_penetapan')->useCurrent();
             $table->text('catatan_kepala')->nullable();
             
