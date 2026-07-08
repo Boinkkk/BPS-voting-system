@@ -41,7 +41,7 @@
             <div class="p-6 bg-white border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                 <div>
                     <h3 class="text-lg font-bold text-gray-900">Daftar Kandidat Sistem</h3>
-                    <p class="text-sm text-gray-500">Menampilkan 10 pegawai dengan skor kinerja tertinggi pada periode yang dipilih.</p>
+                    <p class="text-sm text-gray-500">Menampilkan 10 pegawai dengan skor tertinggi berdasarkan Nilai CKP dan Absensi pada periode yang dipilih.</p>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -60,7 +60,7 @@
                     <form action="{{ route('admin.kandidat.generate') }}" method="POST">
                         @csrf
                         <input type="hidden" name="periode_id" value="{{ $periode_id }}">
-                        <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan nilai kinerja dan absen pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
+                        <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
                             Kalkulasi 10 Kandidat
                         </button>
                     </form>

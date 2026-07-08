@@ -18,35 +18,22 @@ class KandidatService
         $periode = PeriodePenilaian::find($periodeId);
         if (!$periode) return;
 
-        // Ambil semua data kinerja pada periode tersebut (hanya untuk role Pegawai)
-        // Di-group per pegawai
-        $kinerjas = KinerjaPegawai::where('periode_id', $periodeId)
-            ->whereHas('pegawai.role', function($q) {
-                $q->where('tipe', 'Pegawai');
-            })
-            ->get()->groupBy('id_pegawai');
+        // Ambil semua pegawai dengan role 'Pegawai'
+        $pegawais = \App\Models\Pegawai::whereHas('role', function($q) {
+            $q->where('tipe', 'Pegawai');
+        })->get();
 
         $scores = [];
 
-        foreach ($kinerjas as $idPegawai => $recordsBulan) {
-            $totalSkorBulan = 0;
-            $jumlahBulan = $recordsBulan->count();
+        foreach ($pegawais as $pegawai) {
+            $idPegawai = $pegawai->id;
 
-            foreach ($recordsBulan as $record) {
-                // Sesuai instruksi: jika null anggap 0. Pembagi selalu 4.
-                $hk = $record->rata_rata_hasil_kerja ?? 0;
-                $pr = $record->rata_rata_perilaku ?? 0;
-                $kjk = $record->nilai_kjk ?? 0;
-                $tl = $record->nilai_tl_psw ?? 0;
-
-                $skorSatuBulan = ($hk + $pr + $kjk + $tl) / 4;
-                $totalSkorBulan += $skorSatuBulan;
-            }
-
-            // Rata-rata dari seluruh bulan yang ada (Skor Kinerja)
-            $rataRataKeseluruhan = $jumlahBulan > 0 ? ($totalSkorBulan / $jumlahBulan) : 0;
+            // 1. Ambil Nilai CKP (0 jika tidak ada)
+            $ckp = \App\Models\NilaiCkp::where('periode_id', $periodeId)
+                        ->where('pegawai_id', $idPegawai)->first();
+            $nilaiCkp = $ckp ? $ckp->nilai : 0;
             
-            // Hitung Bobot Absensi (Total Penalti)
+            // 2. Hitung Bobot Absensi (Total Penalti)
             $bobotAbsensi = 0;
             
             // Ambil data absensi pegawai ini pada periode yang sama
@@ -59,8 +46,13 @@ class KandidatService
                 $bobotAbsensi += $absen->penalti;
             }
 
-            // Skor Akhir = Nilai Kinerja (0-100) dikurangi penalti absensi
-            $skorAkhir = $rataRataKeseluruhan + $bobotAbsensi;
+            // Jika tidak punya data sama sekali di periode ini, bisa dilewati agar tidak masuk ranking dengan skor 0
+            if (!$ckp && $rekapsAbsen->isEmpty()) {
+                continue;
+            }
+
+            // Skor Akhir = Nilai CKP dikurangi penalti absensi (penalti bernilai negatif)
+            $skorAkhir = $nilaiCkp + $bobotAbsensi;
 
             $scores[] = [
                 'pegawai_id' => $idPegawai,
