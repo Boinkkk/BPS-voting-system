@@ -69,9 +69,6 @@
                 </div>
                 
                 <div class="mt-4 flex gap-2 border-t pt-4">
-                    <button onclick="openModal('periodeModal')" class="bg-[#0D8ABC] hover:bg-sky-800 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors">
-                        + Tambah Periode Baru
-                    </button>
                     <button onclick="openModal('manualModal')" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors">
                         + Input Kinerja Pegawai (Manual)
                     </button>
@@ -148,41 +145,6 @@
         </div>
     </div>
 
-    <!-- Periode Modal -->
-    <div id="periodeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold">Tambah Periode Penilaian</h3>
-                <button onclick="closeModal('periodeModal')" class="text-gray-500 hover:text-gray-700">&times;</button>
-            </div>
-            <form action="{{ route('admin.kinerja.periode') }}" method="POST">
-                @csrf
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama Periode</label>
-                    <input type="text" name="nama" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Contoh: Triwulan I 2024">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                    <input type="date" name="tanggal_mulai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
-                    <input type="date" name="tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Status Awal</label>
-                    <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                        <option value="penginputan">Penginputan Data</option>
-                        <option value="voting">Masa Voting</option>
-                        <option value="selesai">Selesai</option>
-                    </select>
-                </div>
-                <div class="flex justify-end mt-6">
-                    <button type="submit" class="bg-sky-600 text-white px-4 py-2 rounded shadow hover:bg-sky-700">Simpan Periode</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Manual Kinerja Modal -->
     <div id="manualModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">

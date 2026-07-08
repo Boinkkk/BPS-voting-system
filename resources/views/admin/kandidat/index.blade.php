@@ -56,6 +56,7 @@
                         </select>
                     </form>
 
+                    @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Admin')
                     <form action="{{ route('admin.kandidat.generate') }}" method="POST">
                         @csrf
                         <input type="hidden" name="periode_id" value="{{ $periode_id }}">
@@ -63,6 +64,7 @@
                             Kalkulasi 10 Kandidat
                         </button>
                     </form>
+                    @endif
                 </div>
             </div>
 

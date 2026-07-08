@@ -9,7 +9,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard');
+        $pemenangTerakhir = \App\Models\HasilAkhir::with(['kandidat.pegawai', 'periode'])
+            ->where('is_terpilih', true)
+            ->whereHas('periode', function ($q) {
+                $q->where('status', 'selesai');
+            })
+            ->orderBy('waktu_penetapan', 'desc')
+            ->first();
+
+        return view('dashboard', compact('pemenangTerakhir'));
     }
 
     public function profile()

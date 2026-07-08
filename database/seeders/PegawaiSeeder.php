@@ -24,8 +24,9 @@ class PegawaiSeeder extends Seeder
 
         // Ensure Roles exist
         $roleAdmin = Role::firstOrCreate(['tipe' => 'Admin']);
-        $roleKepala = Role::firstOrCreate(['tipe' => 'Kepala']);
+        $roleKepalaKantor = Role::firstOrCreate(['tipe' => 'Kepala Kantor']);
         $rolePegawai = Role::firstOrCreate(['tipe' => 'Pegawai']);
+        $roleKepalaUmum = Role::firstOrCreate(['tipe' => 'Kepala Umum']);
 
         // 1. Create Special Testing Accounts
         Pegawai::updateOrCreate(
@@ -45,7 +46,7 @@ class PegawaiSeeder extends Seeder
         Pegawai::updateOrCreate(
             ['email' => 'kepala@bps.go.id'],
             [
-                'role_id' => $roleKepala->id,
+                'role_id' => $roleKepalaKantor->id,
                 'departemen_id' => $deptUmum->id,
                 'jabatan' => 'Kepala BPS',
                 'nama' => 'Akun Kepala',

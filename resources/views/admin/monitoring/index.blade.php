@@ -43,6 +43,7 @@
                     <select name="status" class="border-gray-300 rounded-md shadow-sm text-sm">
                         <option value="penginputan" {{ $periodes->firstWhere('id', $periode_id)->status == 'penginputan' ? 'selected' : '' }}>Penginputan</option>
                         <option value="voting" {{ $periodes->firstWhere('id', $periode_id)->status == 'voting' ? 'selected' : '' }}>Voting</option>
+                        <option value="review_kepala" {{ $periodes->firstWhere('id', $periode_id)->status == 'review_kepala' ? 'selected' : '' }}>Review Kepala Bagian</option>
                         <option value="selesai" {{ $periodes->firstWhere('id', $periode_id)->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
                     </select>
                     <button type="submit" class="bg-gray-800 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-gray-700 transition-colors text-sm">

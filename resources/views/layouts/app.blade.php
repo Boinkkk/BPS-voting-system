@@ -22,42 +22,96 @@
                 Dashboard
             </a>
 
+            <a href="{{ route('admin.kandidat.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kandidat.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <span class="mr-3 text-lg {{ request()->routeIs('admin.kandidat.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">🏆</span>
+                Kandidat Terbaik
+            </a>
+
             @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Admin')
-            <div class="px-3 mb-2">
+            <div class="px-3 mb-2 mt-4">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Administrator</p>
-                <a href="{{ route('admin.kandidat.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kandidat.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <span class="mr-3 text-lg {{ request()->routeIs('admin.kandidat.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">🏆</span>
-                    Kandidat Terbaik
+                <a href="{{ route('admin.pegawai.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pegawai.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('admin.pegawai.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">👥</span>
+                    Data Pegawai
                 </a>
+            </div>
+            @endif
+
+            @php
+                $isAdmin = Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Admin';
+                $isKepalaUmum = Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Kepala_Umum';
+                $isTimPenilai = false;
+                if (Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Pegawai') {
+                    $isTimPenilai = \App\Models\TimPenilai::where('pegawai_id', Auth::user()->id)
+                        ->whereHas('periode', function ($q) {
+                            $q->where('status', '!=', 'selesai');
+                        })->exists();
+                }
+            @endphp
+            
+            @if($isAdmin)
+            <div class="px-3 mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Master Data</p>
+                <a href="{{ route('admin.periode.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.periode.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('admin.periode.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">⏳</span>
+                    Manajemen Periode
+                </a>
+            </div>
+            @endif
+            
+            @if($isAdmin || $isTimPenilai || $isKepalaUmum)
+            <div class="px-3 mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">
+                    {{ $isAdmin ? 'Admin Menu' : ($isKepalaUmum ? 'Kepala Umum Menu' : 'Tim Penilai Menu') }}
+                </p>
                 <a href="{{ route('admin.kinerja.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kinerja.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <span class="mr-3 text-lg {{ request()->routeIs('admin.kinerja.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">📊</span>
                     Penilaian Kinerja
                 </a>
                 <a href="{{ route('admin.absensi.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.absensi.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <span class="mr-3 text-lg {{ request()->routeIs('admin.absensi.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">🕒</span>
+                    <span class="mr-3 text-lg {{ request()->routeIs('admin.absensi.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">📅</span>
                     Absensi Pegawai
                 </a>
+                @if($isAdmin || $isTimPenilai)
                 <a href="{{ route('admin.survey.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.survey.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <span class="mr-3 text-lg {{ request()->routeIs('admin.survey.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">📝</span>
                     Manajemen Survey
-                </a>
-                <a href="{{ route('admin.pegawai.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pegawai.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <span class="mr-3 text-lg {{ request()->routeIs('admin.pegawai.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">👥</span>
-                    Data Pegawai
                 </a>
                 <a href="{{ route('admin.monitoring.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.monitoring.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <span class="mr-3 text-lg {{ request()->routeIs('admin.monitoring.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">📈</span>
                     Monitoring Survei
                 </a>
+                @endif
             </div>
             @endif
-            
+
             @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Pegawai')
-            <div class="px-3 mb-2">
+            <div class="px-3 mb-2 mt-4">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Menu Pegawai</p>
                 <a href="{{ route('pegawai.survey.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <span class="mr-3 text-lg {{ request()->routeIs('pegawai.survey.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">🗳️</span>
                     Voting Kandidat Terbaik
+                </a>
+            </div>
+            @endif
+
+            @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Kepala')
+            <div class="px-3 mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Kepala Bagian</p>
+                
+                <a href="{{ route('kepala.tim_penilai.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('kepala.tim_penilai.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('kepala.tim_penilai.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">👥</span>
+                    Tim Penilai & Surat Tugas
+                </a>
+                <a href="{{ route('kepala.review.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('kepala.review.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('kepala.review.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">👑</span>
+                    Review Nominasi
+                </a>
+                
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2 px-3">Menu Pegawai</p>
+                <a href="{{ route('pegawai.survey.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('pegawai.survey.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">🗳️</span>
+                    Voting Kandidat Terbaik (Read-Only)
                 </a>
             </div>
             @endif

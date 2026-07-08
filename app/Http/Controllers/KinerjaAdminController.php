@@ -115,22 +115,4 @@ class KinerjaAdminController extends Controller
         }
     }
 
-    public function storePeriode(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:150',
-            'tanggal_mulai' => 'required|date',
-            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'status' => 'required|in:penginputan,voting,selesai',
-        ]);
-
-        PeriodePenilaian::create([
-            'nama' => $request->nama,
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_selesai' => $request->tanggal_selesai,
-            'status' => $request->status,
-        ]);
-
-        return redirect()->back()->with('success', 'Periode Penilaian baru berhasil ditambahkan.');
-    }
 }

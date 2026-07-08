@@ -18,9 +18,13 @@ class KandidatService
         $periode = PeriodePenilaian::find($periodeId);
         if (!$periode) return;
 
-        // Ambil semua data kinerja pada periode tersebut
+        // Ambil semua data kinerja pada periode tersebut (hanya untuk role Pegawai)
         // Di-group per pegawai
-        $kinerjas = KinerjaPegawai::where('periode_id', $periodeId)->get()->groupBy('id_pegawai');
+        $kinerjas = KinerjaPegawai::where('periode_id', $periodeId)
+            ->whereHas('pegawai.role', function($q) {
+                $q->where('tipe', 'Pegawai');
+            })
+            ->get()->groupBy('id_pegawai');
 
         $scores = [];
 

@@ -13,7 +13,7 @@ class PegawaiAdminController extends Controller
 {
     public function index()
     {
-        $pegawai = Pegawai::with(['departemen', 'role'])->orderBy('nama')->get();
+        $pegawai = Pegawai::with(['departemen', 'role'])->orderBy('nama')->paginate(10);
         $departemens = Departemen::all();
         $roles = Role::all();
         return view('admin.pegawai.index', compact('pegawai', 'departemens', 'roles'));

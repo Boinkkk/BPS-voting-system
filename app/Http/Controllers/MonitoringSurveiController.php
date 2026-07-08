@@ -44,13 +44,14 @@ class MonitoringSurveiController extends Controller
 
             $totalKandidat = $kandidats->count();
 
-            // 2. Daftar Absen / Progress per Pegawai
-            $semuaPegawai = Pegawai::orderBy('nama')->get();
+            // 2. Daftar Absen / Progress per Pegawai (Hanya role Pegawai)
+            $semuaPegawai = Pegawai::whereHas('role', function ($query) {
+                $query->where('tipe', 'Pegawai');
+            })->orderBy('nama')->get();
             
             $progressPegawai = $semuaPegawai->map(function($pegawai) use ($periode_id, $kandidats, $totalKandidat) {
                 // Berapa kandidat yang sudah disurvei oleh user ini?
                 // Ingat: userId = pegawai_id. Karena 1 user = 1 pegawai.
-                $user = $pegawai->user;
                 $jumlahSudahSurvei = 0;
                 $targetSurvei = $totalKandidat;
 
@@ -60,11 +61,9 @@ class MonitoringSurveiController extends Controller
                     $targetSurvei = max(0, $totalKandidat - 1);
                 }
 
-                if ($user) {
-                    $jumlahSudahSurvei = SurveyProgress::where('periode_id', $periode_id)
-                        ->where('user_id', $user->id)
-                        ->count();
-                }
+                $jumlahSudahSurvei = SurveyProgress::where('periode_id', $periode_id)
+                    ->where('user_id', $pegawai->id)
+                    ->count();
 
                 $status = 'Belum';
                 if ($targetSurvei > 0) {
@@ -89,6 +88,10 @@ class MonitoringSurveiController extends Controller
             $pegawaiSelesai = $progressPegawai->where('status', 'Selesai')->count();
         }
 
+        $totalPegawai = Pegawai::whereHas('role', function ($query) {
+            $query->where('tipe', 'Pegawai');
+        })->count();
+
         $persentase = $totalPegawai > 0 ? round(($pegawaiSelesai / $totalPegawai) * 100, 1) : 0;
 
         return view('admin.monitoring.index', compact(
@@ -105,13 +108,42 @@ class MonitoringSurveiController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:penginputan,voting,selesai',
+            'status' => 'required|in:penginputan,voting,review_kepala,selesai',
         ]);
 
         $periode = PeriodePenilaian::findOrFail($id);
+        
+        // Jika status diubah ke review_kepala, generate top 3 kandidat
+        if ($request->status === 'review_kepala' && $periode->status !== 'review_kepala') {
+            // Hitung live score
+            $kandidats = Kandidat::where('periode_id', $id)->get()->map(function ($kandidat) use ($id) {
+                $rataRata = JawabanSurvei::where('periode_id', $id)
+                    ->where('kandidat_id', $kandidat->id)
+                    ->avg('nilai');
+                $kandidat->live_skor = $rataRata ? round($rataRata, 2) : 0;
+                return $kandidat;
+            })->sortByDesc('live_skor')->values();
+
+            // Hapus data lama jika ada
+            \App\Models\HasilAkhir::where('periode_id', $id)->delete();
+
+            // Ambil Top 3
+            $top3 = $kandidats->take(3);
+            $rank = 1;
+            foreach ($top3 as $k) {
+                \App\Models\HasilAkhir::create([
+                    'periode_id' => $id,
+                    'kandidat_id' => $k->id,
+                    'ranking_final' => $rank,
+                    'is_terpilih' => false
+                ]);
+                $rank++;
+            }
+        }
+
         $periode->status = $request->status;
         $periode->save();
 
-        return redirect()->back()->with('success', 'Status periode berhasil diubah menjadi ' . ucfirst($request->status));
+        return redirect()->back()->with('success', 'Status periode berhasil diubah menjadi ' . ucfirst(str_replace('_', ' ', $request->status)));
     }
 }

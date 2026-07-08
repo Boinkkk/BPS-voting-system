@@ -62,7 +62,8 @@
                                     @for($i = 1; $i <= 5; $i++)
                                         <td class="p-4 text-center align-middle">
                                             <input type="radio" name="jawaban[{{ $p->id }}]" value="{{ $i }}" required 
-                                                class="w-5 h-5 text-[#0091d5] focus:ring-sky-500 border-gray-300">
+                                                class="w-5 h-5 text-[#0091d5] focus:ring-sky-500 border-gray-300"
+                                                {{ Auth::user()->role->tipe !== 'Pegawai' ? 'disabled' : '' }}>
                                         </td>
                                     @endfor
                                 </tr>
@@ -76,9 +77,15 @@
                 <a href="{{ route('pegawai.survey.index') }}" class="px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 shadow-sm">
                     Batal
                 </a>
+                @if(Auth::user()->role->tipe === 'Pegawai')
                 <button type="submit" class="px-6 py-3 bg-[#0091d5] text-white font-medium rounded-md hover:bg-blue-600 shadow-sm">
                     Simpan Penilaian
                 </button>
+                @else
+                <button type="button" disabled class="px-6 py-3 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed shadow-sm">
+                    Mode Read-Only
+                </button>
+                @endif
             </div>
             
         </form>

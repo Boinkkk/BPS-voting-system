@@ -33,6 +33,16 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="mb-4 rounded-md bg-red-50 p-4 border border-red-200">
+                <div class="flex">
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if(isset($error))
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-6 text-center text-gray-500">
                 {{ $error }}
@@ -69,7 +79,11 @@
                                 </div>
                                 
                                 <div class="mt-4">
-                                    @if($isDone)
+                                    @if(Auth::user()->role->tipe !== 'Pegawai')
+                                        <a href="{{ route('pegawai.survey.show', $k->id) }}" class="block w-full text-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600">
+                                            Preview Survey (Read-Only)
+                                        </a>
+                                    @elseif($isDone)
                                         <button disabled class="w-full px-4 py-2 bg-gray-300 text-gray-600 text-sm font-medium rounded-md cursor-not-allowed">
                                             Sudah Disurvey
                                         </button>

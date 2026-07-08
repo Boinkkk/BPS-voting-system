@@ -38,6 +38,7 @@
                             <th class="p-3 font-semibold text-sm">Jabatan</th>
                             <th class="p-3 font-semibold text-sm">Departemen</th>
                             <th class="p-3 font-semibold text-sm">Role</th>
+                            <th class="p-3 font-semibold text-sm">Status</th>
                             <th class="p-3 font-semibold text-sm">Aksi</th>
                         </tr>
                     </thead>
@@ -52,6 +53,9 @@
                                 <td class="p-3 text-sm">
                                     <span class="px-2 py-1 bg-gray-200 text-gray-800 rounded-full text-xs">{{ $p->role->tipe ?? '-' }}</span>
                                 </td>
+                                <td class="p-3 text-sm">
+                                    <span class="px-2 py-1 {{ $p->status_pegawai == 'aktif' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }} rounded-full text-xs">{{ ucfirst($p->status_pegawai) }}</span>
+                                </td>
                                 <td class="p-3 text-sm space-x-2">
                                     <button onclick="openEditModal({{ json_encode($p) }})" class="text-sky-600 hover:text-sky-800 font-medium">Edit</button>
                                     <button onclick="openPasswordModal('{{ $p->id }}', '{{ $p->nama }}')" class="text-orange-600 hover:text-orange-800 font-medium">Password</button>
@@ -60,6 +64,9 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+            <div class="mt-4">
+                {{ $pegawai->links() }}
             </div>
         </div>
     </div>

@@ -14,45 +14,83 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
-    Route::middleware('admin')->group(function () {
-        // Admin Kinerja Management
-        Route::get('/admin/kinerja', [\App\Http\Controllers\KinerjaAdminController::class, 'index'])->name('admin.kinerja.index');
-        Route::post('/admin/kinerja/upload', [\App\Http\Controllers\KinerjaAdminController::class, 'upload'])->name('admin.kinerja.upload');
-        Route::post('/admin/kinerja/manual', [\App\Http\Controllers\KinerjaAdminController::class, 'storeManual'])->name('admin.kinerja.manual');
-        Route::post('/admin/kinerja/periode', [\App\Http\Controllers\KinerjaAdminController::class, 'storePeriode'])->name('admin.kinerja.periode');
 
-        // Admin Survey (Master Data) Management
+    // ==========================
+    // ADMIN
+    // ==========================
+    Route::middleware('admin')->group(function () {
+
+        // Survey
         Route::get('/admin/survey', [\App\Http\Controllers\SurveyAdminController::class, 'index'])->name('admin.survey.index');
         Route::post('/admin/survey', [\App\Http\Controllers\SurveyAdminController::class, 'store'])->name('admin.survey.store');
         Route::put('/admin/survey/{id}', [\App\Http\Controllers\SurveyAdminController::class, 'update'])->name('admin.survey.update');
         Route::delete('/admin/survey/{id}', [\App\Http\Controllers\SurveyAdminController::class, 'destroy'])->name('admin.survey.destroy');
 
-        // Admin Pegawai Management
+        // Pegawai
         Route::get('/admin/pegawai', [\App\Http\Controllers\PegawaiAdminController::class, 'index'])->name('admin.pegawai.index');
         Route::post('/admin/pegawai', [\App\Http\Controllers\PegawaiAdminController::class, 'store'])->name('admin.pegawai.store');
         Route::put('/admin/pegawai/{id}', [\App\Http\Controllers\PegawaiAdminController::class, 'update'])->name('admin.pegawai.update');
         Route::put('/admin/pegawai/{id}/password', [\App\Http\Controllers\PegawaiAdminController::class, 'updatePassword'])->name('admin.pegawai.password');
 
-        // Admin Absensi Management
+        // Monitoring
+        Route::get('/admin/monitoring', [\App\Http\Controllers\MonitoringSurveiController::class, 'index'])->name('admin.monitoring.index');
+        Route::put('/admin/monitoring/{id}/status', [\App\Http\Controllers\MonitoringSurveiController::class, 'updateStatus'])->name('admin.monitoring.update_status');
+
+        // Periode
+        Route::get('/admin/periode', [\App\Http\Controllers\PeriodeController::class, 'index'])->name('admin.periode.index');
+        Route::post('/admin/periode', [\App\Http\Controllers\PeriodeController::class, 'store'])->name('admin.periode.store');
+        Route::put('/admin/periode/{id}', [\App\Http\Controllers\PeriodeController::class, 'update'])->name('admin.periode.update');
+        Route::delete('/admin/periode/{id}', [\App\Http\Controllers\PeriodeController::class, 'destroy'])->name('admin.periode.destroy');
+    });
+
+    // ==========================
+    // ADMIN / KEPALA UMUM
+    // ==========================
+    Route::middleware('admin_or_kepala_umum')->group(function () {
+
+        // Kinerja
+        Route::get('/admin/kinerja', [\App\Http\Controllers\KinerjaAdminController::class, 'index'])->name('admin.kinerja.index');
+        Route::post('/admin/kinerja/upload', [\App\Http\Controllers\KinerjaAdminController::class, 'upload'])->name('admin.kinerja.upload');
+        Route::post('/admin/kinerja/manual', [\App\Http\Controllers\KinerjaAdminController::class, 'storeManual'])->name('admin.kinerja.manual');
+
+        // Absensi
         Route::get('/admin/absensi', [\App\Http\Controllers\AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
         Route::get('/admin/absensi/template', [\App\Http\Controllers\AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
         Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload');
         Route::post('/admin/absensi/bobot', [\App\Http\Controllers\AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
-
-        // Admin Kandidat Management
-        Route::get('/admin/kandidat', [\App\Http\Controllers\KandidatAdminController::class, 'index'])->name('admin.kandidat.index');
-        Route::post('/admin/kandidat/generate', [\App\Http\Controllers\KandidatAdminController::class, 'generate'])->name('admin.kandidat.generate');
-
-        // Admin Monitoring Survei
-        Route::get('/admin/monitoring', [\App\Http\Controllers\MonitoringSurveiController::class, 'index'])->name('admin.monitoring.index');
-        Route::put('/admin/monitoring/{id}/status', [\App\Http\Controllers\MonitoringSurveiController::class, 'updateStatus'])->name('admin.monitoring.update_status');
     });
 
-    // Pegawai Survey Voting
+    // ==========================
+    // KANDIDAT (SEMUA ROLE LOGIN)
+    // ==========================
+    Route::get('/admin/kandidat', [\App\Http\Controllers\KandidatAdminController::class, 'index'])->name('admin.kandidat.index');
+
+    Route::middleware('admin')->group(function () {
+        Route::post('/admin/kandidat/generate', [\App\Http\Controllers\KandidatAdminController::class, 'generate'])->name('admin.kandidat.generate');
+    });
+
+    // ==========================
+    // KEPALA BAGIAN
+    // ==========================
+    Route::middleware([\App\Http\Middleware\CheckRoleKepala::class])->group(function () {
+
+        Route::get('/kepala/review', [\App\Http\Controllers\KepalaController::class, 'index'])->name('kepala.review.index');
+        Route::post('/kepala/review/{id}/pilih', [\App\Http\Controllers\KepalaController::class, 'pilihPemenang'])->name('kepala.review.pilih');
+
+        Route::get('/kepala/tim-penilai', [\App\Http\Controllers\TimPenilaiController::class, 'index'])->name('kepala.tim_penilai.index');
+        Route::post('/kepala/tim-penilai', [\App\Http\Controllers\TimPenilaiController::class, 'store'])->name('kepala.tim_penilai.store');
+        Route::get('/kepala/tim-penilai/{periode_id}/cetak', [\App\Http\Controllers\TimPenilaiController::class, 'cetak'])->name('kepala.tim_penilai.cetak');
+    });
+
+    // ==========================
+    // SURVEY PEGAWAI
+    // ==========================
     Route::get('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'index'])->name('pegawai.survey.index');
     Route::get('/survey/{kandidat_id}', [\App\Http\Controllers\SurveyPegawaiController::class, 'show'])->name('pegawai.survey.show');
     Route::post('/survey/{kandidat_id}', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store');
-});
+
+}); // <-- auth
