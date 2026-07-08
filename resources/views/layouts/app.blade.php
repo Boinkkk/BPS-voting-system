@@ -39,7 +39,7 @@
 
             @php
                 $isAdmin = Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Admin';
-                $isKepalaUmum = Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Kepala_Umum';
+                $isKepalaUmum = Auth::user() && Auth::user()->role && (Auth::user()->role->tipe == 'Kepala Umum' || Auth::user()->role->tipe == 'Kepala_Umum');
                 $isTimPenilai = false;
                 if (Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Pegawai') {
                     $isTimPenilai = \App\Models\TimPenilai::where('pegawai_id', Auth::user()->id)
@@ -72,6 +72,10 @@
                     <span class="mr-3 text-lg {{ request()->routeIs('admin.absensi.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">📅</span>
                     Absensi Pegawai
                 </a>
+                <a href="{{ route('admin.ckp.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.ckp.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('admin.ckp.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">🎯</span>
+                    Nilai CKP
+                </a>
                 @if($isAdmin || $isTimPenilai)
                 <a href="{{ route('admin.survey.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.survey.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <span class="mr-3 text-lg {{ request()->routeIs('admin.survey.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">📝</span>
@@ -95,7 +99,7 @@
             </div>
             @endif
 
-            @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Kepala')
+            @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Kepala Kantor')
             <div class="px-3 mb-2">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Kepala Bagian</p>
                 

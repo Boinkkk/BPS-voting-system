@@ -78,7 +78,7 @@ class TimPenilaiController extends Controller
 
         // Cari data kepala (yang menetapkan)
         $kepala = Pegawai::whereHas('role', function($q) {
-            $q->where('tipe', 'Kepala');
+            $q->where('tipe', 'Kepala Kantor');
         })->first();
 
         return view('kepala.tim_penilai.cetak', compact('periode', 'penanggungJawab', 'ketua', 'anggota', 'kepala'));

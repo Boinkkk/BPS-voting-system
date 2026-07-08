@@ -56,9 +56,9 @@
                     @csrf
                     <div class="w-full md:w-1/3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Periode Penilaian</label>
-                        <select name="periode_id" required class="w-full text-sm border-gray-300 rounded-md">
+                        <select name="periode_id" id="upload_periode" required class="w-full text-sm border-gray-300 rounded-md">
                             @foreach ($periodes as $p)
-                                <option value="{{ $p->id }}" {{ $periode_id == $p->id ? 'selected' : '' }}>
+                                <option value="{{ $p->id }}" data-triwulan="{{ $p->triwulan }}" {{ $periode_id == $p->id ? 'selected' : '' }}>
                                     {{ $p->nama }}
                                 </option>
                             @endforeach
@@ -66,9 +66,12 @@
                     </div>
                     <div class="w-full md:w-1/4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Bulan (1-12)</label>
-                        <select name="bulan" required class="w-full text-sm border-gray-300 rounded-md">
+                        <select name="bulan" id="upload_bulan" required class="w-full text-sm border-gray-300 rounded-md">
+                            @php
+                                $namaB = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
+                            @endphp
                             @for($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>Bulan {{ $i }}</option>
+                                <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>{{ $namaB[$i] }}</option>
                             @endfor
                         </select>
                     </div>
@@ -134,14 +137,17 @@
                         <h3 class="text-lg font-medium text-gray-900">Data Absensi Tersimpan</h3>
                         
                         <form action="{{ route('admin.absensi.index') }}" method="GET" class="flex space-x-2">
-                            <select name="periode_id" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
+                            <select name="periode_id" id="filter_periode" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
                                 @foreach ($periodes as $p)
-                                    <option value="{{ $p->id }}" {{ $periode_id == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
+                                    <option value="{{ $p->id }}" data-triwulan="{{ $p->triwulan }}" {{ $periode_id == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                                 @endforeach
                             </select>
-                            <select name="bulan" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
+                            <select name="bulan" id="filter_bulan" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
+                                @php
+                                    $namaB = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
+                                @endphp
                                 @for($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>Bulan {{ $i }}</option>
+                                    <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>{{ $namaB[$i] }}</option>
                                 @endfor
                             </select>
                         </form>
@@ -190,3 +196,55 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const bulanNames = {
+            1: 'Januari', 2: 'Februari', 3: 'Maret',
+            4: 'April', 5: 'Mei', 6: 'Juni',
+            7: 'Juli', 8: 'Agustus', 9: 'September',
+            10: 'Oktober', 11: 'November', 12: 'Desember'
+        };
+
+        function updateBulanOptions(periodeSelectId, bulanSelectId) {
+            const periodeSelect = document.getElementById(periodeSelectId);
+            const bulanSelect = document.getElementById(bulanSelectId);
+            if(!periodeSelect || !bulanSelect) return;
+
+            const selectedOption = periodeSelect.options[periodeSelect.selectedIndex];
+            const triwulan = selectedOption.getAttribute('data-triwulan');
+            
+            let allowedMonths = [1,2,3,4,5,6,7,8,9,10,11,12];
+            if (triwulan == '1') allowedMonths = [1, 2, 3];
+            if (triwulan == '2') allowedMonths = [4, 5, 6];
+            if (triwulan == '3') allowedMonths = [7, 8, 9];
+            if (triwulan == '4') allowedMonths = [10, 11, 12];
+
+            const currentVal = bulanSelect.value;
+            bulanSelect.innerHTML = '';
+            
+            allowedMonths.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = bulanNames[m];
+                if (m == currentVal) opt.selected = true;
+                bulanSelect.appendChild(opt);
+            });
+        }
+
+        const uploadPeriode = document.getElementById('upload_periode');
+        if (uploadPeriode) {
+            uploadPeriode.addEventListener('change', () => updateBulanOptions('upload_periode', 'upload_bulan'));
+            updateBulanOptions('upload_periode', 'upload_bulan');
+        }
+
+        const filterPeriode = document.getElementById('filter_periode');
+        if (filterPeriode) {
+            // Kita tidak menambah listener change pada filter_periode 
+            // karena ada onchange="this.form.submit()" bawaan form yang akan me-reload halaman
+            updateBulanOptions('filter_periode', 'filter_bulan');
+        }
+    });
+</script>
+@endpush

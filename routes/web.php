@@ -62,6 +62,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/absensi/template', [\App\Http\Controllers\AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
         Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload');
         Route::post('/admin/absensi/bobot', [\App\Http\Controllers\AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
+
+        // Nilai CKP
+        Route::get('/admin/ckp', [\App\Http\Controllers\CkpController::class, 'index'])->name('admin.ckp.index');
+        Route::post('/admin/ckp/upload', [\App\Http\Controllers\CkpController::class, 'upload'])->name('admin.ckp.upload');
+        Route::post('/admin/ckp/manual', [\App\Http\Controllers\CkpController::class, 'manual'])->name('admin.ckp.manual');
     });
 
     // ==========================

@@ -157,10 +157,10 @@
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Target Periode</label>
-                    <select name="periode_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                        <option value="sekarang">Periode Sekarang (Sesuai Tanggal Aktif)</option>
+                    <select name="periode_id" id="manual_periode" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        <option value="sekarang" data-triwulan="">Periode Sekarang (Sesuai Tanggal Aktif)</option>
                         @foreach ($periodes as $p)
-                            <option value="{{ $p->id }}" {{ $periode_id == $p->id ? 'selected' : '' }}>
+                            <option value="{{ $p->id }}" data-triwulan="{{ $p->triwulan }}" {{ $periode_id == $p->id ? 'selected' : '' }}>
                                 {{ $p->nama }}
                             </option>
                         @endforeach
@@ -181,7 +181,7 @@
                 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Pilih Bulan</label>
-                    <select name="bulan" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <select name="bulan" id="manual_bulan" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                         @foreach([1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'] as $num => $name)
                             <option value="{{ $num }}">{{ $name }}</option>
                         @endforeach
@@ -220,5 +220,46 @@
         function closeModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const bulanNames = {
+                1: 'Januari', 2: 'Februari', 3: 'Maret',
+                4: 'April', 5: 'Mei', 6: 'Juni',
+                7: 'Juli', 8: 'Agustus', 9: 'September',
+                10: 'Oktober', 11: 'November', 12: 'Desember'
+            };
+
+            function updateBulanOptions(periodeSelectId, bulanSelectId) {
+                const periodeSelect = document.getElementById(periodeSelectId);
+                const bulanSelect = document.getElementById(bulanSelectId);
+                if(!periodeSelect || !bulanSelect) return;
+
+                const selectedOption = periodeSelect.options[periodeSelect.selectedIndex];
+                const triwulan = selectedOption.getAttribute('data-triwulan');
+                
+                let allowedMonths = [1,2,3,4,5,6,7,8,9,10,11,12];
+                if (triwulan == '1') allowedMonths = [1, 2, 3];
+                if (triwulan == '2') allowedMonths = [4, 5, 6];
+                if (triwulan == '3') allowedMonths = [7, 8, 9];
+                if (triwulan == '4') allowedMonths = [10, 11, 12];
+
+                const currentVal = bulanSelect.value;
+                bulanSelect.innerHTML = '';
+                
+                allowedMonths.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = bulanNames[m];
+                    if (m == currentVal) opt.selected = true;
+                    bulanSelect.appendChild(opt);
+                });
+            }
+
+            const manualPeriode = document.getElementById('manual_periode');
+            if (manualPeriode) {
+                manualPeriode.addEventListener('change', () => updateBulanOptions('manual_periode', 'manual_bulan'));
+                updateBulanOptions('manual_periode', 'manual_bulan');
+            }
+        });
     </script>
 @endsection

@@ -13,7 +13,7 @@ class CheckRoleAdminOrKepalaUmum
     {
         if (Auth::check() && Auth::user()->role) {
             $tipe = Auth::user()->role->tipe;
-            if ($tipe === 'Admin' || $tipe === 'Kepala_Umum') {
+            if ($tipe === 'Admin' || $tipe === 'Kepala Umum' || $tipe === 'Kepala_Umum') {
                 return $next($request);
             }
 

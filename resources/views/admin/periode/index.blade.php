@@ -57,7 +57,7 @@
                                                 </span>
                                             </td>
                                             <td class="p-3 text-sm">
-                                                <button onclick="openEditModal({{ $p->id }}, '{{ $p->nama }}', '{{ $p->tanggal_mulai }}', '{{ $p->tanggal_selesai }}', '{{ $p->status }}')" class="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
+                                                <button onclick="openEditModal({{ $p->id }}, '{{ $p->triwulan }}', '{{ $p->tahun }}', '{{ $p->tanggal_mulai }}', '{{ $p->tanggal_selesai }}', '{{ $p->status }}')" class="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
                                                 <form action="{{ route('admin.periode.destroy', $p->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus periode ini?');">
                                                     @csrf
                                                     @method('DELETE')
@@ -89,9 +89,20 @@
             </div>
             <form action="{{ route('admin.periode.store') }}" method="POST">
                 @csrf
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama Periode</label>
-                    <input type="text" name="nama" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Contoh: Triwulan I 2024">
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Triwulan</label>
+                        <select name="triwulan" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm">
+                            <option value="1">Triwulan 1 (Jan - Mar)</option>
+                            <option value="2">Triwulan 2 (Apr - Jun)</option>
+                            <option value="3">Triwulan 3 (Jul - Sep)</option>
+                            <option value="4">Triwulan 4 (Okt - Des)</option>
+                        </select>
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tahun</label>
+                        <input type="number" name="tahun" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ date('Y') }}" min="2000">
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
@@ -127,9 +138,20 @@
             <form id="editPeriodeForm" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama Periode</label>
-                    <input type="text" name="nama" id="edit_nama" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Triwulan</label>
+                        <select name="triwulan" id="edit_triwulan" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm">
+                            <option value="1">Triwulan 1 (Jan - Mar)</option>
+                            <option value="2">Triwulan 2 (Apr - Jun)</option>
+                            <option value="3">Triwulan 3 (Jul - Sep)</option>
+                            <option value="4">Triwulan 4 (Okt - Des)</option>
+                        </select>
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tahun</label>
+                        <input type="number" name="tahun" id="edit_tahun" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" min="2000">
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
@@ -162,8 +184,9 @@
         function closeModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
-        function openEditModal(id, nama, tanggal_mulai, tanggal_selesai, status) {
-            document.getElementById('edit_nama').value = nama;
+        function openEditModal(id, triwulan, tahun, tanggal_mulai, tanggal_selesai, status) {
+            document.getElementById('edit_triwulan').value = triwulan;
+            document.getElementById('edit_tahun').value = tahun;
             document.getElementById('edit_tanggal_mulai').value = tanggal_mulai;
             document.getElementById('edit_tanggal_selesai').value = tanggal_selesai;
             document.getElementById('edit_status').value = status;

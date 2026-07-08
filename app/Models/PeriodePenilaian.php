@@ -12,6 +12,8 @@ class PeriodePenilaian extends Model
     protected $table = 'periode_penilaian';
 
     protected $fillable = [
+        'triwulan',
+        'tahun',
         'nama',
         'tanggal_mulai',
         'tanggal_selesai',
