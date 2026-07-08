@@ -13,6 +13,7 @@ class PertanyaanSurvei extends Model
 
     protected $fillable = [
         'nomor_urut',
+        'grup_kategori',
         'kategori',
         'pertanyaan',
         'bobot'

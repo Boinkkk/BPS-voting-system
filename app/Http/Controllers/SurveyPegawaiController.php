@@ -54,7 +54,7 @@ class SurveyPegawaiController extends Controller
         }
 
         $kandidat = Kandidat::with('pegawai')->findOrFail($kandidat_id);
-        $pertanyaans = PertanyaanSurvei::orderBy('nomor_urut')->get();
+        $pertanyaans = PertanyaanSurvei::orderBy('nomor_urut')->get()->groupBy('grup_kategori');
 
         return view('pegawai.survey.form', compact('kandidat', 'pertanyaans', 'periodeAktif'));
     }

@@ -9,6 +9,7 @@ use App\Models\PeriodePenilaian;
 use App\Imports\CkpImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use App\Services\KandidatService;
 
 class CkpController extends Controller
 {
@@ -62,7 +63,13 @@ class CkpController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', 'Nilai CKP berhasil disimpan.');
+        try {
+            KandidatService::generateTop10Kandidat($request->periode_id);
+        } catch (\Exception $e) {
+            // Log error if needed, but don't stop the flow
+        }
+
+        return redirect()->back()->with('success', 'Nilai CKP berhasil disimpan dan ranking kandidat telah diperbarui.');
     }
 
     public function upload(Request $request)
@@ -74,7 +81,14 @@ class CkpController extends Controller
 
         try {
             Excel::import(new CkpImport($request->periode_id), $request->file('file'));
-            return redirect()->back()->with('success', 'Data CKP berhasil diunggah dan disimpan.');
+            
+            try {
+                KandidatService::generateTop10Kandidat($request->periode_id);
+            } catch (\Exception $e) {
+                // Log error if needed
+            }
+
+            return redirect()->back()->with('success', 'Data CKP berhasil diunggah dan ranking kandidat telah diperbarui.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage());
         }
