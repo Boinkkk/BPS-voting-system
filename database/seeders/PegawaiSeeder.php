@@ -58,6 +58,20 @@ class PegawaiSeeder extends Seeder
         );
 
         Pegawai::updateOrCreate(
+            ['email' => 'kepalaumum@bps.go.id'],
+            [
+                'role_id' => $roleKepalaUmum->id,
+                'departemen_id' => $deptUmum->id,
+                'jabatan' => 'Kepala Umum BPS',
+                'nama' => 'Akun Kepala Umum',
+                'nip' => 'kepalaumum001',
+                'password' => $password,
+                'tanggal_masuk' => '2020-01-01',
+                'status_pegawai' => 'aktif',
+            ]
+        );
+
+        Pegawai::updateOrCreate(
             ['email' => 'pegawai@bps.go.id'],
             [
                 'role_id' => $rolePegawai->id,
