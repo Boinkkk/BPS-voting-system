@@ -88,55 +88,22 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Form Pengaturan Bobot -->
-            <div class="lg:col-span-1">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
-                    <div class="p-4 border-b bg-gray-50">
-                        <h3 class="text-lg font-medium text-gray-900">Pengaturan Bobot Penalti</h3>
-                        <p class="text-xs text-gray-500 mt-1">Sesuaikan besaran potongan poin untuk setiap jenis absensi.</p>
-                    </div>
-                    <div class="p-4">
-                        <form action="{{ route('admin.absensi.bobot') }}" method="POST" class="space-y-4">
-                            @csrf
-                            
-                            @php
-                                $groupedBobots = $bobots->groupBy('kategori');
-                            @endphp
-                            
-                            @foreach($groupedBobots as $kategori => $items)
-                                <div>
-                                    <h4 class="font-semibold text-sm text-gray-700 border-b pb-1 mb-2">Penalti {{ $kategori }}</h4>
-                                    @foreach($items as $bobot)
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex-1">
-                                            <label class="block text-xs font-medium text-gray-700" title="{{ $bobot->keterangan }}">{{ $bobot->kode_absen }}</label>
-                                        </div>
-                                        <div class="w-16">
-                                            <input type="number" step="0.01" min="0" name="bobots[{{ $bobot->id }}]" value="{{ $bobot->bobot }}" class="w-full text-xs border-gray-300 rounded py-1 px-2 text-right focus:ring-sky-500 focus:border-sky-500">
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            @endforeach
-                            
-                            <div class="pt-2 border-t">
-                                <button type="submit" class="w-full px-3 py-2 bg-amber-500 text-white text-sm font-medium rounded hover:bg-amber-600 transition-colors">
-                                    Simpan Perubahan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
+        <div class="space-y-6">
             <!-- Data Absensi -->
-            <div class="lg:col-span-3">
+            <div class="w-full">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                    <div class="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
                         <h3 class="text-lg font-medium text-gray-900">Data Absensi Tersimpan</h3>
                         
-                        <form action="{{ route('admin.absensi.index') }}" method="GET" class="flex space-x-2">
+                        <form action="{{ route('admin.absensi.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama / NIP" class="text-sm border-gray-300 rounded-md w-full sm:w-auto" onkeydown="if(event.key === 'Enter'){ this.form.submit(); }">
+                            <button type="submit" class="hidden">Cari</button>
+                            <select name="per_page" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
+                                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 Baris</option>
+                                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 Baris</option>
+                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 Baris</option>
+                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 Baris</option>
+                            </select>
                             <select name="periode_id" id="filter_periode" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md">
                                 @foreach ($periodes as $p)
                                     <option value="{{ $p->id }}" data-triwulan="{{ $p->triwulan }}" {{ $periode_id == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
@@ -189,13 +156,27 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($absensis instanceof \Illuminate\Pagination\LengthAwarePaginator && $absensis->hasPages())
+                        <div class="p-4 border-t">
+                            {{ $absensis->links() }}
+                        </div>
+                    @endif
                 </div>
 
-                @if(isset($rekapTriwulan) && count($rekapTriwulan) > 0)
+                @if(isset($rekapTriwulanPage) && count($rekapTriwulanPage) > 0)
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mt-6">
-                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-gray-900">Rekap Nilai Presensi Akhir (Satu Triwulan)</h3>
-                        <p class="text-sm text-gray-500">Nilai dihitung berdasarkan total TK dan KJK selama triwulan terpilih.</p>
+                    <div class="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Rekap Nilai Presensi Akhir (Satu Triwulan)</h3>
+                            <p class="text-sm text-gray-500">Nilai dihitung berdasarkan total TK dan KJK selama triwulan terpilih.</p>
+                        </div>
+                        <form action="{{ route('admin.absensi.index') }}" method="GET" class="flex space-x-2 items-center">
+                            <input type="hidden" name="periode_id" value="{{ request('periode_id', $periode_id) }}">
+                            <input type="hidden" name="bulan" value="{{ request('bulan', $bulan) }}">
+                            <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama / NIP" class="text-sm border-gray-300 rounded-md" onkeydown="if(event.key === 'Enter'){ this.form.submit(); }">
+                            <button type="submit" class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Cari</button>
+                        </form>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse whitespace-nowrap">
@@ -208,7 +189,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($rekapTriwulan as $rekap)
+                                @foreach($rekapTriwulanPage as $rekap)
                                     <tr class="border-b hover:bg-gray-50">
                                         <td class="p-3 text-sm font-medium">{{ $rekap->pegawai->nama }}</td>
                                         <td class="p-3 text-sm text-center font-bold {{ $rekap->total_tk > 0 ? 'text-red-600' : 'text-green-600' }}">{{ $rekap->total_tk }}</td>
@@ -221,6 +202,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($rekapTriwulanPage instanceof \Illuminate\Pagination\LengthAwarePaginator && $rekapTriwulanPage->hasPages())
+                        <div class="p-4 border-t">
+                            {{ $rekapTriwulanPage->links() }}
+                        </div>
+                    @endif
                 </div>
                 @endif
             </div>

@@ -25,21 +25,40 @@ class AbsensiAdminController extends Controller
             $bulan = date('n');
         }
 
-        $absensis = [];
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+        $absensis = null;
         $rekapTriwulan = collect();
+        $rekapTriwulanPage = null;
         
         if ($periode_id) {
             if ($bulan) {
-                $absensis = AbsensiPegawai::with('pegawai')
+                $query = AbsensiPegawai::with('pegawai')
                             ->where('periode_id', $periode_id)
-                            ->where('bulan', $bulan)
-                            ->get();
+                            ->where('bulan', $bulan);
+                if ($search) {
+                    $query->whereHas('pegawai', function($q) use ($search) {
+                        $q->where('nama', 'like', '%' . $search . '%')
+                          ->orWhere('nip', 'like', '%' . $search . '%');
+                    });
+                }
+                $absensis = $query->paginate($perPage, ['*'], 'absensi_page')
+                            ->appends(request()->query());
+            } else {
+                // If somehow no month is selected, just return empty paginator
+                $absensis = new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, 1, ['path' => $request->url(), 'query' => $request->query(), 'pageName' => 'absensi_page']);
             }
             
             // Rekap Triwulan (Semua bulan dalam periode ini)
-            $allAbsenPeriode = AbsensiPegawai::with('pegawai')
-                            ->where('periode_id', $periode_id)
-                            ->get();
+            $allAbsenQuery = AbsensiPegawai::with('pegawai')
+                            ->where('periode_id', $periode_id);
+            if ($search) {
+                $allAbsenQuery->whereHas('pegawai', function($q) use ($search) {
+                    $q->where('nama', 'like', '%' . $search . '%')
+                      ->orWhere('nip', 'like', '%' . $search . '%');
+                });
+            }
+            $allAbsenPeriode = $allAbsenQuery->get();
                             
             $grouped = $allAbsenPeriode->groupBy('pegawai_id');
             foreach($grouped as $pegawai_id => $dataAbsen) {
@@ -71,11 +90,21 @@ class AbsensiAdminController extends Controller
                     'nilai_presensi' => $nilaiPresensi
                 ]);
             }
+            
+            $rekapPage = \Illuminate\Pagination\Paginator::resolveCurrentPage('rekap_page');
+            $rekapTriwulanPage = new \Illuminate\Pagination\LengthAwarePaginator(
+                $rekapTriwulan->forPage($rekapPage, $perPage),
+                $rekapTriwulan->count(),
+                $perPage,
+                $rekapPage,
+                ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'query' => $request->query(), 'pageName' => 'rekap_page']
+            );
+        } else {
+            $absensis = new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, 1, ['path' => $request->url(), 'query' => $request->query(), 'pageName' => 'absensi_page']);
+            $rekapTriwulanPage = new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, 1, ['path' => $request->url(), 'query' => $request->query(), 'pageName' => 'rekap_page']);
         }
 
-        $bobots = \App\Models\BobotPenalti::orderBy('kategori')->get();
-
-        return view('admin.absensi.index', compact('absensis', 'periodes', 'periode_id', 'bulan', 'bobots', 'rekapTriwulan'));
+        return view('admin.absensi.index', compact('absensis', 'periodes', 'periode_id', 'bulan', 'rekapTriwulanPage', 'perPage'));
     }
 
     public function downloadTemplate()
