@@ -45,6 +45,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/periode', [\App\Http\Controllers\PeriodeController::class, 'store'])->name('admin.periode.store');
         Route::put('/admin/periode/{id}', [\App\Http\Controllers\PeriodeController::class, 'update'])->name('admin.periode.update');
         Route::delete('/admin/periode/{id}', [\App\Http\Controllers\PeriodeController::class, 'destroy'])->name('admin.periode.destroy');
+
+        // Pengaturan Bobot
+        Route::get('/admin/pengaturan-bobot', [\App\Http\Controllers\PengaturanBobotController::class, 'index'])->name('admin.pengaturan-bobot.index');
+        Route::post('/admin/pengaturan-bobot', [\App\Http\Controllers\PengaturanBobotController::class, 'update'])->name('admin.pengaturan-bobot.update');
     });
 
     // ==========================

@@ -35,6 +35,11 @@ class KandidatAdminController extends Controller
             'periode_id' => 'required|exists:periode_penilaian,id'
         ]);
 
+        $periode = PeriodePenilaian::find($request->periode_id);
+        if ($periode->status !== 'penginputan') {
+            return redirect()->back()->with('error', 'Kalkulasi ulang hanya dapat dilakukan pada masa penginputan data.');
+        }
+
         try {
             KandidatService::generateTop10Kandidat($request->periode_id);
             return redirect()->back()->with('success', '10 Kandidat terbaik berhasil dikalkulasi ulang dan disimpan untuk periode ini.');

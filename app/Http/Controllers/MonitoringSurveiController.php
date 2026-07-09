@@ -29,17 +29,61 @@ class MonitoringSurveiController extends Controller
         if ($periode_id) {
             // 1. Live Score (Klasemen)
             // Hitung rata-rata nilai dari jawaban survei per kandidat untuk periode ini
+            $pengaturan = \App\Models\PengaturanBobot::first();
+            $ckpWeight = $pengaturan ? $pengaturan->ckp : 50;
+            $absensiWeight = $pengaturan ? $pengaturan->absensi : 25;
+            $surveyWeight = $pengaturan ? $pengaturan->survey : 25;
+
             $kandidats = Kandidat::with('pegawai')
                 ->where('periode_id', $periode_id)
                 ->get()
-                ->map(function ($kandidat) use ($periode_id) {
+                ->map(function ($kandidat) use ($periode_id, $ckpWeight, $absensiWeight, $surveyWeight) {
+                    // Survey Normalized
                     $rataRata = JawabanSurvei::where('periode_id', $periode_id)
                         ->where('kandidat_id', $kandidat->id)
                         ->avg('nilai');
+                    $surveyNormalized = $rataRata ? ($rataRata / 5) * 100 : 0;
                     $kandidat->live_skor = $rataRata ? round($rataRata, 2) : 0;
+                    $kandidat->survey_normalized = round($surveyNormalized, 2);
+
+                    // CKP
+                    $ckp = \App\Models\NilaiCkp::where('periode_id', $periode_id)
+                            ->where('pegawai_id', $kandidat->pegawai_id)->first();
+                    $nilaiCkp = $ckp ? $ckp->nilai : 0;
+                    
+                    // Absensi
+                    $rekapsAbsen = \App\Models\AbsensiPegawai::where('periode_id', $periode_id)
+                                        ->where('pegawai_id', $kandidat->pegawai_id)
+                                        ->get();
+                    $totalKjk = $rekapsAbsen->sum('kjk');
+                    $totalTk = $rekapsAbsen->sum('tk');
+                    
+                    $nilaiAbsensi = 100;
+                    if ($totalTk >= 1) {
+                        $nilaiAbsensi = 96;
+                    } else {
+                        if ($totalKjk == 0) {
+                            $nilaiAbsensi = 100;
+                        } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                            $nilaiAbsensi = 99;
+                        } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                            $nilaiAbsensi = 98;
+                        } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                            $nilaiAbsensi = 97;
+                        } else {
+                            $nilaiAbsensi = 96;
+                        }
+                    }
+
+                    // Skor Final Gabungan
+                    $finalScore = ($nilaiCkp * ($ckpWeight / 100)) + 
+                                  ($nilaiAbsensi * ($absensiWeight / 100)) + 
+                                  ($surveyNormalized * ($surveyWeight / 100));
+                    
+                    $kandidat->skor_final = round($finalScore, 2);
                     return $kandidat;
                 })
-                ->sortByDesc('live_skor')
+                ->sortByDesc('skor_final')
                 ->values();
 
             $totalKandidat = $kandidats->count();
@@ -115,14 +159,57 @@ class MonitoringSurveiController extends Controller
         
         // Jika status diubah ke review_kepala, generate top 3 kandidat
         if ($request->status === 'review_kepala' && $periode->status !== 'review_kepala') {
-            // Hitung live score
-            $kandidats = Kandidat::where('periode_id', $id)->get()->map(function ($kandidat) use ($id) {
+            $pengaturan = \App\Models\PengaturanBobot::first();
+            $ckpWeight = $pengaturan ? $pengaturan->ckp : 50;
+            $absensiWeight = $pengaturan ? $pengaturan->absensi : 25;
+            $surveyWeight = $pengaturan ? $pengaturan->survey : 25;
+
+            // Hitung skor final gabungan
+            $kandidats = Kandidat::where('periode_id', $id)->get()->map(function ($kandidat) use ($id, $ckpWeight, $absensiWeight, $surveyWeight) {
+                // 1. Survey Normalized
                 $rataRata = JawabanSurvei::where('periode_id', $id)
                     ->where('kandidat_id', $kandidat->id)
                     ->avg('nilai');
+                $surveyNormalized = $rataRata ? ($rataRata / 5) * 100 : 0;
                 $kandidat->live_skor = $rataRata ? round($rataRata, 2) : 0;
+
+                // 2. CKP
+                $ckp = \App\Models\NilaiCkp::where('periode_id', $id)
+                        ->where('pegawai_id', $kandidat->pegawai_id)->first();
+                $nilaiCkp = $ckp ? $ckp->nilai : 0;
+                
+                // 3. Absensi
+                $rekapsAbsen = \App\Models\AbsensiPegawai::where('periode_id', $id)
+                                    ->where('pegawai_id', $kandidat->pegawai_id)
+                                    ->get();
+                $totalKjk = $rekapsAbsen->sum('kjk');
+                $totalTk = $rekapsAbsen->sum('tk');
+                
+                $nilaiAbsensi = 100;
+                if ($totalTk >= 1) {
+                    $nilaiAbsensi = 96;
+                } else {
+                    if ($totalKjk == 0) {
+                        $nilaiAbsensi = 100;
+                    } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                        $nilaiAbsensi = 99;
+                    } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                        $nilaiAbsensi = 98;
+                    } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                        $nilaiAbsensi = 97;
+                    } else {
+                        $nilaiAbsensi = 96;
+                    }
+                }
+                
+                // Skor Final Gabungan
+                $finalScore = ($nilaiCkp * ($ckpWeight / 100)) + 
+                              ($nilaiAbsensi * ($absensiWeight / 100)) + 
+                              ($surveyNormalized * ($surveyWeight / 100));
+                              
+                $kandidat->skor_final_gabungan = $finalScore;
                 return $kandidat;
-            })->sortByDesc('live_skor')->values();
+            })->sortByDesc('skor_final_gabungan')->values();
 
             // Hapus data lama jika ada
             \App\Models\HasilAkhir::where('periode_id', $id)->delete();

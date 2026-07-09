@@ -57,13 +57,23 @@
                     </form>
 
                     @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Admin')
-                    <form action="{{ route('admin.kandidat.generate') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="periode_id" value="{{ $periode_id }}">
-                        <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
-                            Kalkulasi 10 Kandidat
-                        </button>
-                    </form>
+                        @php
+                            $selectedPeriode = $periodes->firstWhere('id', $periode_id);
+                            $isPenginputan = $selectedPeriode && $selectedPeriode->status == 'penginputan';
+                        @endphp
+                        <form action="{{ route('admin.kandidat.generate') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="periode_id" value="{{ $periode_id }}">
+                            @if($isPenginputan)
+                                <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
+                                    Kalkulasi 10 Kandidat
+                                </button>
+                            @else
+                                <button type="button" class="px-4 py-2 bg-gray-400 border border-transparent rounded-md shadow-sm text-sm font-medium text-white cursor-not-allowed" title="Kalkulasi ulang hanya dapat dilakukan pada masa penginputan data.">
+                                    Kalkulasi 10 Kandidat
+                                </button>
+                            @endif
+                        </form>
                     @endif
                 </div>
             </div>

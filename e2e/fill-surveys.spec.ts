@@ -2,83 +2,112 @@ import { test, expect } from '@playwright/test';
 import { execSync } from 'child_process';
 import path from 'path';
 
-// Fetch users from the database using a simple artisan command via execSync
-let users: { email: string }[] = [];
+let users: { email?: string, nip?: string }[] = [];
 
-test.beforeAll(async () => {
-    try {
-        const scriptPath = path.resolve(process.cwd(), 'e2e', 'get_users.php');
-        const output = execSync(`php "${scriptPath}"`).toString();
-        // Look for JSON array in the output
-        const jsonMatch = output.match(/\[.*\]/);
-        if (jsonMatch) {
-            users = JSON.parse(jsonMatch[0]);
-        } else {
-            console.error("Could not find JSON in PHP output:", output);
-        }
-    } catch (e) {
-        console.error("Failed to fetch users:", e);
+// Fetch users synchronously before declaring tests
+try {
+    const scriptPath = path.resolve(process.cwd(), 'e2e', 'get_users.php');
+    const output = execSync(`php "${scriptPath}"`).toString();
+    const jsonMatch = output.match(/\[.*\]/);
+    if (jsonMatch) {
+        users = JSON.parse(jsonMatch[0]);
+    } else {
+        console.error("Could not find JSON in PHP output:", output);
     }
-});
+} catch (e) {
+    console.error("Failed to fetch users:", e);
+}
 
-test('Setiap User mengisi survey secara lengkap dengan penilaian random', async ({ browser }) => {
-    test.setTimeout(1000 * 60 * 60); // Allow 1 hour for all users to complete
+// Aktifkan mode parallel agar worker bisa memproses file ini secara bersamaan
+test.describe.configure({ mode: 'parallel' });
 
+test.describe('Survey Automation untuk Semua User', () => {
+    
     if (users.length === 0) {
-        console.log('No users found to process.');
+        test('Tidak ada user ditemukan', async () => {
+            console.log('Pastikan ada user Pegawai di database.');
+        });
         return;
     }
 
     for (const user of users) {
-        const context = await browser.newContext({
-            baseURL: 'http://localhost:8000'
-        });
-        const page = await context.newPage();
+        const identifier = user.nip || user.email || 'unknown';
+        
+        // Setiap user mendapatkan blok test mandiri yang akan dijalankan oleh worker secara paralel
+        test(`User ${identifier} mengisi survey`, async ({ browser }) => {
+            test.setTimeout(1000 * 60 * 15); // Beri batas waktu 15 menit per user
 
-        // 1. Log in
-        await page.goto('/login');
-        await page.fill('input[name="identifier"]', user.email);
-        await page.fill('input[name="password"]', 'password123'); // Default password from seeder
-        await page.click('button[type="submit"]');
+            const context = await browser.newContext({
+                baseURL: 'http://localhost:8000'
+            });
+            const page = await context.newPage();
 
-        // Check if successfully logged in
-        await expect(page).toHaveURL(/.*dashboard/);
+            // 1. Log in
+            await page.goto('/login');
+            await page.fill('input[name="identifier"]', identifier);
+            await page.fill('input[name="password"]', 'password123'); // Password default
+            await page.click('button[type="submit"]');
 
-        // 2. Go to survey index
-        await page.goto('/survey');
+            // Cek sukses login
+            await expect(page).toHaveURL(/.*dashboard/);
 
-        // 3. Find all candidate survey links that have not been filled
-        const candidateLinks = await page.locator('a:has-text("Mulai Survey")').evaluateAll(elements => 
-            elements.map(el => (el as HTMLAnchorElement).href)
-        );
+            // 2. Ke halaman index survey
+            await page.goto('/survey');
 
-        for (const link of candidateLinks) {
-            // Go to the survey form
-            await page.goto(link);
+            // 3. Looping semua kandidat yang belum diisi (tombol "Mulai Survey")
+            while (true) {
+                // Ambil ulang semua link kandidat karena kita akan bolak-balik halaman
+                const candidateLinks = await page.locator('a:has-text("Mulai Survey")').evaluateAll(elements => 
+                    elements.map(el => (el as HTMLAnchorElement).href)
+                );
 
-            // 4. Fill random ratings for all questions
-            // Find all questions (table rows that contain radio buttons)
-            const rows = await page.locator('tbody tr').all();
-            
-            for (const row of rows) {
-                const radios = await row.locator('input[type="radio"]').all();
-                if (radios.length > 0) {
-                    // Pick a random rating from 1 to 5
-                    const randomIndex = Math.floor(Math.random() * radios.length);
-                    await radios[randomIndex].check();
+                if (candidateLinks.length === 0) {
+                    break; // Tidak ada lagi survey yang harus diisi
                 }
+
+                // Masuk ke kandidat pertama di daftar yang tersisa
+                await page.goto(candidateLinks[0]);
+
+                // 4. Mengisi Survey (Multi-step UI Form)
+                let hasNextStep = true;
+                while (hasNextStep) {
+                    // Cari baris pertanyaan di tahap/step yang sedang TAMPIL saja
+                    const visibleRows = await page.locator('.step-section:visible tbody tr').all();
+                    
+                    for (const row of visibleRows) {
+                        // Cari bintang / label (dari 1 sampai 5)
+                        const labels = await row.locator('label').all();
+                        if (labels.length > 0) {
+                            // Pilih bintang secara acak
+                            const randomIndex = Math.floor(Math.random() * labels.length);
+                            // force: true dibutuhkan karena struktur UI Bintang menyembunyikan input aslinya
+                            await labels[randomIndex].click({ force: true });
+                        }
+                    }
+
+                    // Cek apakah ada tombol "Selanjutnya" di tahap ini
+                    const nextButton = page.locator('.step-section:visible button:has-text("Selanjutnya")');
+                    if (await nextButton.isVisible()) {
+                        await nextButton.click();
+                        // Tunggu sebentar untuk transisi UI
+                        await page.waitForTimeout(400); 
+                    } else {
+                        // Jika tidak ada "Selanjutnya", berarti ini tahap terakhir
+                        hasNextStep = false;
+                        
+                        // Klik tombol Simpan
+                        await page.click('.step-section:visible button[type="submit"]:has-text("Simpan Penilaian")');
+                    }
+                }
+
+                // Setelah simpan, pastikan kembali ke halaman index survey dan ada notifikasi sukses
+                await expect(page).toHaveURL(/.*survey/);
+                await expect(page.locator('.bg-green-50')).toBeVisible();
             }
 
-            // 5. Submit survey
-            await page.click('button[type="submit"]:has-text("Simpan Penilaian")');
-            
-            // Wait to return to index and see success message
-            await expect(page).toHaveURL(/.*survey/);
-            await expect(page.locator('.bg-green-50')).toBeVisible();
-        }
-
-        // Logout
-        await page.click('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign Out")');
-        await context.close();
+            // Logout setelah semua kandidat selesai disurvey
+            await page.click('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign Out")');
+            await context.close();
+        });
     }
 });

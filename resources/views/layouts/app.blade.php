@@ -56,6 +56,10 @@
                     <span class="mr-3 text-lg {{ request()->routeIs('admin.periode.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">⏳</span>
                     Manajemen Periode
                 </a>
+                <a href="{{ route('admin.pengaturan-bobot.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pengaturan-bobot.*') ? 'bg-[#e6f4fa] text-[#0091d5]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <span class="mr-3 text-lg {{ request()->routeIs('admin.pengaturan-bobot.*') ? 'text-[#0091d5]' : 'text-gray-400' }}">⚖️</span>
+                    Pengaturan Bobot
+                </a>
             </div>
             @endif
             

@@ -105,7 +105,7 @@
                             <tr class="bg-gray-50 border-b">
                                 <th class="p-4 text-sm font-semibold text-gray-600">Peringkat</th>
                                 <th class="p-4 text-sm font-semibold text-gray-600">Kandidat</th>
-                                <th class="p-4 text-sm font-semibold text-gray-600 text-right">Skor (1-5)</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600 text-right">Skor Final Gabungan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -127,10 +127,11 @@
                                     <p class="text-xs text-gray-500">NIP: {{ $k->pegawai->nip }}</p>
                                 </td>
                                 <td class="p-4 text-right">
-                                    <div class="flex items-center justify-end">
-                                        <span class="text-lg font-bold {{ $k->live_skor >= 4 ? 'text-[#76bc21]' : ($k->live_skor >= 3 ? 'text-yellow-500' : 'text-red-500') }}">
-                                            {{ number_format($k->live_skor, 2, ',', '.') }}
+                                    <div class="flex flex-col items-end justify-center">
+                                        <span class="text-lg font-bold text-[#0091d5]">
+                                            {{ number_format($k->skor_final, 2, ',', '.') }}
                                         </span>
+                                        <span class="text-xs text-gray-500">Rata-rata Survei: {{ number_format($k->live_skor, 2, ',', '.') }}</span>
                                     </div>
                                 </td>
                             </tr>

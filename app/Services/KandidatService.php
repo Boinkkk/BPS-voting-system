@@ -25,6 +25,14 @@ class KandidatService
 
         $scores = [];
 
+        $pengaturan = \App\Models\PengaturanBobot::first();
+        $ckpWeight = $pengaturan ? $pengaturan->ckp : 50;
+        $absensiWeight = $pengaturan ? $pengaturan->absensi : 25;
+        
+        $totalFase1Weight = $ckpWeight + $absensiWeight;
+        $relativeCkpWeight = $totalFase1Weight > 0 ? ($ckpWeight / $totalFase1Weight) : 0;
+        $relativeAbsensiWeight = $totalFase1Weight > 0 ? ($absensiWeight / $totalFase1Weight) : 0;
+
         foreach ($pegawais as $pegawai) {
             $idPegawai = $pegawai->id;
 
@@ -33,26 +41,38 @@ class KandidatService
                         ->where('pegawai_id', $idPegawai)->first();
             $nilaiCkp = $ckp ? $ckp->nilai : 0;
             
-            // 2. Hitung Bobot Absensi (Total Penalti)
-            $bobotAbsensi = 0;
-            
-            // Ambil data absensi pegawai ini pada periode yang sama
+            // 2. Hitung Nilai Absensi Triwulan
             $rekapsAbsen = \App\Models\AbsensiPegawai::where('periode_id', $periodeId)
                                 ->where('pegawai_id', $idPegawai)
                                 ->get();
                                 
-            foreach ($rekapsAbsen as $absen) {
-                // Gunakan accessor getPenaltiAttribute
-                $bobotAbsensi += $absen->penalti;
+            $totalKjk = $rekapsAbsen->sum('kjk');
+            $totalTk = $rekapsAbsen->sum('tk');
+            
+            $nilaiAbsensi = 100;
+            if ($totalTk >= 1) {
+                $nilaiAbsensi = 96;
+            } else {
+                if ($totalKjk == 0) {
+                    $nilaiAbsensi = 100;
+                } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                    $nilaiAbsensi = 99;
+                } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                    $nilaiAbsensi = 98;
+                } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                    $nilaiAbsensi = 97;
+                } else {
+                    $nilaiAbsensi = 96;
+                }
             }
 
-            // Jika tidak punya data sama sekali di periode ini, bisa dilewati agar tidak masuk ranking dengan skor 0
+            // Jika tidak punya data CKP maupun Absensi sama sekali di periode ini, bisa dilewati
             if (!$ckp && $rekapsAbsen->isEmpty()) {
                 continue;
             }
 
-            // Skor Akhir = Nilai CKP dikurangi penalti absensi (penalti bernilai negatif)
-            $skorAkhir = $nilaiCkp + $bobotAbsensi;
+            // Skor Akhir Fase 1 = (Nilai CKP * Bobot Relatif CKP) + (Nilai Absensi * Bobot Relatif Absensi)
+            $skorAkhir = ($nilaiCkp * $relativeCkpWeight) + ($nilaiAbsensi * $relativeAbsensiWeight);
 
             $scores[] = [
                 'pegawai_id' => $idPegawai,
