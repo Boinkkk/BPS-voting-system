@@ -16,24 +16,42 @@
 .star-rating {
     display: inline-flex;
     flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
 }
+
 .star-rating input {
     display: none;
 }
+
 .star-rating label {
     cursor: pointer;
-    color: #d1d5db; /* Tailwind gray-300 */
-    transition: color 0.2s;
+    color: #d1d5db;
+    transition: color .2s;
+    padding: 2px;
 }
-.star-rating input:checked ~ label,
-.star-rating input:checked,
-.star-rating label:hover ~ label,
-.star-rating label:hover {
-    color: #fbbf24; /* Tailwind yellow-400 */
+
+.star-rating label svg {
+    width: 32px;
+    height: 32px;
+    display: block;
 }
-/* Focus state for accessibility */
-.star-rating input:focus-visible + svg {
+
+/* Hover */
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #fbbf24;
+}
+
+/* Setelah dipilih */
+.star-rating input:checked ~ label {
+    color: #fbbf24;
+}
+
+/* Focus */
+.star-rating input:focus-visible + label svg {
     outline: 2px solid #3b82f6;
+    outline-offset: 2px;
     border-radius: 9999px;
 }
 </style>
@@ -80,7 +98,7 @@
                     </div>
                     
                     <div class="p-0 overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-max">
+                        <table class="w-full text-left border-collapse min-w-full">
                             <thead>
                                 <tr class="bg-gray-100 border-b">
                                     <th class="p-4 font-semibold text-sm w-12 text-center">No</th>
@@ -98,14 +116,32 @@
                                         </td>
                                         <td class="p-4 text-center align-middle">
                                             <div class="star-rating">
+
                                                 @for($i = 5; $i >= 1; $i--)
-                                                    <input type="radio" id="star-{{ $p->id }}-{{ $i }}" name="jawaban[{{ $p->id }}]" value="{{ $i }}" required {{ Auth::user()->role->tipe !== 'Pegawai' ? 'disabled' : '' }}>
-                                                    <label for="star-{{ $p->id }}-{{ $i }}" title="{{ $i }} Bintang">
-                                                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+
+                                                    <input
+                                                        type="radio"
+                                                        id="star-{{ $p->id }}-{{ $i }}"
+                                                        name="jawaban[{{ $p->id }}]"
+                                                        value="{{ $i }}"
+                                                        required
+                                                        {{ Auth::user()->role->tipe !== 'Pegawai' ? 'disabled' : '' }}
+                                                    >
+
+                                                    <label
+                                                        for="star-{{ $p->id }}-{{ $i }}"
+                                                        title="{{ $i }} Bintang"
+                                                    >
+                                                        <svg
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                         </svg>
                                                     </label>
+
                                                 @endfor
+
                                             </div>
                                         </td>
                                     </tr>

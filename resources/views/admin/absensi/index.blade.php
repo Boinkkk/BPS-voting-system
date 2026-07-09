@@ -65,7 +65,7 @@
                         </select>
                     </div>
                     <div class="w-full md:w-1/4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bulan (1-12)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
                         <select name="bulan" id="upload_bulan" required class="w-full text-sm border-gray-300 rounded-md">
                             @php
                                 $namaB = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
@@ -161,10 +161,11 @@
                                     <th class="p-3 font-semibold text-sm text-center">HK</th>
                                     <th class="p-3 font-semibold text-sm text-center">HD</th>
                                     <th class="p-3 font-semibold text-sm text-center text-red-600">TK</th>
-                                    <th class="p-3 font-semibold text-sm text-center">TL</th>
-                                    <th class="p-3 font-semibold text-sm text-center">PSW (Total)</th>
-                                    <th class="p-3 font-semibold text-sm text-center text-red-600">KJK (Menit)</th>
-                                    <th class="p-3 font-semibold text-sm text-center text-amber-600">Skor Absensi (Penalti)</th>
+                                    <th class="p-3 font-semibold text-sm text-center">PSW</th>
+                                    <th class="p-3 font-semibold text-sm text-center">Total TL</th>
+                                    <th class="p-3 font-semibold text-sm text-center">KJK HT</th>
+                                    <th class="p-3 font-semibold text-sm text-center">KJK PC</th>
+                                    <th class="p-3 font-semibold text-sm text-center text-red-600">KJK</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -174,12 +175,11 @@
                                         <td class="p-3 text-sm text-center">{{ $absen->hk }}</td>
                                         <td class="p-3 text-sm text-center font-bold text-green-600">{{ $absen->hd }}</td>
                                         <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->tk }}</td>
-                                        <td class="p-3 text-sm text-center">{{ $absen->tl }}</td>
                                         <td class="p-3 text-sm text-center">{{ $absen->psw }}</td>
+                                        <td class="p-3 text-sm text-center">{{ $absen->tl }}</td>
+                                        <td class="p-3 text-sm text-center">{{ $absen->kjk_ht }}</td>
+                                        <td class="p-3 text-sm text-center">{{ $absen->kjk_pc }}</td>
                                         <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->kjk }}</td>
-                                        <td class="p-3 text-sm text-center font-bold {{ $absen->penalti < 0 ? 'text-red-600' : 'text-green-600' }}">
-                                            {{ number_format($absen->penalti, 2) }}
-                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -190,6 +190,39 @@
                         </table>
                     </div>
                 </div>
+
+                @if(isset($rekapTriwulan) && count($rekapTriwulan) > 0)
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mt-6">
+                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">Rekap Nilai Presensi Akhir (Satu Triwulan)</h3>
+                        <p class="text-sm text-gray-500">Nilai dihitung berdasarkan total TK dan KJK selama triwulan terpilih.</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-gray-100 border-b">
+                                    <th class="p-3 font-semibold text-sm">Nama Pegawai</th>
+                                    <th class="p-3 font-semibold text-sm text-center">Total TK (Triwulan)</th>
+                                    <th class="p-3 font-semibold text-sm text-center">Total KJK (Triwulan)</th>
+                                    <th class="p-3 font-semibold text-sm text-center text-blue-600">Nilai Presensi Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($rekapTriwulan as $rekap)
+                                    <tr class="border-b hover:bg-gray-50">
+                                        <td class="p-3 text-sm font-medium">{{ $rekap->pegawai->nama }}</td>
+                                        <td class="p-3 text-sm text-center font-bold {{ $rekap->total_tk > 0 ? 'text-red-600' : 'text-green-600' }}">{{ $rekap->total_tk }}</td>
+                                        <td class="p-3 text-sm text-center text-gray-700">{{ $rekap->total_kjk }} Menit</td>
+                                        <td class="p-3 text-sm text-center font-bold {{ $rekap->nilai_presensi < 100 ? 'text-amber-600' : 'text-green-600' }}">
+                                            {{ $rekap->nilai_presensi }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -208,27 +241,39 @@
         };
 
         function updateBulanOptions(periodeSelectId, bulanSelectId) {
+
+            console.log("update dipanggil");
             const periodeSelect = document.getElementById(periodeSelectId);
             const bulanSelect = document.getElementById(bulanSelectId);
             if(!periodeSelect || !bulanSelect) return;
 
             const selectedOption = periodeSelect.options[periodeSelect.selectedIndex];
             const triwulan = selectedOption.getAttribute('data-triwulan');
-            
-            let allowedMonths = [1,2,3,4,5,6,7,8,9,10,11,12];
-            if (triwulan == '1') allowedMonths = [1, 2, 3];
-            if (triwulan == '2') allowedMonths = [4, 5, 6];
-            if (triwulan == '3') allowedMonths = [7, 8, 9];
-            if (triwulan == '4') allowedMonths = [10, 11, 12];
+            console.log({
+        triwulan,
+        selected: selectedOption.text,
+    });
 
-            const currentVal = bulanSelect.value;
+            let allowedMonths = [1,2,3,4,5,6,7,8,9,10,11,12];
+            if (triwulan == 1 || triwulan == '1') allowedMonths = [1, 2, 3];
+            if (triwulan == 2 || triwulan == '2') allowedMonths = [4, 5, 6];
+            if (triwulan == 3 || triwulan == '3') allowedMonths = [7, 8, 9];
+            if (triwulan == 4 || triwulan == '4') allowedMonths = [10, 11, 12];
+
+            const currentVal = parseInt(bulanSelect.value) || 0;
             bulanSelect.innerHTML = '';
             
-            allowedMonths.forEach(m => {
+            allowedMonths.forEach((m, index) => {
                 const opt = document.createElement('option');
                 opt.value = m;
                 opt.textContent = bulanNames[m];
-                if (m == currentVal) opt.selected = true;
+                
+                // Jika bulan yang dipilih sebelumnya ada di allowedMonths, pilih itu.
+                // Jika tidak, pilih bulan pertama dari allowedMonths
+                if (m === currentVal || (index === 0 && !allowedMonths.includes(currentVal))) {
+                    opt.selected = true;
+                }
+                
                 bulanSelect.appendChild(opt);
             });
         }

@@ -73,4 +73,33 @@ class AbsensiPegawai extends Model
 
         return $penalti;
     }
+
+    /**
+     * Hitung Nilai Presensi Akhir.
+     * 1. Apabila TK >= 1, nilai 96
+     * 2. Apabila TK = 0, hitung dari KJK:
+     *    0 -> 100
+     *    1-60 -> 99
+     *    61-120 -> 98
+     *    121-450 -> 97
+     *    >450 -> 96
+     */
+    public function getNilaiPresensiAttribute()
+    {
+        if ($this->tk >= 1) {
+            return 96;
+        }
+
+        if ($this->kjk == 0) {
+            return 100;
+        } elseif ($this->kjk >= 1 && $this->kjk <= 60) {
+            return 99;
+        } elseif ($this->kjk >= 61 && $this->kjk <= 120) {
+            return 98;
+        } elseif ($this->kjk >= 121 && $this->kjk <= 450) {
+            return 97;
+        } else {
+            return 96;
+        }
+    }
 }

@@ -26,16 +26,56 @@ class AbsensiAdminController extends Controller
         }
 
         $absensis = [];
-        if ($periode_id && $bulan) {
-            $absensis = AbsensiPegawai::with('pegawai')
-                        ->where('periode_id', $periode_id)
-                        ->where('bulan', $bulan)
-                        ->get();
+        $rekapTriwulan = collect();
+        
+        if ($periode_id) {
+            if ($bulan) {
+                $absensis = AbsensiPegawai::with('pegawai')
+                            ->where('periode_id', $periode_id)
+                            ->where('bulan', $bulan)
+                            ->get();
+            }
+            
+            // Rekap Triwulan (Semua bulan dalam periode ini)
+            $allAbsenPeriode = AbsensiPegawai::with('pegawai')
+                            ->where('periode_id', $periode_id)
+                            ->get();
+                            
+            $grouped = $allAbsenPeriode->groupBy('pegawai_id');
+            foreach($grouped as $pegawai_id => $dataAbsen) {
+                $totalKjk = $dataAbsen->sum('kjk');
+                $totalTk = $dataAbsen->sum('tk');
+                $pegawai = $dataAbsen->first()->pegawai;
+                
+                $nilaiPresensi = 100;
+                if ($totalTk >= 1) {
+                    $nilaiPresensi = 96;
+                } else {
+                    if ($totalKjk == 0) {
+                        $nilaiPresensi = 100;
+                    } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                        $nilaiPresensi = 99;
+                    } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                        $nilaiPresensi = 98;
+                    } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                        $nilaiPresensi = 97;
+                    } else {
+                        $nilaiPresensi = 96;
+                    }
+                }
+                
+                $rekapTriwulan->push((object)[
+                    'pegawai' => $pegawai,
+                    'total_tk' => $totalTk,
+                    'total_kjk' => $totalKjk,
+                    'nilai_presensi' => $nilaiPresensi
+                ]);
+            }
         }
 
         $bobots = \App\Models\BobotPenalti::orderBy('kategori')->get();
 
-        return view('admin.absensi.index', compact('absensis', 'periodes', 'periode_id', 'bulan', 'bobots'));
+        return view('admin.absensi.index', compact('absensis', 'periodes', 'periode_id', 'bulan', 'bobots', 'rekapTriwulan'));
     }
 
     public function downloadTemplate()
