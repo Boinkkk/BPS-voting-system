@@ -21,6 +21,30 @@ class KepalaController extends Controller
                 ->where('periode_id', $periodeReview->id)
                 ->orderBy('ranking_final', 'asc')
                 ->get();
+            
+            $pengaturan = \App\Models\PengaturanBobot::first();
+            $ckpWeight = $pengaturan ? $pengaturan->ckp : 50;
+            $absensiWeight = $pengaturan ? $pengaturan->absensi : 25;
+            $surveyWeight = $pengaturan ? $pengaturan->survey : 25;
+
+            foreach ($kandidats as $ha) {
+                $kandidat = $ha->kandidat;
+                
+                $rataRata = \App\Models\JawabanSurvei::where('periode_id', $periodeReview->id)
+                    ->where('kandidat_id', $kandidat->id)
+                    ->avg('nilai');
+                $surveyNormalized = $rataRata ? ($rataRata / 5) * 100 : 0;
+                
+                $nilaiCkp = $kandidat->skor_ckp;
+                $nilaiAbsensi = $kandidat->skor_absensi;
+                
+                $finalScore = ($nilaiCkp * ($ckpWeight / 100)) + 
+                              ($nilaiAbsensi * ($absensiWeight / 100)) + 
+                              ($surveyNormalized * ($surveyWeight / 100));
+                              
+                $ha->skor_survey_normalized = round($surveyNormalized, 2);
+                $ha->skor_akhir_voting = round($finalScore, 2);
+            }
         }
 
         return view('kepala.review.index', compact('periodeReview', 'kandidats'));

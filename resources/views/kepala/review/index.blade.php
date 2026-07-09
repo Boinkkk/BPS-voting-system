@@ -57,8 +57,24 @@
                                     <span class="font-medium text-gray-900">{{ $h->kandidat->pegawai->nip }}</span>
                                 </div>
                                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
-                                    <span class="text-gray-500 text-sm">Skor Evaluasi (0-100)</span>
+                                    <span class="text-gray-500 text-sm">Skor CKP (0-100)</span>
+                                    <span class="font-bold text-gray-700">{{ number_format($h->kandidat->skor_ckp, 2, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
+                                    <span class="text-gray-500 text-sm">Skor Absensi (0-100)</span>
+                                    <span class="font-bold text-gray-700">{{ number_format($h->kandidat->skor_absensi, 2, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
+                                    <span class="text-gray-500 text-sm">Skor Survei (0-100)</span>
+                                    <span class="font-bold text-gray-700">{{ number_format($h->skor_survey_normalized ?? 0, 2, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
+                                    <span class="text-gray-500 text-sm">Skor Fase 1 (Evaluasi)</span>
                                     <span class="font-bold text-[#0091d5]">{{ number_format($h->kandidat->skor, 2, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
+                                    <span class="text-gray-500 text-sm">Skor Akhir Keseluruhan</span>
+                                    <span class="font-bold text-[#0091d5]">{{ number_format($h->skor_akhir_voting, 2, ',', '.') }}</span>
                                 </div>
                                 <div class="text-sm text-gray-600 text-center mb-6 italic">
                                     "Kandidat ini adalah salah satu dari 3 peraih voting tertinggi oleh pegawai."

@@ -50,6 +50,8 @@ class PeriodeController extends Controller
         $nama = 'Triwulan ' . $request->triwulan . ' Tahun ' . $request->tahun;
 
         $periode = PeriodePenilaian::findOrFail($id);
+        $oldStatus = $periode->status;
+        
         $periode->update([
             'triwulan' => $request->triwulan,
             'tahun' => $request->tahun,
@@ -58,6 +60,10 @@ class PeriodeController extends Controller
             'tanggal_selesai' => $request->tanggal_selesai,
             'status' => $request->status,
         ]);
+
+        if ($request->status === 'review_kepala' && $oldStatus !== 'review_kepala') {
+            \App\Services\KandidatService::generateTop3Kandidat($id);
+        }
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian berhasil diperbarui.');
     }

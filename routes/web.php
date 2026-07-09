@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/absensi', [\App\Http\Controllers\AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
         Route::get('/admin/absensi/template', [\App\Http\Controllers\AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
         Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload');
+        Route::post('/admin/absensi/manual', [\App\Http\Controllers\AbsensiAdminController::class, 'storeManual'])->name('admin.absensi.manual');
         Route::post('/admin/absensi/bobot', [\App\Http\Controllers\AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
 
         // Nilai CKP
@@ -80,6 +81,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('admin')->group(function () {
         Route::post('/admin/kandidat/generate', [\App\Http\Controllers\KandidatAdminController::class, 'generate'])->name('admin.kandidat.generate');
+        Route::post('/admin/kandidat/generate-top3', [\App\Http\Controllers\KandidatAdminController::class, 'generateTop3'])->name('admin.kandidat.generateTop3');
     });
 
     // ==========================
@@ -99,7 +101,6 @@ Route::middleware('auth')->group(function () {
     // SURVEY PEGAWAI
     // ==========================
     Route::get('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'index'])->name('pegawai.survey.index');
-    Route::get('/survey/{kandidat_id}', [\App\Http\Controllers\SurveyPegawaiController::class, 'show'])->name('pegawai.survey.show');
-    Route::post('/survey/{kandidat_id}', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store');
+    Route::post('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store');
 
 }); // <-- auth

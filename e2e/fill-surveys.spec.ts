@@ -54,58 +54,56 @@ test.describe('Survey Automation untuk Semua User', () => {
             // 2. Ke halaman index survey
             await page.goto('/survey');
 
-            // 3. Looping semua kandidat yang belum diisi (tombol "Mulai Survey")
-            while (true) {
-                // Ambil ulang semua link kandidat karena kita akan bolak-balik halaman
-                const candidateLinks = await page.locator('a:has-text("Mulai Survey")').evaluateAll(elements => 
-                    elements.map(el => (el as HTMLAnchorElement).href)
-                );
-
-                if (candidateLinks.length === 0) {
-                    break; // Tidak ada lagi survey yang harus diisi
-                }
-
-                // Masuk ke kandidat pertama di daftar yang tersisa
-                await page.goto(candidateLinks[0]);
-
-                // 4. Mengisi Survey (Multi-step UI Form)
+            // Cek apakah sudah mengisi (muncul teks "Terima Kasih!")
+            const isDone = await page.locator('text="Terima Kasih!"').isVisible();
+            const isEmpty = await page.locator('text="Belum ada kandidat yang terpilih"').isVisible();
+            
+            if (!isDone && !isEmpty) {
+                // 3. Mengisi Survey (UI Baru: Setiap step mewakili 1 pertanyaan, di dalamnya ada list SEMUA kandidat)
                 let hasNextStep = true;
                 while (hasNextStep) {
-                    // Cari baris pertanyaan di tahap/step yang sedang TAMPIL saja
+                    // Pastikan menunggu elemen dirender sepenuhnya
+                    await page.waitForTimeout(300);
+
+                    // Cari semua baris kandidat di step yang TAMPIL
                     const visibleRows = await page.locator('.step-section:visible tbody tr').all();
                     
                     for (const row of visibleRows) {
                         // Cari bintang / label (dari 1 sampai 5)
                         const labels = await row.locator('label').all();
                         if (labels.length > 0) {
-                            // Pilih bintang secara acak
+                            // Pilih bintang secara acak untuk kandidat tersebut
                             const randomIndex = Math.floor(Math.random() * labels.length);
-                            // force: true dibutuhkan karena struktur UI Bintang menyembunyikan input aslinya
+                            // force: true dibutuhkan karena input asli disembunyikan CSS
                             await labels[randomIndex].click({ force: true });
                         }
                     }
 
-                    // Cek apakah ada tombol "Selanjutnya" di tahap ini
+                    // Cek tombol di step ini
                     const nextButton = page.locator('.step-section:visible button:has-text("Selanjutnya")');
+                    const submitButton = page.locator('.step-section:visible button[type="submit"]:has-text("Kirim Semua Penilaian")');
+
                     if (await nextButton.isVisible()) {
                         await nextButton.click();
                         // Tunggu sebentar untuk transisi UI
                         await page.waitForTimeout(400); 
-                    } else {
-                        // Jika tidak ada "Selanjutnya", berarti ini tahap terakhir
+                    } else if (await submitButton.isVisible()) {
+                        // Jika tidak ada "Selanjutnya" tapi ada "Kirim Semua Penilaian", ini step terakhir
                         hasNextStep = false;
-                        
-                        // Klik tombol Simpan
-                        await page.click('.step-section:visible button[type="submit"]:has-text("Simpan Penilaian")');
+                        await submitButton.click();
+                    } else {
+                        // Jika tidak ada tombol sama sekali, keluar (menghindari infinite loop)
+                        hasNextStep = false;
+                        console.log(`Tidak menemukan tombol navigasi pada User ${identifier}`);
                     }
                 }
 
-                // Setelah simpan, pastikan kembali ke halaman index survey dan ada notifikasi sukses
+                // Setelah dikirim, pastikan muncul notifikasi sukses
                 await expect(page).toHaveURL(/.*survey/);
                 await expect(page.locator('.bg-green-50')).toBeVisible();
             }
 
-            // Logout setelah semua kandidat selesai disurvey
+            // Logout setelah survey selesai
             await page.click('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign Out")');
             await context.close();
         });

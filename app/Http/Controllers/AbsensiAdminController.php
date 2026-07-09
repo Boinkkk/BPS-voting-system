@@ -104,7 +104,9 @@ class AbsensiAdminController extends Controller
             $rekapTriwulanPage = new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, 1, ['path' => $request->url(), 'query' => $request->query(), 'pageName' => 'rekap_page']);
         }
 
-        return view('admin.absensi.index', compact('absensis', 'periodes', 'periode_id', 'bulan', 'rekapTriwulanPage', 'perPage'));
+        $semuaPegawai = \App\Models\Pegawai::whereHas('role', function($q){ $q->where('tipe', 'Pegawai'); })->orderBy('nama')->get();
+
+        return view('admin.absensi.index', compact('absensis', 'periodes', 'periode_id', 'bulan', 'rekapTriwulanPage', 'perPage', 'semuaPegawai'));
     }
 
     public function downloadTemplate()
@@ -160,5 +162,61 @@ class AbsensiAdminController extends Controller
         // \App\Services\KandidatService::generateTop10Kandidat($periode_id_aktif_jika_ada);
 
         return redirect()->back()->with('success', 'Pengaturan bobot penalti berhasil diperbarui.');
+    }
+
+    public function storeManual(Request $request)
+    {
+        $request->validate([
+            'periode_id' => 'required|exists:periode_penilaian,id',
+            'pegawai_id' => 'required|exists:pegawai,id',
+            'bulan' => 'required|integer|min:1|max:12',
+            'hk' => 'required|integer|min:0',
+            'hd' => 'required|integer|min:0',
+            'tk' => 'required|integer|min:0',
+            'psw' => 'required|integer|min:0',
+            'tl' => 'required|integer|min:0',
+            'kjk_ht' => 'required|integer|min:0',
+            'kjk_pc' => 'required|integer|min:0',
+            'kjk' => 'required|integer|min:0'
+        ]);
+
+        $periode = PeriodePenilaian::find($request->periode_id);
+        if ($periode->status !== 'penginputan') {
+            return redirect()->back()->with('error', 'Input data absensi manual hanya dapat dilakukan pada masa penginputan data.');
+        }
+
+        try {
+            AbsensiPegawai::updateOrCreate(
+                [
+                    'periode_id' => $request->periode_id,
+                    'pegawai_id' => $request->pegawai_id,
+                    'bulan' => $request->bulan,
+                ],
+                [
+                    'hk' => $request->hk,
+                    'hd' => $request->hd,
+                    'tk' => $request->tk,
+                    'psw' => $request->psw,
+                    'tl' => $request->tl,
+                    'kjk_ht' => $request->kjk_ht,
+                    'kjk_pc' => $request->kjk_pc,
+                    'kjk' => $request->kjk,
+                    // set the rest to 0 to prevent errors
+                    'tb' => 0, 'pd' => 0, 'dk' => 0, 'kn' => 0,
+                    'psw1' => 0, 'psw2' => 0, 'psw3' => 0, 'psw4' => 0,
+                    'ht' => 0, 'tl1' => 0, 'tl2' => 0, 'tl3' => 0, 'tl4' => 0,
+                    'cb' => 0, 'cl' => 0, 'cm' => 0, 'cp' => 0, 'cs' => 0,
+                    'ct10' => 0, 'ct11' => 0, 'ct12' => 0,
+                    'cst1' => 0, 'cst2' => 0, 'cs1' => 0, 'cp1' => 0, 'cm1' => 0, 'cb1' => 0,
+                ]
+            );
+
+            // Trigger otomatis kalkulasi kandidat
+            \App\Services\KandidatService::generateTop10Kandidat($request->periode_id);
+
+            return redirect()->back()->with('success', 'Data absensi manual berhasil ditambahkan/diperbarui. Skor akhir kandidat telah dikalkulasi ulang.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+        }
     }
 }

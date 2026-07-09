@@ -28,38 +28,16 @@ class SurveyPegawaiController extends Controller
                         ->take(10)
                         ->get();
 
-        $jawabanSelesai = SurveyProgress::where('periode_id', $periodeAktif->id)
-                                        ->where('user_id', $user->id)
-                                        ->pluck('kandidat_id')
-                                        ->toArray();
-
-        return view('pegawai.survey.index', compact('periodeAktif', 'kandidats', 'jawabanSelesai'));
-    }
-
-    public function show($kandidat_id)
-    {
-        $user = Auth::user();
-        $periodeAktif = PeriodePenilaian::where('status', 'voting')->first();
-        if (!$periodeAktif) {
-            return redirect()->route('pegawai.survey.index')->with('error', 'Tidak ada periode aktif.');
-        }
-
         $sudahIsi = SurveyProgress::where('periode_id', $periodeAktif->id)
-                                ->where('user_id', $user->id)
-                                ->where('kandidat_id', $kandidat_id)
-                                ->exists();
+                                        ->where('user_id', $user->id)
+                                        ->exists();
 
-        if ($sudahIsi) {
-            return redirect()->route('pegawai.survey.index')->with('info', 'Anda sudah mensurvei kandidat ini.');
-        }
+        $pertanyaans = PertanyaanSurvei::orderBy('nomor_urut')->get();
 
-        $kandidat = Kandidat::with('pegawai')->findOrFail($kandidat_id);
-        $pertanyaans = PertanyaanSurvei::orderBy('nomor_urut')->get()->groupBy('grup_kategori');
-
-        return view('pegawai.survey.form', compact('kandidat', 'pertanyaans', 'periodeAktif'));
+        return view('pegawai.survey.index', compact('periodeAktif', 'kandidats', 'sudahIsi', 'pertanyaans'));
     }
 
-    public function store(Request $request, $kandidat_id)
+    public function store(Request $request)
     {
         $user = Auth::user();
         if ($user->role->tipe !== 'Pegawai') {
@@ -68,28 +46,29 @@ class SurveyPegawaiController extends Controller
 
         $request->validate([
             'jawaban' => 'required|array',
-            'jawaban.*' => 'required|integer|min:1|max:5',
+            'jawaban.*.*' => 'required|integer|min:1|max:5',
         ]);
 
-        $user = Auth::user();
         $periodeAktif = PeriodePenilaian::where('status', 'voting')->first();
 
-        // 1. Catat bahwa user ini sudah survei (tanpa mencatat nilai ke tabel progress)
-        SurveyProgress::updateOrCreate([
-            'periode_id' => $periodeAktif->id,
-            'user_id' => $user->id,
-            'kandidat_id' => $kandidat_id,
-        ]);
+        // 1. Simpan nilai ke jawaban_survei tanpa id user atau session (100% anonim)
+        foreach ($request->jawaban as $pertanyaan_id => $kandidatScores) {
+            foreach ($kandidatScores as $kandidat_id => $nilai) {
+                JawabanSurvei::create([
+                    'periode_id' => $periodeAktif->id,
+                    'kandidat_id' => $kandidat_id,
+                    'pertanyaan_id' => $pertanyaan_id,
+                    'nilai' => $nilai,
+                    'waktu_jawab' => now(),
+                ]);
 
-        // 2. Simpan nilai ke jawaban_survei tanpa id user atau session (100% anonim)
-        foreach ($request->jawaban as $pertanyaan_id => $nilai) {
-            JawabanSurvei::create([
-                'periode_id' => $periodeAktif->id,
-                'kandidat_id' => $kandidat_id,
-                'pertanyaan_id' => $pertanyaan_id,
-                'nilai' => $nilai,
-                'waktu_jawab' => now(),
-            ]);
+                // Catat progress untuk setiap kandidat
+                SurveyProgress::updateOrCreate([
+                    'periode_id' => $periodeAktif->id,
+                    'user_id' => $user->id,
+                    'kandidat_id' => $kandidat_id,
+                ]);
+            }
         }
 
         return redirect()->route('pegawai.survey.index')->with('success', 'Survey berhasil disimpan!');

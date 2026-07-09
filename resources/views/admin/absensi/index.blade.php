@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('header')
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <h2 class="text-xl font-semibold leading-tight text-gray-800">
     Rekap Absensi Bulanan Pegawai
 </h2>
@@ -47,9 +48,14 @@
                     <h3 class="text-lg font-medium text-gray-900">Upload Data Rekap Absensi (Excel)</h3>
                     <p class="text-sm text-gray-500">Unggah file excel berisi rekap absen per bulan.</p>
                 </div>
-                <a href="{{ route('admin.absensi.template') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
-                    ⬇️ Download Template Excel
-                </a>
+                <div class="flex space-x-2">
+                    <button type="button" onclick="openManualModal()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                        + Input Manual
+                    </button>
+                    <a href="{{ route('admin.absensi.template') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                        ⬇️ Download Template Excel
+                    </a>
+                </div>
             </div>
             <div class="p-6">
                 <form action="{{ route('admin.absensi.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row items-end space-y-4 md:space-y-0 md:space-x-4">
@@ -86,6 +92,115 @@
                     </div>
                 </form>
             </div>
+        </div>
+
+        <!-- Modal Input Manual -->
+        <div id="manualInputModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeManualModal()"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl w-full relative">
+                    <div class="absolute top-0 right-0 pt-4 pr-4">
+                        <button type="button" class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="closeManualModal()">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                    Input Data Absensi Manual
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">Masukkan data absensi pegawai jika data belum ada atau ingin diperbarui secara manual. Data yang dimasukkan akan menimpa data sebelumnya pada periode dan bulan yang sama.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-4 pb-6 sm:px-6">
+                <form action="{{ route('admin.absensi.manual') }}" method="POST">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Periode Penilaian</label>
+                            <select name="periode_id" id="manual_periode" required class="w-full text-sm border-gray-300 rounded-md">
+                                <option value="">-- Pilih Periode --</option>
+                                @foreach ($periodes as $p)
+                                    <option value="{{ $p->id }}" data-triwulan="{{ $p->triwulan }}" {{ $periode_id == $p->id ? 'selected' : '' }}>
+                                        {{ $p->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
+                            <select name="bulan" id="manual_bulan" required class="w-full text-sm border-gray-300 rounded-md">
+                                <option value="">-- Pilih Bulan --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Pegawai</label>
+                            <select name="pegawai_id" id="manual_pegawai" required class="w-full text-sm border-gray-300 rounded-md">
+                                <option value="">-- Cari Nama Pegawai --</option>
+                                @foreach ($semuaPegawai as $pegawai)
+                                    <option value="{{ $pegawai->id }}">{{ $pegawai->nama }} ({{ $pegawai->nip }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">HK (Hari Kerja)</label>
+                            <input type="number" name="hk" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">HD (Hadir)</label>
+                            <input type="number" name="hd" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 text-red-600">TK (Tidak Kerja)</label>
+                            <input type="number" name="tk" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">PSW</label>
+                            <input type="number" name="psw" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total TL</label>
+                            <input type="number" name="tl" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">KJK HT</label>
+                            <input type="number" name="kjk_ht" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">KJK PC</label>
+                            <input type="number" name="kjk_pc" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 text-red-600">Total KJK</label>
+                            <input type="number" name="kjk" min="0" required class="w-full text-sm border border-gray-300 rounded-md p-2">
+                        </div>
+                    </div>
+                    <div class="flex justify-end border-t pt-4 mt-6">
+                        <button type="button" onclick="closeManualModal()" class="mr-3 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                            Simpan Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
         </div>
 
         <div class="space-y-6">
@@ -275,6 +390,35 @@
             // Kita tidak menambah listener change pada filter_periode 
             // karena ada onchange="this.form.submit()" bawaan form yang akan me-reload halaman
             updateBulanOptions('filter_periode', 'filter_bulan');
+        }
+
+        const manualPeriode = document.getElementById('manual_periode');
+        if (manualPeriode) {
+            manualPeriode.addEventListener('change', () => updateBulanOptions('manual_periode', 'manual_bulan'));
+            updateBulanOptions('manual_periode', 'manual_bulan');
+        }
+    });
+
+    function openManualModal() {
+        document.getElementById('manualInputModal').classList.remove('hidden');
+    }
+
+    function closeManualModal() {
+        document.getElementById('manualInputModal').classList.add('hidden');
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('manual_pegawai')) {
+            new TomSelect("#manual_pegawai",{
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: "Cari Nama Pegawai..."
+            });
         }
     });
 </script>

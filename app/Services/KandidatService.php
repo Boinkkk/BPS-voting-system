@@ -76,6 +76,8 @@ class KandidatService
 
             $scores[] = [
                 'pegawai_id' => $idPegawai,
+                'skor_ckp' => $nilaiCkp,
+                'skor_absensi' => $nilaiAbsensi,
                 'skor' => $skorAkhir
             ];
         }
@@ -99,6 +101,8 @@ class KandidatService
                 Kandidat::create([
                     'periode_id' => $periodeId,
                     'pegawai_id' => $k['pegawai_id'],
+                    'skor_ckp' => $k['skor_ckp'],
+                    'skor_absensi' => $k['skor_absensi'],
                     'skor' => $k['skor'],
                     'ranking_sistem' => $rank,
                     'status' => 'aktif'
@@ -106,6 +110,90 @@ class KandidatService
                 $rank++;
             }
 
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Hitung ulang dan ambil 3 kandidat terbaik untuk masuk ke fase review kepala.
+     * Perhitungan: CKP + Absensi + Survei.
+     */
+    public static function generateTop3Kandidat($periodeId)
+    {
+        $periode = PeriodePenilaian::find($periodeId);
+        if (!$periode) return;
+
+        $pengaturan = \App\Models\PengaturanBobot::first();
+        $ckpWeight = $pengaturan ? $pengaturan->ckp : 50;
+        $absensiWeight = $pengaturan ? $pengaturan->absensi : 25;
+        $surveyWeight = $pengaturan ? $pengaturan->survey : 25;
+
+        // Ambil 10 kandidat yang ada pada periode ini
+        $kandidats = Kandidat::where('periode_id', $periodeId)->get()->map(function ($kandidat) use ($periodeId, $ckpWeight, $absensiWeight, $surveyWeight) {
+            // 1. Survey Normalized
+            $rataRata = \App\Models\JawabanSurvei::where('periode_id', $periodeId)
+                ->where('kandidat_id', $kandidat->id)
+                ->avg('nilai');
+            $surveyNormalized = $rataRata ? ($rataRata / 5) * 100 : 0;
+
+            // 2. CKP
+            $ckp = \App\Models\NilaiCkp::where('periode_id', $periodeId)
+                    ->where('pegawai_id', $kandidat->pegawai_id)->first();
+            $nilaiCkp = $ckp ? $ckp->nilai : 0;
+            
+            // 3. Absensi
+            $rekapsAbsen = \App\Models\AbsensiPegawai::where('periode_id', $periodeId)
+                                ->where('pegawai_id', $kandidat->pegawai_id)
+                                ->get();
+            $totalKjk = $rekapsAbsen->sum('kjk');
+            $totalTk = $rekapsAbsen->sum('tk');
+            
+            $nilaiAbsensi = 100;
+            if ($totalTk >= 1) {
+                $nilaiAbsensi = 96;
+            } else {
+                if ($totalKjk == 0) {
+                    $nilaiAbsensi = 100;
+                } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                    $nilaiAbsensi = 99;
+                } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                    $nilaiAbsensi = 98;
+                } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                    $nilaiAbsensi = 97;
+                } else {
+                    $nilaiAbsensi = 96;
+                }
+            }
+            
+            // Skor Final Gabungan
+            $finalScore = ($nilaiCkp * ($ckpWeight / 100)) + 
+                          ($nilaiAbsensi * ($absensiWeight / 100)) + 
+                          ($surveyNormalized * ($surveyWeight / 100));
+                          
+            $kandidat->skor_final_gabungan = $finalScore;
+            return $kandidat;
+        })->sortByDesc('skor_final_gabungan')->values();
+
+        DB::beginTransaction();
+        try {
+            // Hapus data hasil_akhir lama jika ada
+            \App\Models\HasilAkhir::where('periode_id', $periodeId)->delete();
+
+            // Ambil Top 3
+            $top3 = $kandidats->take(3);
+            $rank = 1;
+            foreach ($top3 as $k) {
+                \App\Models\HasilAkhir::create([
+                    'periode_id' => $periodeId,
+                    'kandidat_id' => $k->id,
+                    'ranking_final' => $rank,
+                    'is_terpilih' => false
+                ]);
+                $rank++;
+            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

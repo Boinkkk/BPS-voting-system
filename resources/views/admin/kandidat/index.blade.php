@@ -2,7 +2,7 @@
 
 @section('header')
 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-    Kandidat Terbaik (10 Besar)
+    Kandidat Terbaik ({{ isset($is_fase_2_selesai) && $is_fase_2_selesai ? '3' : '10' }} Besar)
 </h2>
 @endsection
 
@@ -41,7 +41,13 @@
             <div class="p-6 bg-white border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                 <div>
                     <h3 class="text-lg font-bold text-gray-900">Daftar Kandidat Sistem</h3>
-                    <p class="text-sm text-gray-500">Menampilkan 10 pegawai dengan skor tertinggi berdasarkan Nilai CKP dan Absensi pada periode yang dipilih.</p>
+                    <p class="text-sm text-gray-500">
+                        @if(isset($is_fase_2_selesai) && $is_fase_2_selesai)
+                            Menampilkan 3 pegawai terbaik berdasarkan hasil voting survei pada periode yang dipilih.
+                        @else
+                            Menampilkan 10 pegawai dengan skor tertinggi berdasarkan Nilai CKP dan Absensi pada periode yang dipilih.
+                        @endif
+                    </p>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -60,20 +66,32 @@
                         @php
                             $selectedPeriode = $periodes->firstWhere('id', $periode_id);
                             $isPenginputan = $selectedPeriode && $selectedPeriode->status == 'penginputan';
+                            $isReviewKepala = $selectedPeriode && $selectedPeriode->status == 'review_kepala';
                         @endphp
-                        <form action="{{ route('admin.kandidat.generate') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="periode_id" value="{{ $periode_id }}">
-                            @if($isPenginputan)
-                                <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
-                                    Kalkulasi 10 Kandidat
+                        
+                        @if($isReviewKepala)
+                            <form action="{{ route('admin.kandidat.generateTop3') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="periode_id" value="{{ $periode_id }}">
+                                <button type="submit" class="px-4 py-2 bg-amber-500 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang 3 Kandidat Terbaik berdasarkan Nilai CKP, Absensi, dan Hasil Survei pada periode ini, lalu menimpa data 3 besar sebelumnya. Lanjutkan?')">
+                                    Kalkulasi Ulang 3 Terbaik
                                 </button>
-                            @else
-                                <button type="button" class="px-4 py-2 bg-gray-400 border border-transparent rounded-md shadow-sm text-sm font-medium text-white cursor-not-allowed" title="Kalkulasi ulang hanya dapat dilakukan pada masa penginputan data.">
-                                    Kalkulasi 10 Kandidat
-                                </button>
-                            @endif
-                        </form>
+                            </form>
+                        @else
+                            <form action="{{ route('admin.kandidat.generate') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="periode_id" value="{{ $periode_id }}">
+                                @if($isPenginputan)
+                                    <button type="submit" class="px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
+                                        Kalkulasi 10 Kandidat
+                                    </button>
+                                @else
+                                    <button type="button" class="px-4 py-2 bg-gray-400 border border-transparent rounded-md shadow-sm text-sm font-medium text-white cursor-not-allowed" title="Kalkulasi ulang kandidat hanya dapat dilakukan pada masa penginputan atau review kepala.">
+                                        Kalkulasi Kandidat
+                                    </button>
+                                @endif
+                            </form>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -86,6 +104,11 @@
                             <th class="p-4 font-semibold text-sm text-center w-16">Peringkat</th>
                             <th class="p-4 font-semibold text-sm">Nama Pegawai</th>
                             <th class="p-4 font-semibold text-sm">Jabatan</th>
+                            <th class="p-4 font-semibold text-sm text-center">Skor CKP</th>
+                            <th class="p-4 font-semibold text-sm text-center">Skor Absensi</th>
+                            @if(isset($is_fase_2_selesai) && $is_fase_2_selesai)
+                                <th class="p-4 font-semibold text-sm text-center">Skor Survei</th>
+                            @endif
                             <th class="p-4 font-semibold text-sm text-center">Skor Akhir (Keseluruhan)</th>
                         </tr>
                     </thead>
@@ -100,11 +123,18 @@
                                     <div class="text-sm text-gray-500">{{ $k->pegawai->nip }}</div>
                                 </td>
                                 <td class="p-4 text-sm text-gray-600">{{ $k->pegawai->jabatan }}</td>
-                                <td class="p-4 text-center font-bold text-[#0091d5] text-lg">{{ number_format($k->skor, 2, ',', '.') }}</td>
+                                <td class="p-4 text-center font-bold text-gray-700 text-lg">{{ number_format($k->skor_ckp, 2, ',', '.') }}</td>
+                                <td class="p-4 text-center font-bold text-gray-700 text-lg">{{ number_format($k->skor_absensi, 2, ',', '.') }}</td>
+                                @if(isset($is_fase_2_selesai) && $is_fase_2_selesai)
+                                    <td class="p-4 text-center font-bold text-gray-700 text-lg">{{ number_format($k->skor_survey ?? 0, 2, ',', '.') }}</td>
+                                    <td class="p-4 text-center font-bold text-[#0091d5] text-lg">{{ number_format($k->skor_akhir_voting ?? $k->skor, 2, ',', '.') }}</td>
+                                @else
+                                    <td class="p-4 text-center font-bold text-[#0091d5] text-lg">{{ number_format($k->skor, 2, ',', '.') }}</td>
+                                @endif
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="p-8 text-center text-gray-500">
+                                <td colspan="6" class="p-8 text-center text-gray-500">
                                     <p class="mb-2">Belum ada kandidat yang dihasilkan untuk periode ini.</p>
                                     <p class="text-sm">Silakan klik tombol <strong>"Kalkulasi 10 Kandidat"</strong> di kanan atas.</p>
                                 </td>

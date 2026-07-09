@@ -14,6 +14,8 @@ class Kandidat extends Model
     protected $fillable = [
         'periode_id',
         'pegawai_id',
+        'skor_ckp',
+        'skor_absensi',
         'skor',
         'ranking_sistem',
         'status',

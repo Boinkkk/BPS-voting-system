@@ -2,11 +2,55 @@
 
 @section('header')
 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-    Survey Kandidat Pegawai Terbaik
+    Survey Penilaian Kandidat Pegawai Terbaik
 </h2>
 @endsection
 
 @section('content')
+<style>
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    color: #d1d5db;
+    transition: color .2s;
+    padding: 2px;
+}
+
+.star-rating label svg {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+/* Hover */
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #fbbf24;
+}
+
+/* Setelah dipilih */
+.star-rating input:checked ~ label {
+    color: #fbbf24;
+}
+
+/* Focus */
+.star-rating input:focus-visible + label svg {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 9999px;
+}
+</style>
+
 <div class="py-6">
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
         
@@ -47,65 +91,272 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-6 text-center text-gray-500">
                 {{ $error }}
             </div>
+        @elseif($sudahIsi)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-10 text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Terima Kasih!</h3>
+                <p class="text-gray-500">Anda sudah menyelesaikan penilaian untuk periode <strong>{{ $periodeAktif->nama }}</strong>.</p>
+            </div>
+        @elseif($kandidats->isEmpty())
+             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-6 text-center text-gray-500">
+                Belum ada kandidat yang terpilih pada periode ini.
+            </div>
         @else
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-                <div class="p-6 border-b bg-gray-50">
-                    <h3 class="text-lg font-medium text-gray-900">Periode: {{ $periodeAktif->nama }}</h3>
-                    <p class="text-sm text-gray-500 mt-1">Silakan berikan penilaian objektif (Skala 1-5) untuk masing-masing kandidat di bawah ini berdasarkan Core Values BerAKHLAK.</p>
+            <!-- Header Informasi -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
+                <div class="p-4 border-b bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Periode: {{ $periodeAktif->nama }}</h3>
+                        <p class="text-sm text-gray-500 mt-1">Sistem akan menyimpan jawaban Anda secara otomatis di memori browser.</p>
+                    </div>
+                    <div class="mt-4 sm:mt-0">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-[#0091d5]">
+                            Total Pertanyaan: {{ count($pertanyaans) }}
+                        </span>
+                    </div>
                 </div>
                 
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($kandidats as $k)
-                            @php
-                                $isDone = in_array($k->id, $jawabanSelesai);
-                            @endphp
-                            
-                            <div class="border rounded-lg p-4 {{ $isDone ? 'bg-gray-50 border-gray-200' : 'bg-white border-sky-200 shadow-sm hover:shadow-md transition-shadow' }}">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h4 class="font-bold text-gray-900">{{ $k->pegawai->nama }}</h4>
-                                        <p class="text-xs text-gray-500 mt-1">{{ $k->pegawai->jabatan }}</p>
-                                    </div>
-                                    @if($isDone)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Selesai
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                                            Belum Dinilai
-                                        </span>
-                                    @endif
-                                </div>
-                                
-                                <div class="mt-4">
-                                    @if(Auth::user()->role->tipe !== 'Pegawai')
-                                        <a href="{{ route('pegawai.survey.show', $k->id) }}" class="block w-full text-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600">
-                                            Preview Survey (Read-Only)
-                                        </a>
-                                    @elseif($isDone)
-                                        <button disabled class="w-full px-4 py-2 bg-gray-300 text-gray-600 text-sm font-medium rounded-md cursor-not-allowed">
-                                            Sudah Disurvey
-                                        </button>
-                                    @else
-                                        <a href="{{ route('pegawai.survey.show', $k->id) }}" class="block w-full text-center px-4 py-2 bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600">
-                                            Mulai Survey
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                    
-                    @if($kandidats->isEmpty())
-                        <div class="text-center py-8 text-gray-500">
-                            Belum ada kandidat yang terpilih pada periode ini.
-                        </div>
-                    @endif
+                <!-- Progress Bar Utama -->
+                <div class="w-full bg-gray-200 h-2">
+                    <div id="main-progress-bar" class="bg-[#0091d5] h-2 transition-all duration-300 ease-in-out" style="width: 0%"></div>
                 </div>
             </div>
+
+            <form id="surveyForm" action="{{ route('pegawai.survey.store') }}" method="POST">
+                @csrf
+                
+                @foreach($pertanyaans as $index => $p)
+                <div class="step-section" id="step-{{ $loop->iteration }}" style="display: none; transition: opacity 0.3s ease;">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
+                        
+                        <div class="p-6 border-b bg-sky-50 flex flex-col md:flex-row md:items-start justify-between">
+                            <div class="flex items-start">
+                                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#0091d5] text-white text-sm font-bold mr-4 mt-0.5 shadow">{{ $loop->iteration }}</span>
+                                <div>
+                                    <div class="font-bold text-[#0091d5] text-sm tracking-wider uppercase mb-1">{{ $p->kategori }}</div>
+                                    <div class="text-gray-900 text-lg font-medium">{{ $p->pertanyaan }}</div>
+                                </div>
+                            </div>
+                            <div class="mt-4 md:mt-0 whitespace-nowrap text-right">
+                                <span class="text-sm font-bold text-gray-500">Pertanyaan {{ $loop->iteration }} dari {{ count($pertanyaans) }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
+                                    <thead>
+                                        <tr class="bg-gray-100 border-b">
+                                            <th class="p-4 font-semibold text-sm w-1/2 text-gray-700">Nama Kandidat</th>
+                                            <th class="p-4 font-semibold text-sm w-1/2 text-center text-gray-700">Penilaian (1-5)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($kandidats as $k)
+                                        <tr class="border-b hover:bg-sky-50 transition-colors bg-white">
+                                            <td class="p-4 text-sm border-r border-gray-200">
+                                                <div class="font-semibold text-gray-900">{{ $k->pegawai->nama }}</div>
+                                                <div class="text-xs text-gray-500 mt-1">{{ $k->pegawai->jabatan }}</div>
+                                            </td>
+                                            <td class="p-4 text-center align-middle">
+                                                <div class="star-rating">
+                                                    @for($i = 5; $i >= 1; $i--)
+                                                        <input
+                                                            type="radio"
+                                                            id="star-{{ $p->id }}-{{ $k->id }}-{{ $i }}"
+                                                            name="jawaban[{{ $p->id }}][{{ $k->id }}]"
+                                                            value="{{ $i }}"
+                                                            required
+                                                            onchange="saveToLocal('{{ $p->id }}', '{{ $k->id }}', '{{ $i }}')"
+                                                            {{ Auth::user()->role->tipe !== 'Pegawai' ? 'disabled' : '' }}
+                                                        >
+                                                        <label
+                                                            for="star-{{ $p->id }}-{{ $k->id }}-{{ $i }}"
+                                                            title="{{ $i }} Bintang"
+                                                        >
+                                                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                            </svg>
+                                                        </label>
+                                                    @endfor
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Navigation -->
+                    <div class="flex justify-between items-center mb-10">
+                        <div>
+                            @if(!$loop->first)
+                            <button type="button" onclick="changeStep({{ $loop->iteration - 1 }})" class="px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 shadow-sm transition-colors flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                Sebelumnya
+                            </button>
+                            @endif
+                        </div>
+                        <div class="flex space-x-4">
+                            @if(!$loop->last)
+                            <button type="button" onclick="changeStep({{ $loop->iteration + 1 }})" class="px-6 py-3 bg-gray-800 text-white font-medium rounded-md hover:bg-gray-700 shadow-sm transition-colors flex items-center">
+                                Selanjutnya
+                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                            @endif
+
+                            @if($loop->last)
+                                @if(Auth::user()->role->tipe === 'Pegawai')
+                                <button type="submit" class="px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-blue-600 shadow-md transition-colors flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Kirim Semua Penilaian
+                                </button>
+                                @else
+                                <button type="button" disabled class="px-8 py-3 bg-gray-400 text-white font-bold rounded-md cursor-not-allowed shadow-md">
+                                    Mode Read-Only
+                                </button>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+                
+            </form>
         @endif
 
     </div>
 </div>
+
+@if(isset($kandidats) && !$kandidats->isEmpty() && !$sudahIsi)
+<script>
+    let currentStep = 1;
+    const totalSteps = {{ count($pertanyaans) }};
+    const storagePrefix = 'survey_draft_periode_{{ $periodeAktif->id }}_';
+
+    function saveToLocal(pertanyaanId, kandidatId, nilai) {
+        const key = storagePrefix + pertanyaanId + '_' + kandidatId;
+        localStorage.setItem(key, nilai);
+    }
+
+    function loadFromLocal() {
+        const radios = document.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            const match = radio.name.match(/jawaban\[([^\]]+)\]\[([^\]]+)\]/);
+            if(match) {
+                const pId = match[1];
+                const kId = match[2];
+                const savedVal = localStorage.getItem(storagePrefix + pId + '_' + kId);
+                
+                if (savedVal && radio.value === savedVal) {
+                    radio.checked = true;
+                }
+            }
+        });
+    }
+
+    function clearLocalDrafts() {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith(storagePrefix)) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+    }
+
+    function updateUI() {
+        for(let i = 1; i <= totalSteps; i++) {
+            let stepDiv = document.getElementById('step-' + i);
+            if(stepDiv) stepDiv.style.display = (i === currentStep) ? 'block' : 'none';
+        }
+
+        const progress = (currentStep / totalSteps) * 100;
+        document.getElementById('main-progress-bar').style.width = progress + '%';
+    }
+
+    function validateStep(step) {
+        const stepDiv = document.getElementById('step-' + step);
+        if(!stepDiv) return true;
+
+        const radios = stepDiv.querySelectorAll('input[type="radio"]');
+        const names = new Set();
+        radios.forEach(r => names.add(r.name));
+
+        for(let name of names) {
+            const checked = stepDiv.querySelector(`input[name="${name}"]:checked`);
+            if(!checked) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function changeStep(newStep) {
+        if(newStep > currentStep) {
+            if(!validateStep(currentStep)) {
+                alert('Silakan lengkapi penilaian untuk semua kandidat pada pertanyaan ini sebelum melanjutkan.');
+                return;
+            }
+        }
+        
+        if(newStep >= 1 && newStep <= totalSteps) {
+            currentStep = newStep;
+            localStorage.setItem(storagePrefix + 'currentStep', currentStep);
+            updateUI();
+            window.scrollTo(0, 0);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Restore step
+        const savedStep = localStorage.getItem(storagePrefix + 'currentStep');
+        if (savedStep) {
+            const parsedStep = parseInt(savedStep, 10);
+            if (parsedStep >= 1 && parsedStep <= totalSteps) {
+                currentStep = parsedStep;
+            }
+        }
+
+        loadFromLocal();
+        updateUI();
+
+        // Attach event listener to the form to capture changes via event delegation
+        document.getElementById('surveyForm').addEventListener('change', function(e) {
+            if (e.target && e.target.type === 'radio') {
+                const match = e.target.name.match(/jawaban\[([^\]]+)\]\[([^\]]+)\]/);
+                if(match) {
+                    saveToLocal(match[1], match[2], e.target.value);
+                }
+            }
+        });
+
+        // Also add click event just in case some browsers don't bubble change events for hidden radios
+        document.getElementById('surveyForm').addEventListener('click', function(e) {
+            if (e.target && e.target.type === 'radio') {
+                const match = e.target.name.match(/jawaban\[([^\]]+)\]\[([^\]]+)\]/);
+                if(match) {
+                    saveToLocal(match[1], match[2], e.target.value);
+                }
+            }
+        });
+
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            if(!validateStep(currentStep)) {
+                e.preventDefault();
+                alert('Silakan lengkapi penilaian terakhir sebelum mengirim.');
+            } else {
+                clearLocalDrafts();
+            }
+        });
+    });
+</script>
+@endif
 @endsection
