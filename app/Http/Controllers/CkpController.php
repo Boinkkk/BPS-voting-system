@@ -53,6 +53,11 @@ class CkpController extends Controller
             'nilai' => 'required|numeric|min:0|max:100',
         ]);
 
+        $periode = PeriodePenilaian::find($request->periode_id);
+        if ($periode->status !== 'penginputan') {
+            return redirect()->back()->with('error', 'Input nilai CKP hanya dapat dilakukan pada masa penginputan data.');
+        }
+
         NilaiCkp::updateOrCreate(
             [
                 'periode_id' => $request->periode_id,
@@ -78,6 +83,11 @@ class CkpController extends Controller
             'file' => 'required|mimes:xlsx,xls,csv',
             'periode_id' => 'required|exists:periode_penilaian,id',
         ]);
+
+        $periode = PeriodePenilaian::find($request->periode_id);
+        if ($periode->status !== 'penginputan') {
+            return redirect()->back()->with('error', 'Upload data CKP hanya dapat dilakukan pada masa penginputan data.');
+        }
 
         try {
             Excel::import(new CkpImport($request->periode_id), $request->file('file'));

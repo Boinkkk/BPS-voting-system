@@ -120,6 +120,11 @@ class AbsensiAdminController extends Controller
             'file'       => 'required|mimes:xlsx,xls'
         ]);
 
+        $periode = PeriodePenilaian::find($request->periode_id);
+        if ($periode->status !== 'penginputan') {
+            return redirect()->back()->with('error', 'Upload data absensi hanya dapat dilakukan pada masa penginputan data.');
+        }
+
         try {
             Excel::import(new AbsensiImport($request->periode_id, $request->bulan), $request->file('file'));
             
@@ -138,6 +143,11 @@ class AbsensiAdminController extends Controller
             'bobots' => 'required|array',
             'bobots.*' => 'numeric|min:0'
         ]);
+
+        $periodeAktif = PeriodePenilaian::whereIn('status', ['voting', 'review_kepala'])->first();
+        if ($periodeAktif) {
+            return redirect()->back()->with('error', 'Tidak dapat mengubah bobot karena sedang ada periode penilaian yang aktif pada fase voting atau review.');
+        }
 
         foreach ($request->bobots as $id => $nilai) {
             \App\Models\BobotPenalti::where('id', $id)->update(['bobot' => $nilai]);

@@ -57,9 +57,14 @@ class KinerjaAdminController extends Controller
         try {
             $realPeriodeId = $this->resolvePeriodeId($request->periode_id);
             
+            $periode = PeriodePenilaian::find($realPeriodeId);
             // Validate if realPeriodeId exists
-            if (!PeriodePenilaian::find($realPeriodeId)) {
+            if (!$periode) {
                 throw new \Exception('Periode tidak valid.');
+            }
+
+            if ($periode->status !== 'penginputan') {
+                return redirect()->back()->with('error', 'Upload data kinerja hanya dapat dilakukan pada masa penginputan data.');
             }
 
             Excel::import(new KinerjaImport($realPeriodeId), $request->file('file'));
@@ -88,8 +93,13 @@ class KinerjaAdminController extends Controller
         try {
             $realPeriodeId = $this->resolvePeriodeId($request->periode_id);
             
-            if (!PeriodePenilaian::find($realPeriodeId)) {
+            $periode = PeriodePenilaian::find($realPeriodeId);
+            if (!$periode) {
                 return redirect()->back()->with('error', 'Periode tidak valid.');
+            }
+
+            if ($periode->status !== 'penginputan') {
+                return redirect()->back()->with('error', 'Input data kinerja hanya dapat dilakukan pada masa penginputan data.');
             }
 
             KinerjaPegawai::updateOrCreate(
