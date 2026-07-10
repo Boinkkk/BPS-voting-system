@@ -37,6 +37,7 @@
                 </form>
 
                 @if($periode_id)
+                @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe === 'Admin')
                 <form method="POST" action="{{ route('admin.monitoring.update_status', $periode_id) }}" class="flex items-center gap-2 mt-4 sm:mt-0 border-l pl-4 border-gray-200">
                     @csrf
                     @method('PUT')
@@ -50,6 +51,7 @@
                         Ubah Status
                     </button>
                 </form>
+                @endif
                 @endif
             </div>
         </div>
@@ -147,12 +149,20 @@
 
             <!-- Daftar Absen -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-gray-800 p-4 text-white">
-                    <h3 class="font-bold text-lg flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        Daftar Absensi Survei
-                    </h3>
-                    <p class="text-gray-400 text-xs mt-1">Daftar Pegawai & Status Pengisian</p>
+                <div class="bg-gray-800 p-4 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-lg flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            Daftar Absensi Survei
+                        </h3>
+                        <p class="text-gray-400 text-xs mt-1">Daftar Pegawai & Status Pengisian</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs text-gray-400 self-center mr-1">Unduh TXT:</span>
+                        <a href="{{ route('admin.monitoring.download_txt', ['periode_id' => $periode_id, 'filter' => 'semua']) }}" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded transition">Semua</a>
+                        <a href="{{ route('admin.monitoring.download_txt', ['periode_id' => $periode_id, 'filter' => 'selesai']) }}" class="text-xs bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded transition">Selesai</a>
+                        <a href="{{ route('admin.monitoring.download_txt', ['periode_id' => $periode_id, 'filter' => 'belum']) }}" class="text-xs bg-orange-700 hover:bg-orange-600 px-3 py-1.5 rounded transition">Belum</a>
+                    </div>
                 </div>
                 
                 <div class="p-0 max-h-[600px] overflow-y-auto">

@@ -1,6 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
+@if(session('success'))
+    <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md shadow-sm">
+        <div class="flex items-center">
+            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <p class="text-sm text-green-700">{{ session('success') }}</p>
+        </div>
+    </div>
+@endif
+@if($errors->any())
+    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
+        <div class="flex items-center mb-2">
+            <svg class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <p class="text-sm font-medium text-red-800">Terdapat kesalahan:</p>
+        </div>
+        <ul class="list-disc list-inside text-sm text-red-700 ml-5">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <!-- Header Banner & Profile Info -->
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 relative">
     <div class="h-40 bg-[#0D8ABC] w-full relative">
@@ -11,7 +36,7 @@
         <div class="flex justify-between items-end -mt-16 mb-4">
             <div class="flex items-end">
                 <div class="w-32 h-32 rounded-xl bg-white p-1 shadow-md border border-gray-100 z-10">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->nama) }}&background=EBF4FF&color=0D8ABC&size=128" alt="Profile" class="w-full h-full rounded-lg object-cover">
+                    <img src="{{ $user->foto_profil ? asset('storage/' . $user->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode($user->nama).'&background=EBF4FF&color=0D8ABC&size=128' }}" alt="Profile" class="w-full h-full rounded-lg object-cover">
                 </div>
                 
                 <div class="ml-6 mb-2">
@@ -25,12 +50,17 @@
                 </div>
             </div>
             
-            <button class="bg-[#0D8ABC] hover:bg-sky-800 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors flex items-center mb-2">
-                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                Edit Profile
-            </button>
+            <form action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data" class="flex items-center mb-2" id="photoForm">
+                @csrf
+                <input type="file" name="foto_profil" id="foto_profil" class="hidden" accept="image/*" onchange="document.getElementById('photoForm').submit()">
+                <label for="foto_profil" class="bg-[#0D8ABC] hover:bg-sky-800 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors flex items-center cursor-pointer">
+                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Ubah Foto Profil
+                </label>
+            </form>
         </div>
     </div>
 </div>
@@ -150,7 +180,7 @@
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Card 1 -->
-        <a href="#" class="block p-5 rounded-lg border border-gray-200 hover:border-sky-300 hover:bg-sky-50/30 transition-colors group">
+        <a href="javascript:void(0)" onclick="document.getElementById('passwordModal').classList.remove('hidden')" class="block p-5 rounded-lg border border-gray-200 hover:border-sky-300 hover:bg-sky-50/30 transition-colors group">
             <div class="flex justify-between items-start mb-3">
                 <div class="text-sky-600">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -196,6 +226,38 @@
             <h3 class="text-sm font-bold text-gray-900 mb-1">Notification Settings</h3>
             <p class="text-xs text-gray-500">Control how you receive system alerts and updates.</p>
         </a>
+    </div>
+</div>
+
+<!-- Password Modal -->
+<div id="passwordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-900">Ubah Password</h3>
+            <button onclick="document.getElementById('passwordModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+        <form action="{{ route('profile.password') }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
+                <input type="password" name="current_password" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-sky-500">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+                <input type="password" name="password" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-sky-500">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                <input type="password" name="password_confirmation" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-sky-500">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="document.getElementById('passwordModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-[#0D8ABC] text-white rounded-md text-sm font-medium hover:bg-sky-800">Simpan Perubahan</button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

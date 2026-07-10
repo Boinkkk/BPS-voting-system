@@ -1,14 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - BPS Selection System</title>
+    <title>SIVOTA - Login</title>
+    
+    <!-- Google Fonts: Hanken Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        /* Subtle texture for professional depth */
+        .bg-texture {
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.02) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        /* Active button scale interaction */
+        .btn-active:active {
+            transform: scale(0.96);
+        }
+        .input-focus-glow:focus-within {
+            box-shadow: 0 0 0 4px rgba(0, 145, 218, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-50/50 min-h-screen flex items-center justify-center font-sans antialiased">
-    <div class="w-full">
-        @yield('content')
-    </div>
+<body class="bg-background text-on-surface min-h-screen flex flex-col items-center overflow-x-hidden bg-texture transition-all selection:bg-primary-container selection:text-on-primary-container">
+    
+    @yield('content')
+
+    <!-- Footer -->
+    <footer class="w-full py-8 flex flex-col items-center gap-2 mt-auto relative z-10">
+        <div class="flex gap-4 md:gap-6 mb-2">
+            <a class="font-label-sm text-label-sm md:text-[14px] text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+            <a class="font-label-sm text-label-sm md:text-[14px] text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+            <a class="font-label-sm text-label-sm md:text-[14px] text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+        </div>
+        <p class="font-label-sm text-label-sm md:text-[14px] text-on-surface-variant text-center opacity-70">
+            &copy; {{ date('Y') }} Badan Pusat Statistik (BPS). All rights reserved.
+        </p>
+    </footer>
+
+    @stack('scripts')
 </body>
 </html>

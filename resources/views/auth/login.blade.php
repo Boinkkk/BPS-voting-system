@@ -1,28 +1,27 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden relative">
-    
-    <div class="p-8 sm:p-10">
-        <div class="flex justify-center mb-6">
-            <!-- Placeholder for BPS Logo, user can replace this later -->
-            <div class="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-md rotate-3">
-                <div class="-rotate-3">BPS</div>
-            </div>
-        </div>
-        
-        <div class="text-center mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">BPS Selection System</h2>
-            <p class="text-sm text-gray-500">Secure Employee Portal Login</p>
-        </div>
+<main class="w-full flex-grow flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-xl animate-fade-in relative z-10">
+    <!-- Logo / Branding Center -->
+    <div class="mb-10 text-center flex flex-col items-center">
+        <img alt="BPS Logo" class="h-16 md:h-20 w-auto mb-6 drop-shadow-sm" src="{{ asset('images/logo.svg') }}">
+        <h1 class="font-headline-lg text-headline-lg md:text-[32px] md:leading-[40px] text-[28px] leading-[36px] font-bold text-on-surface tracking-tight">SIVOTA</h1>
+        <p class="font-body-sm text-body-sm text-on-surface-variant opacity-75 mt-1 uppercase tracking-wider">
+            Sistem Informasi Voting Terpadu
+        </p>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-4">
+            Secure Employee Portal Login
+        </p>
+    </div>
 
+    <!-- Login Card -->
+    <div class="w-full max-w-[440px] bg-surface-container-lowest rounded-2xl md:rounded-2xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant p-8 md:p-10 login-card transition-all duration-300">
+        
         @if ($errors->any())
             <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                        </svg>
+                        <span class="material-symbols-outlined text-red-400 text-[20px]">error</span>
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-red-700">
@@ -33,75 +32,96 @@
             </div>
         @endif
 
-        <form action="{{ route('login') }}" method="POST" class="space-y-6">
+        <form action="{{ route('login') }}" method="POST" class="space-y-6" id="loginForm">
             @csrf
             
-            <div>
-                <label for="identifier" class="flex items-center text-sm font-medium text-gray-700 mb-1">
-                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+            <!-- Username Field -->
+            <div class="space-y-2">
+                <label class="flex items-center gap-2 font-label-md text-label-md font-semibold text-on-surface-variant" for="identifier">
+                    <span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
                     Username or NIP
                 </label>
-                <div class="mt-1">
-                    <input id="identifier" name="identifier" type="text" autocomplete="email" required value="{{ old('identifier') }}"
-                        class="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm bg-gray-50/50"
-                        placeholder="Enter your identification number">
+                <div class="relative flex items-center input-focus-glow transition-all rounded-lg">
+                    <input class="w-full px-4 py-3.5 bg-surface-container-low border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-0 transition-all focus:ring-2 focus:ring-primary/10" id="identifier" name="identifier" placeholder="admin@bps.go.id" required type="text" value="{{ old('identifier') }}">
                 </div>
             </div>
 
-            <div>
-                <div class="flex items-center justify-between mb-1">
-                    <label for="password" class="flex items-center text-sm font-medium text-gray-700">
-                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
+            <!-- Password Field -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <label class="flex items-center gap-2 font-label-md text-label-md font-semibold text-on-surface-variant" for="password">
+                        <span class="material-symbols-outlined text-[20px]" data-icon="lock">lock</span>
                         Password
                     </label>
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-sky-600 hover:text-sky-500 text-xs">
-                            Forgot password?
-                        </a>
-                    </div>
+                    <a class="font-label-md text-label-md font-semibold text-primary hover:underline transition-all" href="#">
+                        Forgot password?
+                    </a>
                 </div>
-                <div class="mt-1 relative">
-                    <input id="password" name="password" type="password" autocomplete="current-password" required
-                        class="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm bg-gray-50/50 pr-10"
-                        placeholder="••••••••">
-                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <svg class="h-5 w-5 text-gray-400 hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
+                <div class="relative flex items-center input-focus-glow transition-all rounded-lg group">
+                    <input class="w-full px-4 py-3.5 pr-12 bg-surface-container-low border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-0 transition-all focus:ring-2 focus:ring-primary/10" id="password" name="password" placeholder="••••••••••••" required type="password">
+                    <button class="absolute right-3 text-on-surface-variant hover:text-primary p-1 transition-colors" onclick="togglePassword()" type="button">
+                        <span class="material-symbols-outlined" data-icon="visibility" id="passwordIcon">visibility</span>
                     </button>
                 </div>
             </div>
 
-            <div class="flex items-center">
-                <input id="remember" name="remember" type="checkbox"
-                    class="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded cursor-pointer">
-                <label for="remember" class="ml-2 block text-xs text-gray-700 cursor-pointer">
+            <!-- Remember Me -->
+            <div class="flex items-center gap-3">
+                <input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary focus:ring-offset-0 bg-surface-container-low transition-all cursor-pointer" id="remember" name="remember" type="checkbox" {{ old('remember') ? 'checked' : '' }}>
+                <label class="font-body-sm text-body-sm text-on-surface-variant cursor-pointer select-none" for="remember">
                     Remember this device
                 </label>
             </div>
 
-            <div>
-                <button type="submit"
-                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0D628B] hover:bg-sky-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors duration-200">
-                    Sign In
-                    <svg class="ml-2 -mr-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="mt-6 border-t border-gray-100 pt-6"></div>
+            <!-- Primary Action -->
+            <button class="btn-active mt-2 group relative w-full bg-primary text-on-primary font-headline-sm text-headline-sm font-semibold py-4 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 hover:bg-primary-container active:scale-[0.98] transition-all overflow-hidden shadow-lg shadow-primary/20" type="submit" id="submitBtn">
+                <span class="btn-text">Sign In</span>
+                <span class="material-symbols-outlined transition-transform group-hover:translate-x-1 btn-icon" data-icon="login">login</span>
+                <!-- Subtle shimmer effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            </button>
         </form>
-    </div>
-</div>
 
-<div class="mt-8 text-center text-xs text-gray-500">
-    <p>&copy; {{ date('Y') }} Badan Pusat Statistik (BPS). All rights reserved.</p>
-    <p class="mt-1">For technical assistance, contact the BPS Service Desk.</p>
-</div>
+        <!-- Support / Extra Options -->
+        <div class="mt-8 pt-8 border-t border-surface-variant flex flex-col items-center gap-4">
+            <p class="font-body-sm text-body-sm text-on-surface-variant text-center">
+                Need technical assistance? Contact BPS Service Desk.
+            </p>
+        </div>
+    </div>
+</main>
 @endsection
+
+@push('scripts')
+<script>
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon = document.getElementById('passwordIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = 'visibility_off';
+        } else {
+            input.type = 'password';
+            icon.textContent = 'visibility';
+        }
+    }
+
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', () => {
+        const btn = document.getElementById('submitBtn');
+        const text = btn.querySelector('.btn-text');
+        const icon = btn.querySelector('.btn-icon');
+        btn.disabled = true;
+        text.textContent = 'Authenticating...';
+        icon.textContent = 'progress_activity';
+        icon.classList.add('animate-spin');
+    });
+
+    // Interactive background effect
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        document.body.style.backgroundImage = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(0,145,218,0.03) 0%, transparent 50%)`;
+    });
+</script>
+@endpush

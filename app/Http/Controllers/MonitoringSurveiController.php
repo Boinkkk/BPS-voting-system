@@ -14,6 +14,11 @@ class MonitoringSurveiController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
+        if (!$user || !$user->role || ($user->role->tipe !== 'Admin' && $user->role->tipe !== 'Kepala Kantor')) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Halaman ini khusus Admin dan Kepala Kantor.');
+        }
+
         $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
         $periode_id = $request->input('periode_id');
 
@@ -95,7 +100,6 @@ class MonitoringSurveiController extends Controller
             
             $progressPegawai = $semuaPegawai->map(function($pegawai) use ($periode_id, $kandidats, $totalKandidat) {
                 // Berapa kandidat yang sudah disurvei oleh user ini?
-                // Ingat: userId = pegawai_id. Karena 1 user = 1 pegawai.
                 $jumlahSudahSurvei = 0;
                 $targetSurvei = $totalKandidat;
 
@@ -149,8 +153,104 @@ class MonitoringSurveiController extends Controller
         ));
     }
 
+    public function downloadTxt(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user || !$user->role || ($user->role->tipe !== 'Admin' && $user->role->tipe !== 'Kepala Kantor')) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        $periode_id = $request->input('periode_id');
+        $filter = $request->input('filter', 'semua'); // selesai, belum, semua
+
+        if (!$periode_id) {
+            return redirect()->back()->with('error', 'Periode tidak valid.');
+        }
+
+        $periode = PeriodePenilaian::find($periode_id);
+        if (!$periode) {
+            return redirect()->back()->with('error', 'Periode tidak ditemukan.');
+        }
+
+        $kandidats = Kandidat::where('periode_id', $periode_id)->get();
+        $totalKandidat = $kandidats->count();
+
+        $semuaPegawai = Pegawai::whereHas('role', function ($query) {
+            $query->where('tipe', 'Pegawai');
+        })->orderBy('nama')->get();
+        
+        $progressPegawai = $semuaPegawai->map(function($pegawai) use ($periode_id, $kandidats, $totalKandidat) {
+            $targetSurvei = $totalKandidat;
+            $isKandidat = $kandidats->where('pegawai_id', $pegawai->id)->first();
+            if ($isKandidat) {
+                $targetSurvei = max(0, $totalKandidat - 1);
+            }
+
+            $jumlahSudahSurvei = SurveyProgress::where('periode_id', $periode_id)
+                ->where('user_id', $pegawai->id)
+                ->count();
+
+            $status = 'Belum';
+            if ($targetSurvei > 0) {
+                if ($jumlahSudahSurvei >= $targetSurvei) {
+                    $status = 'Selesai';
+                } elseif ($jumlahSudahSurvei > 0) {
+                    $status = 'Proses';
+                }
+            } else {
+                 $status = 'Tidak ada target';
+            }
+
+            return (object) [
+                'nama' => $pegawai->nama,
+                'nip' => $pegawai->nip,
+                'sudah' => $jumlahSudahSurvei,
+                'target' => $targetSurvei,
+                'status' => $status
+            ];
+        });
+
+        if ($filter === 'selesai') {
+            $progressPegawai = $progressPegawai->where('status', 'Selesai');
+        } elseif ($filter === 'belum') {
+            $progressPegawai = $progressPegawai->whereIn('status', ['Belum', 'Proses']);
+        }
+
+        $content = "Laporan Progress Survei\n";
+        $content .= "Periode: " . $periode->nama . "\n";
+        $content .= "Filter: " . ucfirst($filter) . "\n";
+        $content .= "Tanggal Unduh: " . now()->format('d M Y H:i:s') . "\n";
+        $content .= str_repeat("=", 80) . "\n\n";
+
+        $content .= str_pad("No", 5) . str_pad("NIP", 20) . str_pad("Nama Pegawai", 35) . str_pad("Progress", 15) . "Status\n";
+        $content .= str_repeat("-", 80) . "\n";
+
+        $no = 1;
+        foreach ($progressPegawai as $p) {
+            $progressStr = $p->sudah . "/" . $p->target;
+            $content .= str_pad($no++, 5) . 
+                        str_pad($p->nip, 20) . 
+                        str_pad(substr($p->nama, 0, 33), 35) . 
+                        str_pad($progressStr, 15) . 
+                        $p->status . "\n";
+        }
+
+        $content .= str_repeat("=", 80) . "\n";
+        $content .= "Total Data: " . $progressPegawai->count() . " pegawai\n";
+
+        $filename = "Progress_Survei_{$periode_id}_" . ucfirst($filter) . "_" . date('Ymd_His') . ".txt";
+
+        return response($content)
+            ->header('Content-Type', 'text/plain')
+            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+    }
+
     public function updateStatus(Request $request, $id)
     {
+        if (auth()->user()->role->tipe !== 'Admin') {
+            return redirect()->back()->with('error', 'Hanya Admin yang memiliki akses untuk mengubah status periode.');
+        }
+
         $request->validate([
             'status' => 'required|in:penginputan,voting,review_kepala,selesai',
         ]);

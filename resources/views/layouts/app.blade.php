@@ -182,7 +182,7 @@
                 </button>
                 
                 <div class="h-8 w-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama) }}&background=0D8ABC&color=fff" alt="User avatar" class="h-full w-full object-cover">
+                    <img src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->nama).'&background=0D8ABC&color=fff' }}" alt="User avatar" class="h-full w-full object-cover">
                 </div>
             </div>
         </header>

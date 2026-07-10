@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-
+use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -18,7 +18,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
-
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     // ==========================
     // ADMIN
     // ==========================
@@ -36,9 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/admin/pegawai/{id}', [\App\Http\Controllers\PegawaiAdminController::class, 'update'])->name('admin.pegawai.update');
         Route::put('/admin/pegawai/{id}/password', [\App\Http\Controllers\PegawaiAdminController::class, 'updatePassword'])->name('admin.pegawai.password');
 
-        // Monitoring
-        Route::get('/admin/monitoring', [\App\Http\Controllers\MonitoringSurveiController::class, 'index'])->name('admin.monitoring.index');
-        Route::put('/admin/monitoring/{id}/status', [\App\Http\Controllers\MonitoringSurveiController::class, 'updateStatus'])->name('admin.monitoring.update_status');
+
 
         // Periode
         Route::get('/admin/periode', [\App\Http\Controllers\PeriodeController::class, 'index'])->name('admin.periode.index');
@@ -73,6 +72,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/ckp/upload', [\App\Http\Controllers\CkpController::class, 'upload'])->name('admin.ckp.upload');
         Route::post('/admin/ckp/manual', [\App\Http\Controllers\CkpController::class, 'manual'])->name('admin.ckp.manual');
     });
+
+    // ==========================
+    // MONITORING SURVEI (ADMIN & KEPALA)
+    // ==========================
+    Route::get('/admin/monitoring', [\App\Http\Controllers\MonitoringSurveiController::class, 'index'])->name('admin.monitoring.index');
+    Route::get('/admin/monitoring/download-txt', [\App\Http\Controllers\MonitoringSurveiController::class, 'downloadTxt'])->name('admin.monitoring.download_txt');
+    Route::put('/admin/monitoring/{id}/status', [\App\Http\Controllers\MonitoringSurveiController::class, 'updateStatus'])->name('admin.monitoring.update_status');
 
     // ==========================
     // KANDIDAT (SEMUA ROLE LOGIN)
