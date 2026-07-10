@@ -19,10 +19,22 @@
     display: none;
 }
 
+@keyframes starPop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+@keyframes starGlow {
+    0% { filter: drop-shadow(0 0 0 rgba(251, 191, 36, 0)); }
+    50% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)); }
+    100% { filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.4)); }
+}
+
 .star-rating label {
     cursor: pointer;
     color: #d1d5db;
-    transition: color .2s;
+    transition: color 0.2s, transform 0.2s;
     padding: 2px;
 }
 
@@ -30,20 +42,32 @@
     width: 28px;
     height: 28px;
     display: block;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Hover */
+/* Hover Effects */
+.star-rating label:hover svg {
+    transform: scale(1.2);
+}
+
 .star-rating label:hover,
 .star-rating label:hover ~ label {
     color: #fbbf24;
 }
 
-/* Setelah dipilih */
+/* Selected State */
 .star-rating input:checked ~ label {
+    color: #f59e0b; 
+}
+
+/* Pop and Glow animation on the exact star that was clicked */
+.star-rating input:checked + label svg {
+    animation: starPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+               starGlow 0.4s ease-in-out forwards;
     color: #fbbf24;
 }
 
-/* Focus */
+/* Focus for accessibility */
 .star-rating input:focus-visible + label svg {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
@@ -310,7 +334,7 @@
     function changeStep(newStep) {
         if(newStep > currentStep) {
             if(!validateStep(currentStep)) {
-                alert('Silakan lengkapi penilaian untuk semua kandidat pada pertanyaan ini sebelum melanjutkan.');
+                showAlertModal('Silakan lengkapi penilaian untuk semua kandidat pada pertanyaan ini sebelum melanjutkan.');
                 return;
             }
         }
@@ -359,12 +383,50 @@
         document.getElementById('surveyForm').addEventListener('submit', function(e) {
             if(!validateStep(currentStep)) {
                 e.preventDefault();
-                alert('Silakan lengkapi penilaian terakhir sebelum mengirim.');
+                showAlertModal('Silakan lengkapi penilaian terakhir sebelum mengirim.');
             } else {
                 clearLocalDrafts();
             }
         });
     });
+</script>
+
+<!-- Alert Modal -->
+<div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="background-color: rgba(17, 24, 39, 0.5);">
+    <div class="bg-white rounded-xl shadow-xl relative overflow-hidden transition-transform duration-300" style="width: 90%; max-width: 400px; transform: scale(0.95);">
+        <div class="bg-red-500 h-2 w-full absolute top-0 left-0"></div>
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 rounded-full bg-red-100 mx-auto flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Penilaian Belum Lengkap</h3>
+            <p id="alertModalMessage" class="text-sm text-gray-500 mb-6">Silakan lengkapi penilaian untuk semua kandidat pada pertanyaan ini sebelum melanjutkan.</p>
+            <button type="button" onclick="closeAlertModal()" class="w-full bg-[#0091d5] hover:bg-sky-600 text-white font-semibold py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
+                Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAlertModal(message) {
+        const modal = document.getElementById('alertModal');
+        const modalContent = modal.querySelector('.bg-white');
+        document.getElementById('alertModalMessage').textContent = message;
+        
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modalContent.style.transform = 'scale(1)';
+    }
+
+    function closeAlertModal() {
+        const modal = document.getElementById('alertModal');
+        const modalContent = modal.querySelector('.bg-white');
+        
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        modalContent.style.transform = 'scale(0.95)';
+    }
 </script>
 @endif
 @endsection

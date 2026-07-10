@@ -190,26 +190,3 @@
       </div>
     </div>
   </div>
-
-    <script>
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-        function openEditModal(id, triwulan, tahun, tanggal_mulai, tanggal_selesai, status) {
-            document.getElementById('edit_triwulan').value = triwulan;
-            document.getElementById('edit_tahun').value = tahun;
-            document.getElementById('edit_tanggal_mulai').value = tanggal_mulai;
-            document.getElementById('edit_tanggal_selesai').value = tanggal_selesai;
-            document.getElementById('edit_status').value = status;
-            
-            // Set form action URL
-            let form = document.getElementById('editPeriodeForm');
-            form.action = '/admin/periode/' + id;
-            
-            openModal('editPeriodeModal');
-        }
-    </script>
-@endsection
