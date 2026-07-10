@@ -36,7 +36,7 @@
         <div class="flex justify-between items-end -mt-16 mb-4">
             <div class="flex items-end">
                 <div class="w-32 h-32 rounded-xl bg-white p-1 shadow-md border border-gray-100 z-10">
-                    <img src="{{ $user->foto_profil ? asset('storage/' . $user->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode($user->nama).'&background=EBF4FF&color=0D8ABC&size=128' }}" alt="Profile" class="w-full h-full rounded-lg object-cover">
+                    <img src="{{ $user->foto_profil_url }}" alt="Profile" class="w-full h-full rounded-lg object-cover">
                 </div>
                 
                 <div class="ml-6 mb-2">

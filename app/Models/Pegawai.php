@@ -45,4 +45,12 @@ class Pegawai extends Authenticatable
     {
         return $this->belongsTo(Departemen::class, 'departemen_id');
     }
+
+    public function getFotoProfilUrlAttribute()
+    {
+        if ($this->foto_profil) {
+            return asset('storage/' . $this->foto_profil);
+        }
+        return asset('images/default_profile.svg');
+    }
 }

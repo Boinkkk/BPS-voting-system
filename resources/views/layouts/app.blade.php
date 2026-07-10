@@ -152,7 +152,7 @@
         <div class="p-4 border-t border-gray-200 flex flex-col items-start md:items-center md:group-hover:items-start transition-all duration-300">
             <a href="{{ route('profile') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300" title="Profil">
                 <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex-shrink-0">
-                    <img src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->nama).'&background=0091DA&color=fff' }}" alt="User avatar" class="h-full w-full object-cover">
+                    <img src="{{ Auth::user()->foto_profil_url }}" alt="User avatar" class="h-full w-full object-cover">
                 </div>
                 <div class="ml-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden flex-1 w-auto md:w-0 md:group-hover:w-auto">
                     <p class="text-sm font-medium text-[#1D1D1B] truncate">{{ Auth::user()->nama ?? 'User' }}</p>

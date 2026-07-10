@@ -81,8 +81,12 @@
     </div>
 
     <!-- Add Periode Modal -->
-    <div id="addPeriodeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+    <div id="addPeriodeModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Background backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-md mx-auto" style="min-width: min(100%, 400px);">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold">Tambah Periode Penilaian</h3>
                 <button onclick="closeModal('addPeriodeModal')" class="text-gray-500 hover:text-gray-700">&times;</button>
@@ -124,13 +128,20 @@
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="bg-sky-600 text-white px-4 py-2 rounded shadow hover:bg-sky-700">Simpan</button>
                 </div>
+                </div>
             </form>
         </div>
+      </div>
     </div>
+  </div>
 
     <!-- Edit Periode Modal -->
-    <div id="editPeriodeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+    <div id="editPeriodeModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Background backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-md mx-auto" style="min-width: min(100%, 400px);">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold">Edit Periode Penilaian</h3>
                 <button onclick="closeModal('editPeriodeModal')" class="text-gray-500 hover:text-gray-700">&times;</button>
@@ -173,9 +184,12 @@
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Simpan Perubahan</button>
                 </div>
+                </div>
             </form>
         </div>
+      </div>
     </div>
+  </div>
 
     <script>
         function openModal(id) {

@@ -147,23 +147,31 @@
                         </div>
                         
                         <div class="p-6">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
-                                    <thead>
+                            <!-- Responsive Table/Card layout -->
+                            <div class="w-full">
+                                <table class="w-full text-left border-collapse rounded-lg overflow-hidden block md:table">
+                                    <thead class="hidden md:table-header-group">
                                         <tr class="bg-gray-100 border-b">
                                             <th class="p-4 font-semibold text-sm w-1/2 text-gray-700">Nama Kandidat</th>
                                             <th class="p-4 font-semibold text-sm w-1/2 text-center text-gray-700">Penilaian (1-5)</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="block md:table-row-group space-y-4 md:space-y-0 p-1 md:p-0">
                                         @foreach($kandidats as $k)
-                                        <tr class="border-b hover:bg-sky-50 transition-colors bg-white">
-                                            <td class="p-4 text-sm border-r border-gray-200">
-                                                <div class="font-semibold text-gray-900">{{ $k->pegawai->nama }}</div>
-                                                <div class="text-xs text-gray-500 mt-1">{{ $k->pegawai->jabatan }}</div>
+                                        <tr class="block md:table-row border border-gray-200 md:border-none md:border-b hover:bg-sky-50 transition-colors bg-white rounded-lg md:rounded-none shadow-sm md:shadow-none p-4 md:p-0">
+                                            <td class="block md:table-cell p-0 md:p-4 text-sm md:border-r border-gray-200 mb-4 md:mb-0 flex justify-center md:justify-start">
+                                                <div class="flex items-center space-x-3 w-full">
+                                                    <div class="flex-shrink-0 w-12 h-12 md:w-10 md:h-10">
+                                                        <img class="w-12 h-12 md:w-10 md:h-10 rounded-full object-cover border border-gray-200" src="{{ $k->pegawai->foto_profil_url }}" alt="{{ $k->pegawai->nama }}">
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold text-gray-900 text-sm md:text-base">{{ $k->pegawai->nama }}</div>
+                                                        <div class="text-xs text-gray-500 mt-1">{{ $k->pegawai->jabatan }}</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td class="p-4 text-center align-middle">
-                                                <div class="star-rating">
+                                            <td class="block md:table-cell p-0 md:p-4 text-center align-middle border-t border-gray-100 md:border-t-0 pt-4 md:pt-0">
+                                                <div class="star-rating transform scale-125 md:scale-100 mt-2 md:mt-0">
                                                     @for($i = 5; $i >= 1; $i--)
                                                         <input
                                                             type="radio"
@@ -194,18 +202,18 @@
                     </div>
                     
                     <!-- Form Navigation -->
-                    <div class="flex justify-between items-center mb-10">
-                        <div>
+                    <div class="flex flex-col-reverse md:flex-row justify-between items-center mt-6 mb-10 gap-4">
+                        <div class="w-full md:w-auto">
                             @if(!$loop->first)
-                            <button type="button" onclick="changeStep({{ $loop->iteration - 1 }})" class="px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 shadow-sm transition-colors flex items-center">
+                            <button type="button" onclick="changeStep({{ $loop->iteration - 1 }})" class="w-full md:w-auto justify-center px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 shadow-sm transition-colors flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                                 Sebelumnya
                             </button>
                             @endif
                         </div>
-                        <div class="flex space-x-4">
+                        <div class="flex w-full md:w-auto space-x-0 md:space-x-4 flex-col md:flex-row gap-4 md:gap-0">
                             @if(!$loop->last)
-                            <button type="button" onclick="changeStep({{ $loop->iteration + 1 }})" class="px-6 py-3 bg-gray-800 text-white font-medium rounded-md hover:bg-gray-700 shadow-sm transition-colors flex items-center">
+                            <button type="button" onclick="changeStep({{ $loop->iteration + 1 }})" class="w-full md:w-auto justify-center px-6 py-3 bg-gray-800 text-white font-medium rounded-md hover:bg-gray-700 shadow-sm transition-colors flex items-center">
                                 Selanjutnya
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                             </button>
@@ -213,12 +221,12 @@
 
                             @if($loop->last)
                                 @if(Auth::user()->role->tipe === 'Pegawai')
-                                <button type="submit" class="px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-blue-600 shadow-md transition-colors flex items-center">
+                                <button type="submit" class="w-full md:w-auto justify-center px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-blue-600 shadow-md transition-colors flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Kirim Semua Penilaian
                                 </button>
                                 @else
-                                <button type="button" disabled class="px-8 py-3 bg-gray-400 text-white font-bold rounded-md cursor-not-allowed shadow-md">
+                                <button type="button" disabled class="w-full md:w-auto justify-center px-8 py-3 bg-gray-400 text-white font-bold rounded-md cursor-not-allowed shadow-md">
                                     Mode Read-Only
                                 </button>
                                 @endif
