@@ -86,20 +86,60 @@ class AbsensiPegawai extends Model
      */
     public function getNilaiPresensiAttribute()
     {
-        if ($this->tk >= 1) {
-            return 96;
+        // 1. Dapatkan Base Score berdasarkan KJK
+        if ($this->kjk == 0) {
+            $baseScore = 100;
+        } elseif ($this->kjk >= 1 && $this->kjk <= 60) {
+            $baseScore = 99;
+        } elseif ($this->kjk >= 61 && $this->kjk <= 120) {
+            $baseScore = 98;
+        } elseif ($this->kjk >= 121 && $this->kjk <= 450) {
+            $baseScore = 97;
+        } else {
+            $baseScore = 96;
         }
 
-        if ($this->kjk == 0) {
-            return 100;
-        } elseif ($this->kjk >= 1 && $this->kjk <= 60) {
-            return 99;
-        } elseif ($this->kjk >= 61 && $this->kjk <= 120) {
-            return 98;
-        } elseif ($this->kjk >= 121 && $this->kjk <= 450) {
-            return 97;
-        } else {
-            return 96;
+        // Ambil pengaturan bobot (jika kosong, gunakan default via dummy object atau array)
+        $bobot = \Illuminate\Support\Facades\Cache::rememberForever('pengaturan_bobot_absensi', function () {
+            return \App\Models\PengaturanBobot::first();
+        });
+
+        if (!$bobot) {
+            // Jika belum ada di database, kembalikan baseScore (atau bisa set default value)
+            return $baseScore;
         }
+
+        // 2. Kurangi dengan TK
+        $baseScore -= ($this->tk * $bobot->bobot_tk);
+
+        // 3. Kurangi dengan HT
+        $baseScore -= ($this->ht * $bobot->bobot_ht);
+
+        // 4. Kurangi dengan PSW
+        if ($bobot->bobot_psw1 > 0 || $bobot->bobot_psw2 > 0 || $bobot->bobot_psw3 > 0 || $bobot->bobot_psw4 > 0) {
+            $baseScore -= (
+                ($this->psw1 * $bobot->bobot_psw1) + 
+                ($this->psw2 * $bobot->bobot_psw2) + 
+                ($this->psw3 * $bobot->bobot_psw3) + 
+                ($this->psw4 * $bobot->bobot_psw4)
+            );
+        } else {
+            $baseScore -= ($this->psw * $bobot->bobot_psw);
+        }
+
+        // 5. Kurangi dengan TL
+        if ($bobot->bobot_tl1 > 0 || $bobot->bobot_tl2 > 0 || $bobot->bobot_tl3 > 0 || $bobot->bobot_tl4 > 0) {
+            $baseScore -= (
+                ($this->tl1 * $bobot->bobot_tl1) + 
+                ($this->tl2 * $bobot->bobot_tl2) + 
+                ($this->tl3 * $bobot->bobot_tl3) + 
+                ($this->tl4 * $bobot->bobot_tl4)
+            );
+        } else {
+            $baseScore -= ($this->tl * $bobot->bobot_tl);
+        }
+
+        // Pastikan skor tidak kurang dari 0
+        return max(0, $baseScore);
     }
 }

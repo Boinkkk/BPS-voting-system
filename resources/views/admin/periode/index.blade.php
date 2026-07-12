@@ -128,7 +128,6 @@
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="bg-sky-600 text-white px-4 py-2 rounded shadow hover:bg-sky-700">Simpan</button>
                 </div>
-                </div>
             </form>
         </div>
       </div>
@@ -184,9 +183,47 @@
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Simpan Perubahan</button>
                 </div>
-                </div>
             </form>
         </div>
       </div>
     </div>
   </div>
+
+@endsection
+
+@push('scripts')
+<script>
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('hidden');
+        // setTimeout for transition
+        setTimeout(() => {
+            modal.children[0].classList.add('opacity-100');
+            modal.children[1].children[0].classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+        }, 50);
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.children[0].classList.remove('opacity-100');
+        modal.children[1].children[0].classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    function openEditModal(id, triwulan, tahun, tanggal_mulai, tanggal_selesai, status) {
+        document.getElementById('edit_triwulan').value = triwulan;
+        document.getElementById('edit_tahun').value = tahun;
+        document.getElementById('edit_tanggal_mulai').value = tanggal_mulai;
+        document.getElementById('edit_tanggal_selesai').value = tanggal_selesai;
+        document.getElementById('edit_status').value = status;
+        
+        // Update form action
+        const form = document.getElementById('editPeriodeForm');
+        form.action = `/admin/periode/${id}`;
+        
+        openModal('editPeriodeModal');
+    }
+</script>
+@endpush
