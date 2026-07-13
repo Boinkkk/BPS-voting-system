@@ -9,7 +9,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $pemenangTerakhir = \App\Models\HasilAkhir::with(['kandidat.pegawai', 'periode'])
+        $pemenangTerakhir = \App\Models\HasilAkhir::with(['periode'])
             ->where('is_terpilih', true)
             ->whereHas('periode', function ($q) {
                 $q->where('status', 'selesai');
@@ -17,7 +17,23 @@ class DashboardController extends Controller
             ->orderBy('waktu_penetapan', 'desc')
             ->first();
 
-        return view('dashboard', compact('pemenangTerakhir'));
+        $top3 = collect();
+        if ($pemenangTerakhir) {
+            $periode = $pemenangTerakhir->periode;
+            $semuaKandidat = \App\Models\HasilAkhir::with(['kandidat.pegawai', 'pemilih'])
+                ->where('periode_id', $periode->id)
+                ->get();
+                
+            $juara1 = $semuaKandidat->where('is_terpilih', true)->first();
+            $lainnya = $semuaKandidat->where('is_terpilih', false)->sortBy('ranking_final')->values();
+            
+            $juara2 = $lainnya->get(0);
+            $juara3 = $lainnya->get(1);
+            
+            $top3 = collect([$juara1, $juara2, $juara3])->filter();
+        }
+
+        return view('dashboard', compact('pemenangTerakhir', 'top3'));
     }
 
     public function profile()

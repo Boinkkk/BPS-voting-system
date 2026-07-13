@@ -9,9 +9,7 @@
         <p class="font-body-sm text-body-sm text-on-surface-variant opacity-75 mt-1 uppercase tracking-wider">
             Sistem Informasi Voting Terpadu
         </p>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-4">
-            Secure Employee Portal Login
-        </p>
+        
     </div>
 
     <!-- Login Card -->

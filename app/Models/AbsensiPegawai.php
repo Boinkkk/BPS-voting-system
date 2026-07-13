@@ -112,8 +112,8 @@ class AbsensiPegawai extends Model
         // 2. Kurangi dengan TK
         $baseScore -= ($this->tk * $bobot->bobot_tk);
 
-        // 3. Kurangi dengan HT
-        $baseScore -= ($this->ht * $bobot->bobot_ht);
+        // 3. Kurangi dengan HT (Dihapus karena HT = TL1 + TL2 + TL3 + TL4, cukup gunakan TL)
+        // $baseScore -= ($this->ht * $bobot->bobot_ht);
 
         // 4. Kurangi dengan PSW
         if ($bobot->bobot_psw1 > 0 || $bobot->bobot_psw2 > 0 || $bobot->bobot_psw3 > 0 || $bobot->bobot_psw4 > 0) {

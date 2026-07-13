@@ -26,7 +26,6 @@ class PengaturanBobotController extends Controller
             'ckp' => 'required|numeric|min:0|max:100',
             'absensi' => 'required|numeric|min:0|max:100',
             'survey' => 'required|numeric|min:0|max:100',
-            'bobot_ht' => 'required|numeric|min:0',
             'bobot_psw' => 'required|numeric|min:0',
             'bobot_psw1' => 'required|numeric|min:0',
             'bobot_psw2' => 'required|numeric|min:0',
@@ -48,7 +47,7 @@ class PengaturanBobotController extends Controller
         $bobot = PengaturanBobot::first();
         $data = $request->only([
             'ckp', 'absensi', 'survey',
-            'bobot_ht', 'bobot_psw', 'bobot_psw1', 'bobot_psw2', 'bobot_psw3', 'bobot_psw4',
+            'bobot_psw', 'bobot_psw1', 'bobot_psw2', 'bobot_psw3', 'bobot_psw4',
             'bobot_tl', 'bobot_tl1', 'bobot_tl2', 'bobot_tl3', 'bobot_tl4', 'bobot_tk'
         ]);
 

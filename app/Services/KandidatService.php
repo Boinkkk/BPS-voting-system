@@ -47,24 +47,50 @@ class KandidatService
                                 ->get();
                                 
             $totalKjk = $rekapsAbsen->sum('kjk');
-            $totalTk = $rekapsAbsen->sum('tk');
             
-            $nilaiAbsensi = 100;
-            if ($totalTk >= 1) {
-                $nilaiAbsensi = 96;
+            // Fase 1: Base Score dari KJK
+            if ($totalKjk == 0) {
+                $nilaiAbsensi = 100;
+            } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                $nilaiAbsensi = 99;
+            } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                $nilaiAbsensi = 98;
+            } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                $nilaiAbsensi = 97;
             } else {
-                if ($totalKjk == 0) {
-                    $nilaiAbsensi = 100;
-                } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
-                    $nilaiAbsensi = 99;
-                } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
-                    $nilaiAbsensi = 98;
-                } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
-                    $nilaiAbsensi = 97;
-                } else {
-                    $nilaiAbsensi = 96;
-                }
+                $nilaiAbsensi = 96;
             }
+
+            // Fase 2 & 3: Pengurangan dari TL, PSW, dan TK
+            $bobotCache = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
+                return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
+            });
+            $getBobot = function ($kode, $default) use ($bobotCache) {
+                return isset($bobotCache[$kode]) ? (float)$bobotCache[$kode] : $default;
+            };
+
+            $totalPenguranganTl = 0;
+            $totalPenguranganPsw = 0;
+            
+            foreach ($rekapsAbsen as $rekap) {
+                $totalPenguranganTl += ($rekap->tl1 * $getBobot('TL1', 0.5)) + 
+                                       ($rekap->tl2 * $getBobot('TL2', 0.5)) + 
+                                       ($rekap->tl3 * $getBobot('TL3', 1.0)) + 
+                                       ($rekap->tl4 * $getBobot('TL4', 2.5));
+                                       
+                $totalPenguranganPsw += ($rekap->psw1 * $getBobot('PSW1', 0.5)) + 
+                                        ($rekap->psw2 * $getBobot('PSW2', 0.5)) + 
+                                        ($rekap->psw3 * $getBobot('PSW3', 1.0)) + 
+                                        ($rekap->psw4 * $getBobot('PSW4', 2.5));
+            }
+            
+            $nilaiAbsensi -= $totalPenguranganTl;
+            $nilaiAbsensi -= $totalPenguranganPsw;
+
+            $totalTk = $rekapsAbsen->sum('tk');
+            $nilaiAbsensi -= ($totalTk * $getBobot('TK', 2.5));
+            
+            $nilaiAbsensi = max(0, $nilaiAbsensi);
 
             // Jika tidak punya data CKP maupun Absensi sama sekali di periode ini, bisa dilewati
             if (!$ckp && $rekapsAbsen->isEmpty()) {
@@ -149,24 +175,50 @@ class KandidatService
                                 ->where('pegawai_id', $kandidat->pegawai_id)
                                 ->get();
             $totalKjk = $rekapsAbsen->sum('kjk');
-            $totalTk = $rekapsAbsen->sum('tk');
             
-            $nilaiAbsensi = 100;
-            if ($totalTk >= 1) {
-                $nilaiAbsensi = 96;
+            // Fase 1: Base Score dari KJK
+            if ($totalKjk == 0) {
+                $nilaiAbsensi = 100;
+            } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                $nilaiAbsensi = 99;
+            } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                $nilaiAbsensi = 98;
+            } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                $nilaiAbsensi = 97;
             } else {
-                if ($totalKjk == 0) {
-                    $nilaiAbsensi = 100;
-                } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
-                    $nilaiAbsensi = 99;
-                } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
-                    $nilaiAbsensi = 98;
-                } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
-                    $nilaiAbsensi = 97;
-                } else {
-                    $nilaiAbsensi = 96;
-                }
+                $nilaiAbsensi = 96;
             }
+
+            // Fase 2 & 3: Pengurangan dari TL, PSW, dan TK
+            $bobotCache = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
+                return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
+            });
+            $getBobot = function ($kode, $default) use ($bobotCache) {
+                return isset($bobotCache[$kode]) ? (float)$bobotCache[$kode] : $default;
+            };
+
+            $totalPenguranganTl = 0;
+            $totalPenguranganPsw = 0;
+            
+            foreach ($rekapsAbsen as $rekap) {
+                $totalPenguranganTl += ($rekap->tl1 * $getBobot('TL1', 0.5)) + 
+                                       ($rekap->tl2 * $getBobot('TL2', 0.5)) + 
+                                       ($rekap->tl3 * $getBobot('TL3', 1.0)) + 
+                                       ($rekap->tl4 * $getBobot('TL4', 2.5));
+                                       
+                $totalPenguranganPsw += ($rekap->psw1 * $getBobot('PSW1', 0.5)) + 
+                                        ($rekap->psw2 * $getBobot('PSW2', 0.5)) + 
+                                        ($rekap->psw3 * $getBobot('PSW3', 1.0)) + 
+                                        ($rekap->psw4 * $getBobot('PSW4', 2.5));
+            }
+            
+            $nilaiAbsensi -= $totalPenguranganTl;
+            $nilaiAbsensi -= $totalPenguranganPsw;
+
+            $totalTk = $rekapsAbsen->sum('tk');
+            $nilaiAbsensi -= ($totalTk * $getBobot('TK', 2.5));
+            
+            $nilaiAbsensi = max(0, $nilaiAbsensi);
             
             // Skor Final Gabungan
             $finalScore = ($nilaiCkp * ($ckpWeight / 100)) + 

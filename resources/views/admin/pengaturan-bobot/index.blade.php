@@ -67,17 +67,13 @@
                     <div class="mt-8 border-t pt-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Pengaturan Bobot Pengurangan Nilai Absensi Akhir</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Bobot HT</label>
-                                <input type="number" step="0.01" name="bobot_ht" value="{{ $bobot->bobot_ht ?? 4 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                                <p class="text-xs text-gray-500 mt-1">Default 4. Setiap HT dikurangkan sejumlah bobot ini.</p>
-                            </div>
+                            <!-- Bobot HT Dihapus -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Bobot TK</label>
                                 <input type="number" step="0.01" name="bobot_tk" value="{{ $bobot->bobot_tk ?? 2 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                                 <p class="text-xs text-gray-500 mt-1">Default 2.</p>
                             </div>
-                            <div></div>
+                            <div class="md:col-span-1 lg:col-span-2"></div>
                             
                             <!-- PSW -->
                             <div>

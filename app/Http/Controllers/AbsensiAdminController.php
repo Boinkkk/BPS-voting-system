@@ -13,16 +13,40 @@ class AbsensiAdminController extends Controller
 {
     public function index(Request $request)
     {
-        $periode_id = $request->input('periode_id');
-        $bulan = $request->input('bulan');
+        $requested_periode_id = $request->input('periode_id');
+        $requested_bulan = $request->input('bulan');
+
+        $periode_id = $requested_periode_id;
+        $bulan = $requested_bulan;
 
         $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
         if (!$periode_id && $periodes->isNotEmpty()) {
             $periode_id = $periodes->first()->id;
         }
 
-        if (!$bulan) {
+        if ($periode_id) {
+            $periode = $periodes->firstWhere('id', $periode_id);
+            if ($periode) {
+                $triwulan = $periode->triwulan;
+                $bulanAwal = ($triwulan - 1) * 3 + 1;
+                $bulanAkhir = $bulanAwal + 2;
+
+                // Jika bulan tidak di-set atau berada di luar range triwulan ini
+                if (!$bulan || $bulan < $bulanAwal || $bulan > $bulanAkhir) {
+                    $bulan = $bulanAwal;
+                }
+            } elseif (!$bulan) {
+                $bulan = date('n');
+            }
+        } elseif (!$bulan) {
             $bulan = date('n');
+        }
+
+        if ($periode_id != $requested_periode_id || $bulan != $requested_bulan) {
+            return redirect()->route('admin.absensi.index', array_merge($request->query(), [
+                'periode_id' => $periode_id,
+                'bulan' => $bulan
+            ]));
         }
 
         $perPage = $request->input('per_page', 10);
@@ -66,22 +90,49 @@ class AbsensiAdminController extends Controller
                 $totalTk = $dataAbsen->sum('tk');
                 $pegawai = $dataAbsen->first()->pegawai;
                 
-                $nilaiPresensi = 100;
-                if ($totalTk >= 1) {
-                    $nilaiPresensi = 96;
+                $pengaturan = \App\Models\PengaturanBobot::first();
+                
+                // Fase 1: Base Score dari KJK
+                if ($totalKjk == 0) {
+                    $nilaiPresensi = 100;
+                } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
+                    $nilaiPresensi = 99;
+                } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
+                    $nilaiPresensi = 98;
+                } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
+                    $nilaiPresensi = 97;
                 } else {
-                    if ($totalKjk == 0) {
-                        $nilaiPresensi = 100;
-                    } elseif ($totalKjk >= 1 && $totalKjk <= 60) {
-                        $nilaiPresensi = 99;
-                    } elseif ($totalKjk >= 61 && $totalKjk <= 120) {
-                        $nilaiPresensi = 98;
-                    } elseif ($totalKjk >= 121 && $totalKjk <= 450) {
-                        $nilaiPresensi = 97;
-                    } else {
-                        $nilaiPresensi = 96;
-                    }
+                    $nilaiPresensi = 96;
                 }
+
+                // Fase 2 & 3: Pengurangan dari TL, PSW, dan TK
+                $bobotCache = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
+                    return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
+                });
+                $getBobot = function ($kode, $default) use ($bobotCache) {
+                    return isset($bobotCache[$kode]) ? (float)$bobotCache[$kode] : $default;
+                };
+
+                $totalPenguranganTl = 0;
+                $totalPenguranganPsw = 0;
+                
+                foreach ($dataAbsen as $rekap) {
+                    $totalPenguranganTl += ($rekap->tl1 * $getBobot('TL1', 0.5)) + 
+                                           ($rekap->tl2 * $getBobot('TL2', 0.5)) + 
+                                           ($rekap->tl3 * $getBobot('TL3', 1.0)) + 
+                                           ($rekap->tl4 * $getBobot('TL4', 2.5));
+                                           
+                    $totalPenguranganPsw += ($rekap->psw1 * $getBobot('PSW1', 0.5)) + 
+                                            ($rekap->psw2 * $getBobot('PSW2', 0.5)) + 
+                                            ($rekap->psw3 * $getBobot('PSW3', 1.0)) + 
+                                            ($rekap->psw4 * $getBobot('PSW4', 2.5));
+                }
+                
+                $nilaiPresensi -= $totalPenguranganTl;
+                $nilaiPresensi -= $totalPenguranganPsw;
+                $nilaiPresensi -= ($totalTk * $getBobot('TK', 2.5));
+                
+                $nilaiPresensi = max(0, $nilaiPresensi);
                 
                 $rekapTriwulan->push((object)[
                     'pegawai' => $pegawai,

@@ -203,6 +203,46 @@
         </div>
         </div>
 
+        <!-- Modal Detail Absensi -->
+        <div id="detailAbsensiModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl w-full relative">
+                    <div class="absolute top-0 right-0 pt-4 pr-4">
+                        <button type="button" class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="closeDetailModal()">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-detail">
+                                    Detail Absensi: <span id="detail-nama" class="font-bold text-[#0091d5]"></span>
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1 mb-4">Rincian keseluruhan kode absensi pada bulan terpilih.</p>
+                                
+                                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 text-sm" id="detail-content">
+                                    <!-- Konten detail akan dimuat via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeDetailModal()">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="space-y-6">
             <!-- Data Absensi -->
             <div class="w-full">
@@ -248,6 +288,7 @@
                                     <th class="p-3 font-semibold text-sm text-center">KJK HT</th>
                                     <th class="p-3 font-semibold text-sm text-center">KJK PC</th>
                                     <th class="p-3 font-semibold text-sm text-center text-red-600">KJK</th>
+                                    <th class="p-3 font-semibold text-sm text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -262,6 +303,16 @@
                                         <td class="p-3 text-sm text-center">{{ $absen->kjk_ht }}</td>
                                         <td class="p-3 text-sm text-center">{{ $absen->kjk_pc }}</td>
                                         <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->kjk }}</td>
+                                        <td class="p-3 text-sm text-center">
+                                            <a href="javascript:void(0)" onclick="openDetailModal(this)" 
+   data-absen="{{ json_encode($absen) }}" 
+   class="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-md cursor-pointer transition-colors z-10 relative" 
+   title="Lihat Detail Kode Absensi">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </a>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -405,6 +456,66 @@
 
     function closeManualModal() {
         document.getElementById('manualInputModal').classList.add('hidden');
+    }
+
+    function openDetailModal(button) {
+        let data = {};
+        try {
+            data = JSON.parse(button.getAttribute('data-absen'));
+        } catch (e) {
+            console.error("Failed to parse absen data", e);
+            return;
+        }
+
+        document.getElementById('detail-nama').innerText = data.pegawai ? data.pegawai.nama : '-';
+        
+        const details = [
+            { label: 'HK', value: data.hk },
+            { label: 'HD', value: data.hd },
+            { label: 'TK', value: data.tk, highlight: true },
+            { label: 'TB', value: data.tb },
+            { label: 'PD', value: data.pd },
+            { label: 'DK', value: data.dk },
+            { label: 'KN', value: data.kn },
+            { label: 'HT', value: data.ht },
+            { label: 'PSW Total', value: data.psw, highlight: true },
+            { label: 'PSW 1', value: data.psw1 },
+            { label: 'PSW 2', value: data.psw2 },
+            { label: 'PSW 3', value: data.psw3 },
+            { label: 'PSW 4', value: data.psw4 },
+            { label: 'TL Total', value: data.tl, highlight: true },
+            { label: 'TL 1', value: data.tl1 },
+            { label: 'TL 2', value: data.tl2 },
+            { label: 'TL 3', value: data.tl3 },
+            { label: 'TL 4', value: data.tl4 },
+            { label: 'CB', value: data.cb },
+            { label: 'CL', value: data.cl },
+            { label: 'CM', value: data.cm },
+            { label: 'CP', value: data.cp },
+            { label: 'CS', value: data.cs },
+            { label: 'KJK HT', value: data.kjk_ht },
+            { label: 'KJK PC', value: data.kjk_pc },
+            { label: 'Total KJK', value: data.kjk, highlight: true }
+        ];
+
+        let htmlContent = '';
+        details.forEach(item => {
+            const val = item.value || 0;
+            const textColor = (item.highlight && val > 0) ? 'text-red-600 font-bold' : 'text-gray-900';
+            htmlContent += `
+                <div class="border rounded p-2 bg-gray-50 flex flex-col items-center justify-center text-center">
+                    <div class="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-1">${item.label}</div>
+                    <div class="text-base ${textColor}">${val}</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('detail-content').innerHTML = htmlContent;
+        document.getElementById('detailAbsensiModal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailAbsensiModal').classList.add('hidden');
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
