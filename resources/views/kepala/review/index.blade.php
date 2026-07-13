@@ -81,13 +81,13 @@
                                 </div>
                             </div>
                             
-                            <form action="{{ route('kepala.review.pilih', $h->id) }}" method="POST" onsubmit="return confirm('Anda yakin menetapkan {{ $h->kandidat->pegawai->nama }} sebagai Pegawai Terbaik? Tindakan ini akan mengakhiri periode penilaian.');">
+                            <form id="form-pilih-{{ $h->id }}" action="{{ route('kepala.review.pilih', $h->id) }}" method="POST">
                                 @csrf
                                 <div class="mb-4">
                                     <label class="block text-xs font-medium text-gray-700 mb-1">Catatan/Alasan (Opsional)</label>
                                     <textarea name="catatan" rows="2" class="w-full border-gray-300 rounded text-sm focus:ring-[#0091d5] focus:border-[#0091d5]" placeholder="Berikan ucapan selamat atau alasan pemilihan..."></textarea>
                                 </div>
-                                <button type="submit" class="w-full py-3 bg-[#0091d5] text-white font-bold rounded-lg shadow hover:bg-sky-700 transition-colors flex justify-center items-center">
+                                <button type="button" onclick="openConfirmModal('{{ $h->id }}', '{{ addslashes($h->kandidat->pegawai->nama) }}')" class="w-full py-3 bg-[#0091d5] text-white font-bold rounded-lg shadow hover:bg-sky-700 transition-colors flex justify-center items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     Tetapkan Pemenang
                                 </button>
@@ -106,4 +106,86 @@
 
     </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="font-family: 'Hanken Grotesk', sans-serif;">
+    <!-- Backdrop -->
+    <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-60 transition-opacity opacity-0 backdrop-blur-sm" aria-hidden="true" onclick="closeConfirmModal()"></div>
+
+    <!-- Modal Panel -->
+    <div id="modalPanel" class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl transition-all opacity-0 translate-y-8 w-full max-w-md mx-auto flex flex-col z-10 border border-gray-100" style="min-width: 280px;">
+        <div class="bg-white px-5 pt-6 pb-5 sm:p-6 sm:pb-5">
+            <div class="sm:flex sm:items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-14 w-14 rounded-full bg-blue-50 sm:mx-0 sm:h-12 sm:w-12">
+                    <svg class="h-7 w-7 text-[#0091d5]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="mt-4 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">
+                        Konfirmasi Penetapan
+                    </h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500 leading-relaxed">
+                            Anda yakin ingin menetapkan <strong id="modalKandidatName" class="text-gray-900"></strong> sebagai Pegawai Terbaik? Tindakan ini akan mengakhiri periode penilaian dan tidak dapat dibatalkan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-50 px-5 py-4 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
+            <button type="button" onclick="submitForm()" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2.5 bg-[#0091d5] text-base font-bold text-white hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0091d5] sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                Ya, Tetapkan
+            </button>
+            <button type="button" onclick="closeConfirmModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-4 py-2.5 bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0091d5] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                Batal
+            </button>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    let currentFormId = null;
+
+    function openConfirmModal(id, name) {
+        currentFormId = 'form-pilih-' + id;
+        document.getElementById('modalKandidatName').innerText = name;
+        
+        const modal = document.getElementById('confirmModal');
+        const overlay = document.getElementById('modalOverlay');
+        const panel = document.getElementById('modalPanel');
+        
+        // Remove hidden so display: flex takes over
+        modal.classList.remove('hidden');
+        
+        // Trigger transitions
+        setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            panel.classList.remove('opacity-0', 'translate-y-8');
+            panel.classList.add('opacity-100', 'translate-y-0');
+        }, 20);
+    }
+
+    function closeConfirmModal() {
+        const overlay = document.getElementById('modalOverlay');
+        const panel = document.getElementById('modalPanel');
+        
+        overlay.classList.add('opacity-0');
+        panel.classList.remove('opacity-100', 'translate-y-0');
+        panel.classList.add('opacity-0', 'translate-y-8');
+        
+        setTimeout(() => {
+            document.getElementById('confirmModal').classList.add('hidden');
+            currentFormId = null;
+        }, 300);
+    }
+
+    function submitForm() {
+        if (currentFormId) {
+            document.getElementById(currentFormId).submit();
+        }
+    }
+</script>
+@endpush
 @endsection

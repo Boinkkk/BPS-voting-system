@@ -5,7 +5,7 @@ $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 $pegawais = \App\Models\Pegawai::whereHas('role', function($q) {
-    $q->where('tipe', 'Pegawai');
-})->get(['email']);
+    $q->whereIn('tipe', ['Pegawai', 'Kepala Umum']);
+})->get(['email', 'nip']);
 
 echo "\n" . json_encode($pegawais) . "\n";

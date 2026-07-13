@@ -1,4 +1,6 @@
-@extends('layouts.app')
+import os
+
+content = r"""@extends('layouts.app')
 
 @section('content')
 <div class="mb-6">
@@ -187,3 +189,8 @@
 </script>
 @endpush
 @endsection
+"""
+
+with open(r'resources/views/dashboard.blade.php', 'w', encoding='utf-8') as f:
+    f.write(content)
+print('OK - wrote', len(content), 'bytes')

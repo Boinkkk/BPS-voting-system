@@ -40,8 +40,8 @@ class SurveyPegawaiController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if ($user->role->tipe !== 'Pegawai') {
-            return redirect()->route('pegawai.survey.index')->with('error', 'Hanya pegawai yang dapat mensubmit survei. Anda hanya memiliki akses pratinjau (read-only).');
+        if (!in_array($user->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum'])) {
+            return redirect()->route('pegawai.survey.index')->with('error', 'Hanya pegawai dan Kepala Umum yang dapat mensubmit survei. Anda hanya memiliki akses pratinjau (read-only).');
         }
 
         $request->validate([

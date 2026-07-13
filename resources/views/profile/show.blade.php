@@ -230,32 +230,42 @@
 </div>
 
 <!-- Password Modal -->
-<div id="passwordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold text-gray-900">Ubah Password</h3>
-            <button onclick="document.getElementById('passwordModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+<div id="passwordModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="font-family: 'Hanken Grotesk', sans-serif;">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="document.getElementById('passwordModal').classList.add('hidden')"></div>
+
+    <!-- Modal Panel -->
+    <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-md mx-auto flex flex-col z-10 border border-gray-100" style="min-width: 280px;">
+        <div class="flex justify-between items-center px-5 pt-5 pb-4 border-b border-gray-100">
+            <h3 class="text-lg font-bold text-gray-900" id="modal-title">Ubah Password</h3>
+            <button type="button" onclick="document.getElementById('passwordModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 focus:outline-none bg-gray-50 hover:bg-gray-100 p-1.5 rounded-full transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
         <form action="{{ route('profile.password') }}" method="POST">
             @csrf
             @method('PUT')
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
-                <input type="password" name="current_password" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-sky-500">
+            <div class="p-5 space-y-4 bg-white">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Password Saat Ini</label>
+                    <input type="password" name="current_password" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0D8ABC] focus:border-[#0D8ABC] transition-colors text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Password Baru</label>
+                    <input type="password" name="password" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0D8ABC] focus:border-[#0D8ABC] transition-colors text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Konfirmasi Password Baru</label>
+                    <input type="password" name="password_confirmation" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0D8ABC] focus:border-[#0D8ABC] transition-colors text-sm">
+                </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
-                <input type="password" name="password" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-sky-500">
-            </div>
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
-                <input type="password" name="password_confirmation" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-sky-500">
-            </div>
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="document.getElementById('passwordModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-[#0D8ABC] text-white rounded-md text-sm font-medium hover:bg-sky-800">Simpan Perubahan</button>
+            <div class="bg-gray-50 px-5 py-4 sm:flex sm:flex-row-reverse border-t border-gray-100">
+                <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2.5 bg-[#0D8ABC] text-base font-bold text-white hover:bg-sky-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D8ABC] sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                    Simpan Perubahan
+                </button>
+                <button type="button" onclick="document.getElementById('passwordModal').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-4 py-2.5 bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D8ABC] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                    Batal
+                </button>
             </div>
         </form>
     </div>

@@ -90,7 +90,10 @@ test.describe('Survey Automation untuk Semua User', () => {
                     } else if (await submitButton.isVisible()) {
                         // Jika tidak ada "Selanjutnya" tapi ada "Kirim Semua Penilaian", ini step terakhir
                         hasNextStep = false;
-                        await submitButton.click();
+                        await Promise.all([
+                            page.waitForNavigation(),
+                            submitButton.click()
+                        ]);
                     } else {
                         // Jika tidak ada tombol sama sekali, keluar (menghindari infinite loop)
                         hasNextStep = false;
@@ -103,8 +106,8 @@ test.describe('Survey Automation untuk Semua User', () => {
                 await expect(page.locator('.bg-green-50')).toBeVisible();
             }
 
-            // Logout setelah survey selesai
-            await page.click('button:has-text("Logout"), a:has-text("Logout"), button:has-text("Sign Out")');
+            // Playwright akan mereset session secara otomatis melalui context.close() 
+            // tanpa perlu melakukan klik tombol logout (terutama karena tombol Sign Out sudah tidak ada di layout utama)
             await context.close();
         });
     }

@@ -95,7 +95,7 @@ class MonitoringSurveiController extends Controller
 
             // 2. Daftar Absen / Progress per Pegawai (Hanya role Pegawai)
             $semuaPegawai = Pegawai::whereHas('role', function ($query) {
-                $query->where('tipe', 'Pegawai');
+                $query->whereIn('tipe', ['Pegawai', 'Kepala Umum', 'Kepala_Umum']);
             })->orderBy('nama')->get();
             
             $progressPegawai = $semuaPegawai->map(function($pegawai) use ($periode_id, $kandidats, $totalKandidat) {
@@ -137,7 +137,7 @@ class MonitoringSurveiController extends Controller
         }
 
         $totalPegawai = Pegawai::whereHas('role', function ($query) {
-            $query->where('tipe', 'Pegawai');
+            $query->whereIn('tipe', ['Pegawai', 'Kepala Umum', 'Kepala_Umum']);
         })->count();
 
         $persentase = $totalPegawai > 0 ? round(($pegawaiSelesai / $totalPegawai) * 100, 1) : 0;
@@ -176,7 +176,7 @@ class MonitoringSurveiController extends Controller
         $totalKandidat = $kandidats->count();
 
         $semuaPegawai = Pegawai::whereHas('role', function ($query) {
-            $query->where('tipe', 'Pegawai');
+            $query->whereIn('tipe', ['Pegawai', 'Kepala Umum', 'Kepala_Umum']);
         })->orderBy('nama')->get();
         
         $progressPegawai = $semuaPegawai->map(function($pegawai) use ($periode_id, $kandidats, $totalKandidat) {

@@ -115,7 +115,7 @@
             </div>
             @endif
 
-            @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Pegawai')
+            @if(Auth::user() && Auth::user()->role && in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']))
             <div class="mb-2 mt-4">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Menu Pegawai</span></p>
                 <a href="{{ route('pegawai.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'bg-[#0091DA]/10 text-[#0091DA]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
@@ -149,7 +149,7 @@
 
         </nav>
         
-        <div class="p-4 border-t border-gray-200 flex flex-col items-start md:items-center md:group-hover:items-start transition-all duration-300">
+        <div class="p-4 border-t border-gray-200 flex flex-col space-y-4 items-start md:items-center md:group-hover:items-start transition-all duration-300">
             <a href="{{ route('profile') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300" title="Profil">
                 <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex-shrink-0">
                     <img src="{{ Auth::user()->foto_profil_url }}" alt="User avatar" class="h-full w-full object-cover">
@@ -159,6 +159,19 @@
                     <p class="text-xs text-gray-500 truncate">{{ Auth::user()->role->tipe ?? 'Role' }}</p>
                 </div>
             </a>
+            
+            <!-- Logout Button -->
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <button type="submit" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300 text-red-500 hover:text-red-600 hover:bg-red-50 p-2 -ml-2 rounded-md" title="Logout">
+                    <svg class="w-5 h-5 flex-shrink-0 mx-0 md:mx-auto md:group-hover:mx-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span class="ml-3 text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden text-left w-auto md:w-0 md:group-hover:w-auto">
+                        Logout
+                    </span>
+                </button>
+            </form>
         </div>
     </aside>
 

@@ -62,33 +62,36 @@ class KandidatService
             }
 
             // Fase 2 & 3: Pengurangan dari TL, PSW, dan TK
-            $bobotCache = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
-                return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
-            });
-            $getBobot = function ($kode, $default) use ($bobotCache) {
-                return isset($bobotCache[$kode]) ? (float)$bobotCache[$kode] : $default;
-            };
+            if ($pengaturan) {
+                $totalPenguranganTl = 0;
+                $totalPenguranganPsw = 0;
+                
+                foreach ($rekapsAbsen as $rekap) {
+                    if ($pengaturan->bobot_tl1 > 0 || $pengaturan->bobot_tl2 > 0 || $pengaturan->bobot_tl3 > 0 || $pengaturan->bobot_tl4 > 0) {
+                        $totalPenguranganTl += ($rekap->tl1 * $pengaturan->bobot_tl1) + 
+                                               ($rekap->tl2 * $pengaturan->bobot_tl2) + 
+                                               ($rekap->tl3 * $pengaturan->bobot_tl3) + 
+                                               ($rekap->tl4 * $pengaturan->bobot_tl4);
+                    } else {
+                        $totalPenguranganTl += ($rekap->tl * $pengaturan->bobot_tl);
+                    }
+                    
+                    if ($pengaturan->bobot_psw1 > 0 || $pengaturan->bobot_psw2 > 0 || $pengaturan->bobot_psw3 > 0 || $pengaturan->bobot_psw4 > 0) {
+                        $totalPenguranganPsw += ($rekap->psw1 * $pengaturan->bobot_psw1) + 
+                                                ($rekap->psw2 * $pengaturan->bobot_psw2) + 
+                                                ($rekap->psw3 * $pengaturan->bobot_psw3) + 
+                                                ($rekap->psw4 * $pengaturan->bobot_psw4);
+                    } else {
+                        $totalPenguranganPsw += ($rekap->psw * $pengaturan->bobot_psw);
+                    }
+                }
+                
+                $nilaiAbsensi -= $totalPenguranganTl;
+                $nilaiAbsensi -= $totalPenguranganPsw;
 
-            $totalPenguranganTl = 0;
-            $totalPenguranganPsw = 0;
-            
-            foreach ($rekapsAbsen as $rekap) {
-                $totalPenguranganTl += ($rekap->tl1 * $getBobot('TL1', 0.5)) + 
-                                       ($rekap->tl2 * $getBobot('TL2', 0.5)) + 
-                                       ($rekap->tl3 * $getBobot('TL3', 1.0)) + 
-                                       ($rekap->tl4 * $getBobot('TL4', 2.5));
-                                       
-                $totalPenguranganPsw += ($rekap->psw1 * $getBobot('PSW1', 0.5)) + 
-                                        ($rekap->psw2 * $getBobot('PSW2', 0.5)) + 
-                                        ($rekap->psw3 * $getBobot('PSW3', 1.0)) + 
-                                        ($rekap->psw4 * $getBobot('PSW4', 2.5));
+                $totalTk = $rekapsAbsen->sum('tk');
+                $nilaiAbsensi -= ($totalTk * $pengaturan->bobot_tk);
             }
-            
-            $nilaiAbsensi -= $totalPenguranganTl;
-            $nilaiAbsensi -= $totalPenguranganPsw;
-
-            $totalTk = $rekapsAbsen->sum('tk');
-            $nilaiAbsensi -= ($totalTk * $getBobot('TK', 2.5));
             
             $nilaiAbsensi = max(0, $nilaiAbsensi);
 
@@ -158,7 +161,7 @@ class KandidatService
         $surveyWeight = $pengaturan ? $pengaturan->survey : 25;
 
         // Ambil 10 kandidat yang ada pada periode ini
-        $kandidats = Kandidat::where('periode_id', $periodeId)->get()->map(function ($kandidat) use ($periodeId, $ckpWeight, $absensiWeight, $surveyWeight) {
+        $kandidats = Kandidat::where('periode_id', $periodeId)->get()->map(function ($kandidat) use ($periodeId, $ckpWeight, $absensiWeight, $surveyWeight, $pengaturan) {
             // 1. Survey Normalized
             $rataRata = \App\Models\JawabanSurvei::where('periode_id', $periodeId)
                 ->where('kandidat_id', $kandidat->id)
@@ -190,33 +193,36 @@ class KandidatService
             }
 
             // Fase 2 & 3: Pengurangan dari TL, PSW, dan TK
-            $bobotCache = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
-                return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
-            });
-            $getBobot = function ($kode, $default) use ($bobotCache) {
-                return isset($bobotCache[$kode]) ? (float)$bobotCache[$kode] : $default;
-            };
+            if ($pengaturan) {
+                $totalPenguranganTl = 0;
+                $totalPenguranganPsw = 0;
+                
+                foreach ($rekapsAbsen as $rekap) {
+                    if ($pengaturan->bobot_tl1 > 0 || $pengaturan->bobot_tl2 > 0 || $pengaturan->bobot_tl3 > 0 || $pengaturan->bobot_tl4 > 0) {
+                        $totalPenguranganTl += ($rekap->tl1 * $pengaturan->bobot_tl1) + 
+                                               ($rekap->tl2 * $pengaturan->bobot_tl2) + 
+                                               ($rekap->tl3 * $pengaturan->bobot_tl3) + 
+                                               ($rekap->tl4 * $pengaturan->bobot_tl4);
+                    } else {
+                        $totalPenguranganTl += ($rekap->tl * $pengaturan->bobot_tl);
+                    }
+                    
+                    if ($pengaturan->bobot_psw1 > 0 || $pengaturan->bobot_psw2 > 0 || $pengaturan->bobot_psw3 > 0 || $pengaturan->bobot_psw4 > 0) {
+                        $totalPenguranganPsw += ($rekap->psw1 * $pengaturan->bobot_psw1) + 
+                                                ($rekap->psw2 * $pengaturan->bobot_psw2) + 
+                                                ($rekap->psw3 * $pengaturan->bobot_psw3) + 
+                                                ($rekap->psw4 * $pengaturan->bobot_psw4);
+                    } else {
+                        $totalPenguranganPsw += ($rekap->psw * $pengaturan->bobot_psw);
+                    }
+                }
+                
+                $nilaiAbsensi -= $totalPenguranganTl;
+                $nilaiAbsensi -= $totalPenguranganPsw;
 
-            $totalPenguranganTl = 0;
-            $totalPenguranganPsw = 0;
-            
-            foreach ($rekapsAbsen as $rekap) {
-                $totalPenguranganTl += ($rekap->tl1 * $getBobot('TL1', 0.5)) + 
-                                       ($rekap->tl2 * $getBobot('TL2', 0.5)) + 
-                                       ($rekap->tl3 * $getBobot('TL3', 1.0)) + 
-                                       ($rekap->tl4 * $getBobot('TL4', 2.5));
-                                       
-                $totalPenguranganPsw += ($rekap->psw1 * $getBobot('PSW1', 0.5)) + 
-                                        ($rekap->psw2 * $getBobot('PSW2', 0.5)) + 
-                                        ($rekap->psw3 * $getBobot('PSW3', 1.0)) + 
-                                        ($rekap->psw4 * $getBobot('PSW4', 2.5));
+                $totalTk = $rekapsAbsen->sum('tk');
+                $nilaiAbsensi -= ($totalTk * $pengaturan->bobot_tk);
             }
-            
-            $nilaiAbsensi -= $totalPenguranganTl;
-            $nilaiAbsensi -= $totalPenguranganPsw;
-
-            $totalTk = $rekapsAbsen->sum('tk');
-            $nilaiAbsensi -= ($totalTk * $getBobot('TK', 2.5));
             
             $nilaiAbsensi = max(0, $nilaiAbsensi);
             

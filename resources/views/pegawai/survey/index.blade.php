@@ -204,7 +204,7 @@
                                                             value="{{ $i }}"
                                                             required
                                                             onchange="saveToLocal('{{ $p->id }}', '{{ $k->id }}', '{{ $i }}')"
-                                                            {{ Auth::user()->role->tipe !== 'Pegawai' ? 'disabled' : '' }}
+                                                            {{ !in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']) ? 'disabled' : '' }}
                                                         >
                                                         <label
                                                             for="star-{{ $p->id }}-{{ $k->id }}-{{ $i }}"
@@ -244,7 +244,7 @@
                             @endif
 
                             @if($loop->last)
-                                @if(Auth::user()->role->tipe === 'Pegawai')
+                                @if(in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']))
                                 <button type="submit" class="w-full md:w-auto justify-center px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-blue-600 shadow-md transition-colors flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Kirim Semua Penilaian
