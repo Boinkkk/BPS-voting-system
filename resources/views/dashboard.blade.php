@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Dashboard Utama</h1>
+    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
     <p class="text-gray-500 text-sm mt-1">Sistem Pemilihan Pegawai Terbaik BerAKHLAK BPS</p>
 </div>
 
@@ -11,8 +11,8 @@
     <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden" id="confetti-container"></div>
 
     <div class="text-center mb-12">
-        <span class="bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">Official Results</span>
-        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">BPS Employee Excellence</h2>
+        <span class="bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">HASIL PEMILIHAN KARYAWAN TERBAIK</span>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">KARYAWAN TERBAIK BPS</h2>
         <p class="text-lg text-gray-500 max-w-2xl mx-auto">Merayakan integritas, dedikasi, dan profesionalisme para insan statistik terbaik pada <b>{{ $pemenangTerakhir->periode->nama }}</b>.</p>
     </div>
 
@@ -57,7 +57,7 @@
                         @endif
                     </div>
                     <div class="absolute -bottom-4 -right-2 bg-gradient-to-br from-yellow-400 to-yellow-600 text-white rounded-full w-14 h-14 flex items-center justify-center font-bold text-2xl border-4 border-white z-20 shadow-xl">&#x1F3C6;</div>
-                    <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-yellow-500 flex flex-col items-center animate-bounce">
+                    <div class="absolute -top-6 left-1/2 z-20 -translate-x-1/2 text-yellow-500 flex flex-col items-center animate-bounce">
                         <span class="text-4xl">&#x2B50;</span>
                     </div>
                 </div>

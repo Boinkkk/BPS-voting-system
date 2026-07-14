@@ -5,6 +5,9 @@
 
 @theme {
     --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-primary: #68B92E;
+    --color-secondary: #EB891B;
+    --color-tersier: #0093DD;
     --color-on-surface: #1c1c1a;
     --color-on-surface-variant: #3f4851;
     --color-secondary-fixed: #acf75a;

@@ -5,7 +5,7 @@
     <h2 class="font-semibold text-2xl leading-tight" style="color: #0091d5; font-family: 'Hanken Grotesk', sans-serif;">
         Review Nominasi Pegawai Terbaik
     </h2>
-    <p class="text-sm text-gray-500 mt-1">Pilih 1 pegawai terbaik dari 3 nominasi teratas hasil voting pegawai.</p>
+    <p class="text-sm text-gray-500 mt-1">Pemilihan Karyawan Terbaik dari Nominasi 3 Teratas berdasarkan Survey, Nilai CKP, Dan Absensi</p>
 </div>
 
 <div class="py-6" style="font-family: 'Hanken Grotesk', sans-serif;">
