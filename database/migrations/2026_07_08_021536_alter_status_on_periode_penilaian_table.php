@@ -9,6 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
         // Because Doctrine DBAL doesn't support altering ENUM columns easily,
         // we can run a raw SQL statement to modify the ENUM.
         DB::statement("ALTER TABLE periode_penilaian MODIFY COLUMN status ENUM('penginputan', 'voting', 'review_kepala', 'selesai') DEFAULT 'penginputan'");

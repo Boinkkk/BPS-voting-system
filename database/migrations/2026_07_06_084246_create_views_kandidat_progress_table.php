@@ -7,8 +7,13 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
+        DB::unprepared("DROP VIEW IF EXISTS v_ranking_kandidat_voting;");
         DB::unprepared("
-            CREATE OR REPLACE VIEW v_ranking_kandidat_voting AS
+            CREATE VIEW v_ranking_kandidat_voting AS
             SELECT 
                 k.id AS kandidat_id,
                 k.periode_id,
@@ -24,8 +29,9 @@ return new class extends Migration
             ORDER BY rata_rata_kumulatif DESC;
         ");
 
+        DB::unprepared("DROP VIEW IF EXISTS v_progress_voting;");
         DB::unprepared("
-            CREATE OR REPLACE VIEW v_progress_voting AS
+            CREATE VIEW v_progress_voting AS
             SELECT 
                 pp.id AS periode_id,
                 pp.nama AS nama_periode,
