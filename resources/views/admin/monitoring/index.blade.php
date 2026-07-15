@@ -43,23 +43,7 @@
                         </button>
                     </form>
 
-                    @if($periode_id)
-                    @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe === 'Admin')
-                    <form method="POST" action="{{ route('admin.monitoring.update_status', $periode_id) }}" class="flex items-center gap-2 mt-4 sm:mt-0 sm:border-l sm:pl-4 border-gray-200">
-                        @csrf
-                        @method('PUT')
-                        <select name="status" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="penginputan" {{ $periodes->firstWhere('id', $periode_id)->status == 'penginputan' ? 'selected' : '' }}>Penginputan</option>
-                            <option value="voting" {{ $periodes->firstWhere('id', $periode_id)->status == 'voting' ? 'selected' : '' }}>Voting</option>
-                            <option value="review_kepala" {{ $periodes->firstWhere('id', $periode_id)->status == 'review_kepala' ? 'selected' : '' }}>Review Kepala Bagian</option>
-                            <option value="selesai" {{ $periodes->firstWhere('id', $periode_id)->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                        </select>
-                        <button type="submit" class="bg-gray-800 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-gray-700 transition-colors text-sm">
-                            Ubah Status
-                        </button>
-                    </form>
-                    @endif
-                    @endif
+
                 </div>
             </div>
         </div>

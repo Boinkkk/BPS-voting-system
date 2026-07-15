@@ -91,4 +91,43 @@ class PeriodePenilaian extends Model
             ];
         }
     }
+
+    public function computeStatusBasedOnDate($forceRecalculate = false)
+    {
+        if (!$forceRecalculate && $this->status === 'selesai') {
+            return 'selesai';
+        }
+        
+        $now = \Carbon\Carbon::now()->startOfDay();
+        $mulai = \Carbon\Carbon::parse($this->tanggal_mulai)->startOfDay();
+        $selesaiPersiapan = $this->tanggal_selesai_persiapan
+            ? \Carbon\Carbon::parse($this->tanggal_selesai_persiapan)->startOfDay()
+            : $mulai->copy()->addDays(4);
+
+        $mulaiVoting = $this->tanggal_mulai_voting 
+            ? \Carbon\Carbon::parse($this->tanggal_mulai_voting)->startOfDay()
+            : $selesaiPersiapan->copy()->addDay();
+            
+        $selesaiVoting = $this->tanggal_selesai_voting
+            ? \Carbon\Carbon::parse($this->tanggal_selesai_voting)->startOfDay()
+            : $mulaiVoting->copy()->addDays(2);
+            
+        $reviewKepala = $this->tanggal_review_kepala
+            ? \Carbon\Carbon::parse($this->tanggal_review_kepala)->startOfDay()
+            : $selesaiVoting->copy()->addDay();
+
+        $selesai = \Carbon\Carbon::parse($this->tanggal_selesai)->startOfDay();
+
+        if ($now->between($mulai, $selesaiPersiapan)) {
+            return 'penginputan';
+        } elseif ($now->between($mulaiVoting, $selesaiVoting)) {
+            return 'voting';
+        } elseif ($now->between($reviewKepala, $selesai->copy()->subDay())) {
+            return 'review_kepala';
+        } elseif ($now->greaterThanOrEqualTo($selesai)) {
+            return 'selesai';
+        }
+        
+        return $this->status;
+    }
 }

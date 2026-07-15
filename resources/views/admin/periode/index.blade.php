@@ -71,13 +71,22 @@
                                             </td>
                                             <td class="px-6 py-5 text-sm text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') }}</td>
                                             <td class="px-6 py-5 text-center">
-                                                <span class="inline-flex px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full 
-                                                    {{ $p->status == 'selesai' ? 'bg-slate-100 text-slate-600' : 'bg-green-100 text-green-700' }}">
+                                                @php
+                                                    $statusColors = [
+                                                        'penginputan' => 'bg-blue-100 text-blue-800',
+                                                        'voting' => 'bg-orange-100 text-orange-800',
+                                                        'review_kepala' => 'bg-purple-100 text-purple-800',
+                                                        'selesai' => 'bg-green-100 text-green-800',
+                                                        'menunggu' => 'bg-gray-100 text-gray-800'
+                                                    ];
+                                                    $colorClass = $statusColors[$p->status] ?? 'bg-slate-100 text-slate-800';
+                                                @endphp
+                                                <span class="inline-flex px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full {{ $colorClass }}">
                                                     {{ ucfirst(str_replace('_', ' ', $p->status)) }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-5 text-center space-x-2 whitespace-nowrap">
-                                                <button onclick="openEditModal({{ $p->id }}, '{{ $p->triwulan }}', '{{ $p->tahun }}', '{{ $p->tanggal_mulai }}', '{{ $p->tanggal_selesai_persiapan ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(4)->format('Y-m-d') }}', '{{ $p->tanggal_mulai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(5)->format('Y-m-d') }}', '{{ $p->tanggal_selesai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(7)->format('Y-m-d') }}', '{{ $p->tanggal_review_kepala ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(8)->format('Y-m-d') }}', '{{ $p->tanggal_selesai }}', '{{ $p->status }}')" class="text-sky-600 hover:text-sky-800 font-medium transition-colors p-2 bg-sky-50 rounded-md hover:bg-sky-100 text-sm px-3">Edit</button>
+                                                <button onclick="openEditModal({{ $p->id }}, '{{ $p->triwulan }}', '{{ $p->tahun }}', '{{ $p->tanggal_mulai }}', '{{ $p->tanggal_selesai_persiapan ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(4)->format('Y-m-d') }}', '{{ $p->tanggal_mulai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(5)->format('Y-m-d') }}', '{{ $p->tanggal_selesai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(7)->format('Y-m-d') }}', '{{ $p->tanggal_review_kepala ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(8)->format('Y-m-d') }}', '{{ $p->tanggal_selesai }}')" class="text-sky-600 hover:text-sky-800 font-medium transition-colors p-2 bg-sky-50 rounded-md hover:bg-sky-100 text-sm px-3">Edit</button>
                                                 <form action="{{ route('admin.periode.destroy', $p->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus periode ini?');">
                                                     @csrf
                                                     @method('DELETE')
@@ -159,15 +168,7 @@
                         <input type="date" name="tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                            <option value="penginputan">Masa Penginputan Kinerja</option>
-                            <option value="voting">Masa Voting Kandidat</option>
-                            <option value="review_kepala">Review Kepala Bagian</option>
-                            <option value="selesai">Selesai</option>
-                        </select>
-                </div>
+
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="bg-sky-600 text-white px-4 py-2 rounded shadow hover:bg-sky-700">Simpan</button>
                 </div>
@@ -236,15 +237,7 @@
                         <input type="date" name="tanggal_selesai" id="edit_tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" id="edit_status" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                            <option value="penginputan">Masa Penginputan Kinerja</option>
-                            <option value="voting">Masa Voting Kandidat</option>
-                            <option value="review_kepala">Review Kepala Bagian</option>
-                            <option value="selesai">Selesai</option>
-                        </select>
-                </div>
+
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Simpan Perubahan</button>
                 </div>
@@ -286,7 +279,6 @@
         document.getElementById('edit_tanggal_selesai_voting').value = tanggal_selesai_voting;
         document.getElementById('edit_tanggal_review_kepala').value = tanggal_review_kepala;
         document.getElementById('edit_tanggal_selesai').value = tanggal_selesai;
-        document.getElementById('edit_status').value = status;
         
         // Update form action
         const form = document.getElementById('editPeriodeForm');
@@ -294,5 +286,72 @@
         
         openModal('editPeriodeModal');
     }
+
+    // Real-time Date Validation Logic
+    function setupDateValidation(formPrefix) {
+        const tglMulai = document.getElementById(formPrefix + 'tanggal_mulai');
+        const tglSelesaiPersiapan = document.getElementById(formPrefix + 'tanggal_selesai_persiapan');
+        const tglMulaiVoting = document.getElementById(formPrefix + 'tanggal_mulai_voting');
+        const tglSelesaiVoting = document.getElementById(formPrefix + 'tanggal_selesai_voting');
+        const tglReviewKepala = document.getElementById(formPrefix + 'tanggal_review_kepala');
+        const tglSelesai = document.getElementById(formPrefix + 'tanggal_selesai');
+        
+        if (!tglMulai) return; // If elements don't have IDs (like in add modal, we'll need to add IDs)
+
+        function enforceMinDates() {
+            if (tglMulai.value) {
+                tglSelesaiPersiapan.min = tglMulai.value;
+                if(tglSelesaiPersiapan.value < tglMulai.value) tglSelesaiPersiapan.value = tglMulai.value;
+            }
+            if (tglSelesaiPersiapan.value) {
+                // Add 1 day for next phase
+                let nextDate = new Date(tglSelesaiPersiapan.value);
+                nextDate.setDate(nextDate.getDate() + 1);
+                let nextDateStr = nextDate.toISOString().split('T')[0];
+                tglMulaiVoting.min = nextDateStr;
+                if(tglMulaiVoting.value < nextDateStr) tglMulaiVoting.value = nextDateStr;
+            }
+            if (tglMulaiVoting.value) {
+                tglSelesaiVoting.min = tglMulaiVoting.value;
+                if(tglSelesaiVoting.value < tglMulaiVoting.value) tglSelesaiVoting.value = tglMulaiVoting.value;
+            }
+            if (tglSelesaiVoting.value) {
+                let nextDate = new Date(tglSelesaiVoting.value);
+                nextDate.setDate(nextDate.getDate() + 1);
+                let nextDateStr = nextDate.toISOString().split('T')[0];
+                tglReviewKepala.min = nextDateStr;
+                if(tglReviewKepala.value < nextDateStr) tglReviewKepala.value = nextDateStr;
+            }
+            if (tglReviewKepala.value) {
+                let nextDate = new Date(tglReviewKepala.value);
+                nextDate.setDate(nextDate.getDate() + 1);
+                let nextDateStr = nextDate.toISOString().split('T')[0];
+                tglSelesai.min = nextDateStr;
+                if(tglSelesai.value < nextDateStr) tglSelesai.value = nextDateStr;
+            }
+        }
+
+        tglMulai.addEventListener('change', enforceMinDates);
+        tglSelesaiPersiapan.addEventListener('change', enforceMinDates);
+        tglMulaiVoting.addEventListener('change', enforceMinDates);
+        tglSelesaiVoting.addEventListener('change', enforceMinDates);
+        tglReviewKepala.addEventListener('change', enforceMinDates);
+        tglSelesai.addEventListener('change', enforceMinDates);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // We will assign IDs to add modal inputs dynamically for validation
+        const addForm = document.querySelector('#addPeriodeModal form');
+        if (addForm) {
+            addForm.querySelector('input[name="tanggal_mulai"]').id = 'add_tanggal_mulai';
+            addForm.querySelector('input[name="tanggal_selesai_persiapan"]').id = 'add_tanggal_selesai_persiapan';
+            addForm.querySelector('input[name="tanggal_mulai_voting"]').id = 'add_tanggal_mulai_voting';
+            addForm.querySelector('input[name="tanggal_selesai_voting"]').id = 'add_tanggal_selesai_voting';
+            addForm.querySelector('input[name="tanggal_review_kepala"]').id = 'add_tanggal_review_kepala';
+            addForm.querySelector('input[name="tanggal_selesai"]').id = 'add_tanggal_selesai';
+            setupDateValidation('add_');
+        }
+        setupDateValidation('edit_');
+    });
 </script>
 @endpush

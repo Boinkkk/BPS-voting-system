@@ -59,7 +59,6 @@ class PeriodeController extends Controller
             'tanggal_selesai_voting' => 'required|date|after_or_equal:tanggal_mulai_voting',
             'tanggal_review_kepala' => 'required|date|after:tanggal_selesai_voting',
             'tanggal_selesai' => 'required|date|after:tanggal_review_kepala',
-            'status' => 'required|in:penginputan,voting,review_kepala,selesai',
         ], [
             'tanggal_selesai_persiapan.after_or_equal' => 'Selesai persiapan harus >= mulai persiapan.',
             'tanggal_mulai_voting.after' => 'Mulai voting harus setelah selesai persiapan (tidak boleh bertabrakan).',
@@ -70,7 +69,7 @@ class PeriodeController extends Controller
 
         $nama = 'Triwulan ' . $request->triwulan . ' Tahun ' . $request->tahun;
 
-        PeriodePenilaian::create([
+        $periode = new PeriodePenilaian([
             'triwulan' => $request->triwulan,
             'tahun' => $request->tahun,
             'nama' => $nama,
@@ -80,8 +79,9 @@ class PeriodeController extends Controller
             'tanggal_selesai_voting' => $request->tanggal_selesai_voting,
             'tanggal_review_kepala' => $request->tanggal_review_kepala,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'status' => $request->status,
         ]);
+        $periode->status = $periode->computeStatusBasedOnDate(true) ?? 'penginputan';
+        $periode->save();
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian baru berhasil ditambahkan.');
     }
@@ -97,7 +97,6 @@ class PeriodeController extends Controller
             'tanggal_selesai_voting' => 'required|date|after_or_equal:tanggal_mulai_voting',
             'tanggal_review_kepala' => 'required|date|after:tanggal_selesai_voting',
             'tanggal_selesai' => 'required|date|after:tanggal_review_kepala',
-            'status' => 'required|in:penginputan,voting,review_kepala,selesai',
         ], [
             'tanggal_selesai_persiapan.after_or_equal' => 'Selesai persiapan harus >= mulai persiapan.',
             'tanggal_mulai_voting.after' => 'Mulai voting harus setelah selesai persiapan (tidak boleh bertabrakan).',
@@ -111,7 +110,7 @@ class PeriodeController extends Controller
         $periode = PeriodePenilaian::findOrFail($id);
         $oldStatus = $periode->status;
         
-        $periode->update([
+        $periode->fill([
             'triwulan' => $request->triwulan,
             'tahun' => $request->tahun,
             'nama' => $nama,
@@ -121,11 +120,12 @@ class PeriodeController extends Controller
             'tanggal_selesai_voting' => $request->tanggal_selesai_voting,
             'tanggal_review_kepala' => $request->tanggal_review_kepala,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'status' => $request->status,
         ]);
+        $periode->status = $periode->computeStatusBasedOnDate(true);
+        $periode->save();
 
-        if ($request->status === 'review_kepala' && $oldStatus !== 'review_kepala') {
-            \App\Services\KandidatService::generateTop3Kandidat($id);
+        if ($periode->status === 'review_kepala' && $oldStatus !== 'review_kepala') {
+            app(\App\Http\Controllers\KandidatAdminController::class)->generateTop3ForPeriode($id);
         }
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian berhasil diperbarui.');

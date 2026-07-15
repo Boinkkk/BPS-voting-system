@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::get('/glosarium', [\App\Http\Controllers\GlosariumController::class, 'index'])->name('glosarium.index');
     // ==========================
     // ADMIN
     // ==========================
@@ -49,6 +50,17 @@ Route::middleware('auth')->group(function () {
         // Pengaturan Bobot
         Route::get('/admin/pengaturan-bobot', [\App\Http\Controllers\PengaturanBobotController::class, 'index'])->name('admin.pengaturan-bobot.index');
         Route::post('/admin/pengaturan-bobot', [\App\Http\Controllers\PengaturanBobotController::class, 'update'])->name('admin.pengaturan-bobot.update');
+
+        // Glosarium Admin
+        Route::get('/admin/glosarium', [\App\Http\Controllers\GlosariumAdminController::class, 'index'])->name('admin.glosarium.index');
+        Route::get('/admin/glosarium/create', [\App\Http\Controllers\GlosariumAdminController::class, 'create'])->name('admin.glosarium.create');
+        Route::post('/admin/glosarium', [\App\Http\Controllers\GlosariumAdminController::class, 'store'])->name('admin.glosarium.store');
+        Route::get('/admin/glosarium/{id}/edit', [\App\Http\Controllers\GlosariumAdminController::class, 'edit'])->name('admin.glosarium.edit');
+        Route::put('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'update'])->name('admin.glosarium.update');
+        Route::delete('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'destroy'])->name('admin.glosarium.destroy');
+
+        // Pengumuman
+        Route::get('/admin/pengumuman', [\App\Http\Controllers\PengumumanController::class, 'index'])->name('admin.pengumuman.index');
     });
 
     // ==========================
