@@ -33,48 +33,12 @@
             border-bottom-right-radius: 4px;
             box-shadow: 1px 0 6px rgba(0, 145, 218, 0.4);
         }
-        /* Magic Indicator Navigation */
-        .magic-cutout {
-            position: absolute;
-            top: -24px;
-            width: 64px;
-            height: 64px;
-            background-color: #f9fafb;
-            border-radius: 50%;
-        }
-        .magic-cutout::before, .magic-cutout::after {
-            content: '';
-            position: absolute;
-            top: 24px;
-            width: 24px;
-            height: 24px;
-            background-color: transparent;
-        }
-        .magic-cutout::before {
-            left: -25px;
-            border-top-right-radius: 24px;
-            box-shadow: 0 -12px 0 0 #f9fafb;
-        }
-        .magic-cutout::after {
-            right: -25px;
-            border-top-left-radius: 24px;
-            box-shadow: 0 -12px 0 0 #f9fafb;
-        }
-        .magic-circle {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            width: 52px;
-            height: 52px;
-            background-color: #0091DA;
-            border-radius: 50%;
-            z-index: 11;
-        }
+        /* SVG Magic Indicator logic handled in HTML/Tailwind classes */
 
         .nav-item .icon-wrapper {
             transform: translateY(4px);
             transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), color 0.4s ease;
-            color: #9ca3af;
+            color: rgba(255, 255, 255, 0.7);
         }
         .nav-item .text-label {
             opacity: 0;
@@ -82,8 +46,8 @@
             transition: all 0.4s ease;
         }
         .nav-item.active .icon-wrapper {
-            transform: translateY(-30px);
-            color: #ffffff;
+            transform: translateY(-40px);
+            color: #F39200;
             z-index: 20;
         }
         .nav-item.active .text-label {
@@ -100,11 +64,13 @@
 
 
     <!-- Mobile Header -->
-    <div class="md:hidden flex items-center justify-between bg-slate-50 border-b border-gray-200 px-4 py-3 flex-shrink-0 z-30 relative shadow-sm">
-        <img src="{{ asset('images/logo.svg') }}" alt="Logo BPS" class="h-8 w-auto">
+    <div class="md:hidden flex items-center justify-between bg-[#F39200] border-b border-[#E08600] px-4 py-3 flex-shrink-0 z-30 relative shadow-sm">
+        <div class="bg-white px-2.5 py-1.5 rounded-lg shadow-sm">
+            <img src="{{ asset('images/logo.svg') }}" alt="Logo BPS" class="h-6 w-auto">
+        </div>
         <div class="flex items-center space-x-4">
             <!-- Notification Icon -->
-            <button class="text-gray-500 hover:text-[#0091DA] focus:outline-none relative">
+            <button class="text-white hover:text-gray-100 focus:outline-none relative">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                 <span class="absolute top-0 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
             </button>
@@ -308,7 +274,7 @@
     </div>
 
     <!-- Mobile Bottom Navigation (Only visible on mobile) -->
-    <div class="md:hidden fixed bottom-0 left-0 w-full bg-[#EB891B] z-40 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] rounded-t-3xl pb-safe">
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-[#F39200] z-40 shadow-[0_-4px_20px_-5px_rgba(243,146,0,0.3)] rounded-t-3xl pb-safe">
         <div class="relative flex justify-center items-center h-20 w-full" id="bottomNav">
             @php
                 $tipe = Auth::user()->role->tipe ?? 'Pegawai';
@@ -337,11 +303,16 @@
                 }
             @endphp
 
-            <!-- The Magic Indicator -->
+            <!-- The Magic Indicator (SVG Based) -->
             <div id="magicIndicator" class="absolute top-0 left-0 w-1/5 h-full flex justify-center transition-transform duration-500 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)] z-10 pointer-events-none" style="transform: translateX({{ max(0, $activeIndex) * 100 }}%); {{ $activeIndex === -1 ? 'opacity: 0;' : '' }}">
-                <div class="magic-cutout">
-                    <div class="magic-circle shadow-lg shadow-[#0091DA]/40"></div>
+                <!-- SVG Cutout Mask -->
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120px] h-[30px] text-[#f9fafb]">
+                    <svg viewBox="0 0 120 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <path d="M 0 0 L 15 0 C 30 0 40 30 60 30 C 80 30 90 0 105 0 L 120 0 Z" fill="currentColor"/>
+                    </svg>
                 </div>
+                <!-- Magic Circle -->
+                <div class="absolute top-[-26px] left-1/2 transform -translate-x-1/2 w-[52px] h-[52px] bg-white rounded-full shadow-lg shadow-black/10 z-[11]"></div>
             </div>
 
             @if($tipe == 'Pegawai')
@@ -349,31 +320,31 @@
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Dashboard</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Dashboard</span>
                 </a>
                 <a href="{{ route('admin.kandidat.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Kandidat</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Kandidat</span>
                 </a>
                 <a href="{{ route('pegawai.survey.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Voting</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Voting</span>
                 </a>
                 <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Glosarium</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Glosarium</span>
                 </a>
                 <button type="button" class="nav-item mobile-more-btn w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 4 ? 'active' : '' }}" data-index="4">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Lainnya</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Lainnya</span>
                 </button>
 
             @elseif($tipe == 'Admin')
@@ -381,31 +352,31 @@
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Periode</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Periode</span>
                 </a>
                 <a href="{{ route('admin.pegawai.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Pegawai</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Pegawai</span>
                 </a>
                 <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Dashboard</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Dashboard</span>
                 </a>
                 <a href="{{ route('admin.monitoring.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Monitoring</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Monitoring</span>
                 </a>
                 <button type="button" class="nav-item mobile-more-btn w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 4 ? 'active' : '' }}" data-index="4">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Lainnya</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Lainnya</span>
                 </button>
 
             @elseif($tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
@@ -413,31 +384,31 @@
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Input CKP</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Input CKP</span>
                 </a>
                 <a href="{{ route('admin.absensi.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Input Absen</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Input Absen</span>
                 </a>
                 <a href="{{ route('pegawai.survey.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Voting</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Voting</span>
                 </a>
                 <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Glosarium</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Glosarium</span>
                 </a>
                 <button type="button" class="nav-item mobile-more-btn w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 4 ? 'active' : '' }}" data-index="4">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Lainnya</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Lainnya</span>
                 </button>
 
             @elseif($tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
@@ -445,31 +416,31 @@
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Dashboard</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Dashboard</span>
                 </a>
                 <a href="{{ route('admin.kandidat.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Kandidat</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Kandidat</span>
                 </a>
                 <a href="{{ route('kepala.review.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Review</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Review</span>
                 </a>
                 <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Glosarium</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Glosarium</span>
                 </a>
                 <button type="button" class="nav-item mobile-more-btn w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 4 ? 'active' : '' }}" data-index="4">
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </div>
-                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-[#0091DA]">Lainnya</span>
+                    <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Lainnya</span>
                 </button>
             @endif
         </div>
