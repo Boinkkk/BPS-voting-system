@@ -35,12 +35,12 @@
             </div>
         @endif
 
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-            <div class="p-4 border-b bg-gray-50">
-                <h3 class="text-lg font-medium text-gray-900">Konfigurasi Bobot (Total harus 100%)</h3>
-                <p class="text-sm text-gray-500">Persentase bobot ini akan menentukan perhitungan ranking Fase 1 dan Fase 3.</p>
+        <div class="bg-white overflow-hidden shadow-lg sm:rounded-2xl ring-1 ring-gray-200 border-0">
+            <div class="p-6 border-b border-slate-200 bg-slate-50">
+                <h3 class="text-lg font-bold text-gray-900">Konfigurasi Bobot (Total harus 100%)</h3>
+                <p class="text-sm text-gray-500 mt-1">Persentase bobot ini akan menentukan perhitungan ranking Fase 1 dan Fase 3.</p>
             </div>
-            <div class="p-6">
+            <div class="p-8">
                 <form action="{{ route('admin.pengaturan-bobot.update') }}" method="POST" id="bobotForm">
                     @csrf
                     

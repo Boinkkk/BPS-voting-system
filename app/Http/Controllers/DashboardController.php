@@ -19,7 +19,46 @@ class DashboardController extends Controller
 
         $top3 = collect();
         $votingProgress = null;
-        $activePeriode = null;
+        
+        $activePeriode = \App\Models\PeriodePenilaian::where('status', '!=', 'selesai')->latest()->first();
+        $phaseDetails = null;
+
+        $selectedMonth = request('month', $activePeriode ? \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->month : \Carbon\Carbon::now()->month);
+        $selectedYear = request('year', $activePeriode ? \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->year : \Carbon\Carbon::now()->year);
+
+        $startOfMonth = \Carbon\Carbon::create($selectedYear, $selectedMonth, 1)->startOfDay();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+        $periodesInMonth = \App\Models\PeriodePenilaian::where(function($query) use ($startOfMonth, $endOfMonth) {
+            $query->whereBetween('tanggal_mulai', [$startOfMonth, $endOfMonth])
+                  ->orWhereBetween('tanggal_selesai', [$startOfMonth, $endOfMonth])
+                  ->orWhere(function($q) use ($startOfMonth, $endOfMonth) {
+                      $q->where('tanggal_mulai', '<=', $startOfMonth)
+                        ->where('tanggal_selesai', '>=', $endOfMonth);
+                  });
+        })->get();
+
+        if ($activePeriode) {
+            $phaseDetails = $activePeriode->phase_details;
+            
+            // Get all Pegawai users
+            $semuaPegawai = \App\Models\Pegawai::whereHas('role', function($q) {
+                $q->where('tipe', 'Pegawai');
+            })->get();
+            
+            // Get who has voted in SurveyProgress
+            $sudahVoting = \App\Models\SurveyProgress::where('periode_id', $activePeriode->id)
+                ->pluck('user_id')
+                ->toArray();
+                
+            $votingProgress = $semuaPegawai->map(function($user) use ($sudahVoting) {
+                return [
+                    'nama' => $user->nama,
+                    'sudah_voting' => in_array($user->id, $sudahVoting),
+                    'foto' => $user->foto_profil_url
+                ];
+            })->sortByDesc('sudah_voting')->values();
+        }
 
         if ($pemenangTerakhir) {
             $periode = $pemenangTerakhir->periode;
@@ -34,32 +73,9 @@ class DashboardController extends Controller
             $juara3 = $lainnya->get(1);
             
             $top3 = collect([$juara1, $juara2, $juara3])->filter();
-        } else {
-            // Check for active voting period to show progress
-            $activePeriode = \App\Models\PeriodePenilaian::where('status', '!=', 'selesai')->latest()->first();
-            
-            if ($activePeriode) {
-                // Get all Pegawai users
-                $semuaPegawai = \App\Models\Pegawai::whereHas('role', function($q) {
-                    $q->where('tipe', 'Pegawai');
-                })->get();
-                
-                // Get who has voted in SurveyProgress
-                $sudahVoting = \App\Models\SurveyProgress::where('periode_id', $activePeriode->id)
-                    ->pluck('user_id')
-                    ->toArray();
-                    
-                $votingProgress = $semuaPegawai->map(function($user) use ($sudahVoting) {
-                    return [
-                        'nama' => $user->nama,
-                        'sudah_voting' => in_array($user->id, $sudahVoting),
-                        'foto' => $user->foto_profil_url
-                    ];
-                })->sortByDesc('sudah_voting')->values();
-            }
         }
 
-        return view('dashboard', compact('pemenangTerakhir', 'top3', 'votingProgress', 'activePeriode'));
+        return view('dashboard', compact('pemenangTerakhir', 'top3', 'votingProgress', 'activePeriode', 'phaseDetails', 'selectedMonth', 'selectedYear', 'periodesInMonth'));
     }
 
     public function profile()

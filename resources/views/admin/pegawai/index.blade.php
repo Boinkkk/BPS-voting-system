@@ -1,13 +1,46 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mb-6 flex justify-between items-center">
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 class="font-semibold text-xl leading-tight" style="color: #0091d5; font-family: 'Hanken Grotesk', sans-serif;">
             {{ __('Manajemen Pegawai') }}
         </h2>
-        <button onclick="openModal('addModal')" class="bg-[#0D8ABC] hover:bg-sky-800 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors">
-            + Tambah Pegawai
-        </button>
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <form action="{{ route('admin.pegawai.index') }}"
+                method="GET"
+                class="relative w-full sm:w-80">
+
+                <div class="relative">
+
+                    <!-- Icon -->
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Cari NIP atau Nama..."
+                        class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-[#0091d5] focus:ring-4 focus:ring-sky-100"
+                    >
+
+                </div>
+
+            </form>
+            <button onclick="openModal('addModal')" class="bg-[#0D8ABC] hover:bg-sky-800 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors whitespace-nowrap">
+                + Tambah Pegawai
+            </button>
+        </div>
     </div>
 
     @if (session('success'))
@@ -26,46 +59,136 @@
         </div>
     @endif
 
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-        <div class="p-6 text-gray-900">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+    <div class="bg-gray-50 overflow-hidden shadow-none sm:rounded-lg border-0">
+        <div class="p-6">
+            
+            <!-- Mobile Card View -->
+            <div class="block md:hidden space-y-4">
+                @forelse($pegawai as $p)
+                    <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-5 transition hover:shadow-md">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between">
+                            <div class="flex gap-3">
+                                <!-- Avatar -->
+                                @if($p->foto_profil ?? false)
+                                    <img src="{{ $p->foto_profil_url ?? '' }}" alt="{{ $p->nama }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-200">
+                                @else
+                                    <div class="w-12 h-12 rounded-full bg-[#0091d5] text-white flex items-center justify-center font-bold">
+                                        {{ strtoupper(substr($p->nama, 0, 1)) }}
+                                    </div>
+                                @endif
+
+                                <!-- Nama & NIP -->
+                                <div>
+                                    <div class="font-semibold text-slate-800 leading-tight">{{ $p->nama }}</div>
+                                    <div class="text-sm text-slate-500">{{ $p->nip }}</div>
+                                    <span class="inline-flex mt-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#0091d5]">
+                                        {{ $p->jabatan }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="my-4 border-t border-slate-100"></div>
+
+                        <!-- Details -->
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div>
+                                <div class="text-[11px] uppercase tracking-wide text-slate-500">Departemen</div>
+                                <div class="mt-1 text-sm font-medium text-slate-700">{{ $p->departemen->nama ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] uppercase tracking-wide text-slate-500">Role</div>
+                                <div class="mt-1 text-sm font-medium text-slate-700">{{ $p->role->tipe ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] uppercase tracking-wide text-slate-500">Status</div>
+                                <div class="mt-1">
+                                    @if($p->status_pegawai == 'aktif')
+                                        <span class="inline-flex px-2 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif</span>
+                                    @else
+                                        <span class="inline-flex px-2 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-bold uppercase tracking-wider">Non-Aktif</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex space-x-2">
+                            <button onclick="openEditModal({{ json_encode($p) }})" class="flex-1 text-center py-2 text-sky-600 bg-sky-50 rounded-lg hover:bg-sky-100 font-medium text-sm transition-colors">Edit</button>
+                            <button onclick="openPasswordModal('{{ $p->id }}', '{{ $p->nama }}')" class="flex-1 text-center py-2 text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 font-medium text-sm transition-colors">Password</button>
+                        </div>
+                    </div>
+                @empty
+                    <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-10 text-center">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-4xl mb-4">📋</div>
+                        <h3 class="font-semibold text-slate-700">Belum Ada Data Pegawai</h3>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto rounded-2xl bg-white shadow-lg ring-1 ring-gray-200">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr class="bg-gray-100 border-b">
-                            <th class="p-3 font-semibold text-sm">NIP</th>
-                            <th class="p-3 font-semibold text-sm">Nama</th>
-                            <th class="p-3 font-semibold text-sm">Email</th>
-                            <th class="p-3 font-semibold text-sm">Jabatan</th>
-                            <th class="p-3 font-semibold text-sm">Departemen</th>
-                            <th class="p-3 font-semibold text-sm">Role</th>
-                            <th class="p-3 font-semibold text-sm">Status</th>
-                            <th class="p-3 font-semibold text-sm">Aksi</th>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">NIP</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Pegawai</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Jabatan</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Departemen</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Role</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Status</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-slate-100">
                         @foreach($pegawai as $p)
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-3 text-sm">{{ $p->nip }}</td>
-                                <td class="p-3 text-sm font-medium text-[#0D8ABC]">{{ $p->nama }}</td>
-                                <td class="p-3 text-sm">{{ $p->email }}</td>
-                                <td class="p-3 text-sm">{{ $p->jabatan }}</td>
-                                <td class="p-3 text-sm">{{ $p->departemen->nama ?? '-' }}</td>
-                                <td class="p-3 text-sm">
-                                    <span class="px-2 py-1 bg-gray-200 text-gray-800 rounded-full text-xs">{{ $p->role->tipe ?? '-' }}</span>
+                            <tr class="hover:bg-slate-50 transition-colors duration-200">
+                                <td class="px-6 py-5 text-sm text-slate-500">{{ $p->nip }}</td>
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        @if($p->foto_profil ?? false)
+                                            <img src="{{ $p->foto_profil_url ?? '' }}" alt="{{ $p->nama }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-200">
+                                        @else
+                                            <div class="w-10 h-10 rounded-full bg-[#0091d5] text-white flex items-center justify-center font-bold text-sm">
+                                                {{ strtoupper(substr($p->nama, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <div class="font-semibold text-slate-800">{{ $p->nama }}</div>
+                                            <div class="text-sm text-slate-500">{{ $p->email }}</div>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="p-3 text-sm">
-                                    <span class="px-2 py-1 {{ $p->status_pegawai == 'aktif' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }} rounded-full text-xs">{{ ucfirst($p->status_pegawai) }}</span>
+                                <td class="px-6 py-5">
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-[#0091d5]">
+                                        {{ $p->jabatan }}
+                                    </span>
                                 </td>
-                                <td class="p-3 text-sm space-x-2">
-                                    <button onclick="openEditModal({{ json_encode($p) }})" class="text-sky-600 hover:text-sky-800 font-medium">Edit</button>
-                                    <button onclick="openPasswordModal('{{ $p->id }}', '{{ $p->nama }}')" class="text-orange-600 hover:text-orange-800 font-medium">Password</button>
+                                <td class="px-6 py-5 text-sm text-slate-700">
+                                    {{ $p->departemen->nama ?? '-' }}
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    <span class="inline-flex px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">{{ $p->role->tipe ?? '-' }}</span>
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    @if($p->status_pegawai == 'aktif')
+                                        <span class="inline-flex px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Aktif</span>
+                                    @else
+                                        <span class="inline-flex px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">Non-Aktif</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-5 text-center space-x-2 whitespace-nowrap">
+                                    <button onclick="openEditModal({{ json_encode($p) }})" class="text-sky-600 hover:text-sky-800 font-medium transition-colors p-1 bg-sky-50 rounded-md hover:bg-sky-100 text-sm px-2">Edit</button>
+                                    <button onclick="openPasswordModal('{{ $p->id }}', '{{ $p->nama }}')" class="text-orange-600 hover:text-orange-800 font-medium transition-colors p-1 bg-orange-50 rounded-md hover:bg-orange-100 text-sm px-2">Password</button>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            <div class="mt-4">
+            <div class="mt-6">
                 {{ $pegawai->links() }}
             </div>
         </div>

@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/kalender', [\App\Http\Controllers\CalendarController::class, 'index'])->name('kalender');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('header')
-<h2 class="text-xl font-semibold leading-tight text-gray-800">
+<h2 class="text-xl font-semibold leading-tight text-gray-800">inpu
     Manajemen Data CKP Pegawai
 </h2>
 @endsection
@@ -41,8 +41,8 @@
         @endif
 
         <!-- Control Panel: Upload & Input Manual -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6 border">
-            <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6 border-0">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                 <h3 class="text-lg font-medium text-gray-900">Upload Data CKP (Excel/CSV)</h3>
             </div>
             <div class="p-4">
@@ -57,28 +57,29 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
                     <div class="w-full md:w-1/3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">File Excel (.xlsx)</label>
-                        <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="w-full text-sm border border-gray-300 rounded-md p-1.5">
-                        <p class="text-xs text-gray-500 mt-1">Kolom wajib: Nama, NIP, Nilai CKP</p>
+                        <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="w-full text-sm border border-gray-300 rounded-md p-[7px] bg-white">
                     </div>
                     <div class="w-full md:w-auto">
-                        <button type="submit" class="w-full px-4 py-2 bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600">
-                            Upload
+                        <button type="submit" class="w-full px-5 py-[9px] bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors">
+                            Upload Data
                         </button>
                     </div>
                 </form>
-                <div class="mt-4 flex gap-2 border-t pt-4">
+                <p class="text-[11px] text-gray-500 mt-3 mb-1">Catatan: Kolom Excel yang wajib ada adalah Nama, NIP, dan Nilai CKP.</p>
+                <div class="mt-4 flex gap-2 border-t border-slate-200 pt-4">
                     <button onclick="openModal('manualModal')" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors">
-                        + Input CKP Pegawai (Manual)
+                        + Input CKP Pegawai
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Filter & Tabel -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-            <div class="p-4 border-b bg-gray-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-0">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <h3 class="text-lg font-medium text-gray-900 whitespace-nowrap">Data CKP Tersimpan</h3>
                 
                 <form action="{{ route('admin.ckp.index') }}" method="GET" class="flex flex-wrap lg:flex-nowrap items-center gap-2 w-full justify-end">
@@ -102,25 +103,34 @@
                 </form>
             </div>
             
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-2xl bg-white shadow-lg border-0">
                 <table class="w-full text-left border-collapse whitespace-nowrap">
                     <thead>
-                        <tr class="bg-gray-100 border-b">
-                            <th class="p-3 font-semibold text-sm">Nama Pegawai</th>
-                            <th class="p-3 font-semibold text-sm">NIP</th>
-                            <th class="p-3 font-semibold text-sm text-center">Nilai CKP</th>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Nama Pegawai</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">NIP</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Nilai CKP</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-slate-100">
                         @forelse($ckps as $ckp)
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-3 text-sm font-medium">{{ $ckp->pegawai->nama }}</td>
-                                <td class="p-3 text-sm text-gray-600">{{ $ckp->pegawai->nip }}</td>
-                                <td class="p-3 text-sm text-center font-bold text-[#0091d5]">{{ number_format($ckp->nilai, 2, ',', '.') }}</td>
+                            <tr class="hover:bg-slate-50 transition-colors duration-200">
+                                <td class="px-6 py-5 text-sm font-semibold text-slate-800">{{ $ckp->pegawai->nama }}</td>
+                                <td class="px-6 py-5 text-sm text-slate-600">{{ $ckp->pegawai->nip }}</td>
+                                <td class="px-6 py-5 text-center">
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-4 py-2 font-bold text-[#0091d5]">
+                                        {{ number_format($ckp->nilai, 2, ',', '.') }}
+                                    </span>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="p-8 text-center text-sm text-gray-500">Belum ada data CKP untuk periode dan kriteria ini.</td>
+                                <td colspan="3" class="px-6 py-14 text-center text-sm text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-3 text-3xl">📋</div>
+                                        Belum ada data CKP untuk kriteria ini.
+                                    </div>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -42,18 +42,18 @@
             </div>
         @endif
 
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
-            <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-0 mb-6">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                 <div>
-                    <h3 class="text-lg font-medium text-gray-900">Upload Data Rekap Absensi (Excel)</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Upload Data Rekap Absensi</h3>
                     <p class="text-sm text-gray-500">Unggah file excel berisi rekap absen per bulan.</p>
                 </div>
                 <div class="flex space-x-2">
-                    <button type="button" onclick="openManualModal()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
-                        + Input Manual
+                    <button type="button" onclick="openManualModal()" class="px-4 py-2 bg-biru text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                        Input Data Absensi
                     </button>
-                    <a href="{{ route('admin.absensi.template') }}" class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
-                        ⬇️ Download Template Excel
+                    <a href="{{ route('admin.absensi.template') }}" class="px-4 py-2 bg-hijau text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                        Download Format Absensi
                     </a>
                 </div>
             </div>
@@ -86,8 +86,8 @@
                         <input type="file" name="file" accept=".xlsx,.xls" required class="w-full text-sm border border-gray-300 rounded-md p-1.5">
                     </div>
                     <div class="w-full md:w-auto">
-                        <button type="submit" class="w-full px-4 py-2.5 bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600">
-                            Upload & Proses
+                        <button type="submit" class="w-full px-4 py-2.5 bg-orange text-white text-sm font-medium rounded-md hover:bg-orange-600">
+                            Upload Data
                         </button>
                     </div>
                 </form>
@@ -246,8 +246,8 @@
         <div class="space-y-6">
             <!-- Data Absensi -->
             <div class="w-full">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border">
-                    <div class="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-0">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
                         <h3 class="text-lg font-medium text-gray-900">Data Absensi Tersimpan</h3>
                         
                         <form action="{{ route('admin.absensi.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
@@ -275,38 +275,38 @@
                         </form>
                     </div>
                     
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto rounded-2xl bg-white shadow-lg">
                         <table class="w-full text-left border-collapse whitespace-nowrap">
                             <thead>
-                                <tr class="bg-gray-100 border-b">
-                                    <th class="p-3 font-semibold text-sm">Nama Pegawai</th>
-                                    <th class="p-3 font-semibold text-sm text-center">HK</th>
-                                    <th class="p-3 font-semibold text-sm text-center">HD</th>
-                                    <th class="p-3 font-semibold text-sm text-center text-red-600">TK</th>
-                                    <th class="p-3 font-semibold text-sm text-center">PSW</th>
-                                    <th class="p-3 font-semibold text-sm text-center">Total TL</th>
-                                    <th class="p-3 font-semibold text-sm text-center">KJK HT</th>
-                                    <th class="p-3 font-semibold text-sm text-center">KJK PC</th>
-                                    <th class="p-3 font-semibold text-sm text-center text-red-600">KJK</th>
-                                    <th class="p-3 font-semibold text-sm text-center">Aksi</th>
+                                <tr class="bg-slate-50 border-b border-slate-200">
+                                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Nama Pegawai</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">HK</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">HD</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-red-600">TK</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">PSW</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Total TL</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">KJK HT</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">KJK PC</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-red-600">KJK</th>
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-slate-100">
                                 @forelse($absensis as $absen)
-                                    <tr class="border-b hover:bg-gray-50">
-                                        <td class="p-3 text-sm font-medium">{{ $absen->pegawai->nama }}</td>
-                                        <td class="p-3 text-sm text-center">{{ $absen->hk }}</td>
-                                        <td class="p-3 text-sm text-center font-bold text-green-600">{{ $absen->hd }}</td>
-                                        <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->tk }}</td>
-                                        <td class="p-3 text-sm text-center">{{ $absen->psw }}</td>
-                                        <td class="p-3 text-sm text-center">{{ $absen->tl }}</td>
-                                        <td class="p-3 text-sm text-center">{{ $absen->kjk_ht }}</td>
-                                        <td class="p-3 text-sm text-center">{{ $absen->kjk_pc }}</td>
-                                        <td class="p-3 text-sm text-center font-bold text-red-600">{{ $absen->kjk }}</td>
-                                        <td class="p-3 text-sm text-center">
+                                    <tr class="hover:bg-slate-50 transition-colors duration-200">
+                                        <td class="px-6 py-5 text-sm font-semibold text-slate-800">{{ $absen->pegawai->nama }}</td>
+                                        <td class="px-4 py-5 text-sm text-center text-slate-600">{{ $absen->hk }}</td>
+                                        <td class="px-4 py-5 text-sm text-center font-bold text-green-600">{{ $absen->hd }}</td>
+                                        <td class="px-4 py-5 text-sm text-center font-bold text-red-600">{{ $absen->tk }}</td>
+                                        <td class="px-4 py-5 text-sm text-center text-slate-600">{{ $absen->psw }}</td>
+                                        <td class="px-4 py-5 text-sm text-center text-slate-600">{{ $absen->tl }}</td>
+                                        <td class="px-4 py-5 text-sm text-center text-slate-600">{{ $absen->kjk_ht }}</td>
+                                        <td class="px-4 py-5 text-sm text-center text-slate-600">{{ $absen->kjk_pc }}</td>
+                                        <td class="px-4 py-5 text-sm text-center font-bold text-red-600">{{ $absen->kjk }}</td>
+                                        <td class="px-6 py-5 text-center">
                                             <a href="javascript:void(0)" onclick="openDetailModal(this)" 
    data-absen="{{ json_encode($absen) }}" 
-   class="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-md cursor-pointer transition-colors z-10 relative" 
+   class="inline-flex items-center justify-center p-2 text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 rounded-md cursor-pointer transition-colors z-10 relative" 
    title="Lihat Detail Kode Absensi">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -316,7 +316,12 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="p-8 text-center text-sm text-gray-500">Belum ada data absensi untuk periode dan bulan ini.</td>
+                                        <td colspan="10" class="px-6 py-14 text-center text-sm text-gray-500">
+                                            <div class="flex flex-col items-center">
+                                                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-3 text-3xl">📋</div>
+                                                Belum ada data absensi untuk periode dan bulan ini.
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -330,8 +335,8 @@
                 </div>
 
                 @if(isset($rekapTriwulanPage) && count($rekapTriwulanPage) > 0)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mt-6">
-                    <div class="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-0 mt-6">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
                         <div>
                             <h3 class="text-lg font-medium text-gray-900">Rekap Nilai Presensi Akhir (Satu Triwulan)</h3>
                             <p class="text-sm text-gray-500">Nilai dihitung berdasarkan total TK dan KJK selama triwulan terpilih.</p>
@@ -344,24 +349,26 @@
                             <button type="submit" class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Cari</button>
                         </form>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto rounded-2xl bg-white shadow-lg border-0">
                         <table class="w-full text-left border-collapse whitespace-nowrap">
                             <thead>
-                                <tr class="bg-gray-100 border-b">
-                                    <th class="p-3 font-semibold text-sm">Nama Pegawai</th>
-                                    <th class="p-3 font-semibold text-sm text-center">Total TK (Triwulan)</th>
-                                    <th class="p-3 font-semibold text-sm text-center">Total KJK (Triwulan)</th>
-                                    <th class="p-3 font-semibold text-sm text-center text-blue-600">Nilai Presensi Akhir</th>
+                                <tr class="bg-slate-50 border-b border-slate-200">
+                                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Nama Pegawai</th>
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Total TK (Triwulan)</th>
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Total KJK (Triwulan)</th>
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-blue-600">Nilai Presensi Akhir</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-slate-100">
                                 @foreach($rekapTriwulanPage as $rekap)
-                                    <tr class="border-b hover:bg-gray-50">
-                                        <td class="p-3 text-sm font-medium">{{ $rekap->pegawai->nama }}</td>
-                                        <td class="p-3 text-sm text-center font-bold {{ $rekap->total_tk > 0 ? 'text-red-600' : 'text-green-600' }}">{{ $rekap->total_tk }}</td>
-                                        <td class="p-3 text-sm text-center text-gray-700">{{ $rekap->total_kjk }} Menit</td>
-                                        <td class="p-3 text-sm text-center font-bold {{ $rekap->nilai_presensi < 100 ? 'text-amber-600' : 'text-green-600' }}">
-                                            {{ $rekap->nilai_presensi }}
+                                    <tr class="hover:bg-slate-50 transition-colors duration-200">
+                                        <td class="px-6 py-5 text-sm font-semibold text-slate-800">{{ $rekap->pegawai->nama }}</td>
+                                        <td class="px-6 py-5 text-sm text-center font-bold {{ $rekap->total_tk > 0 ? 'text-red-600' : 'text-green-600' }}">{{ $rekap->total_tk }}</td>
+                                        <td class="px-6 py-5 text-sm text-center text-slate-600">{{ $rekap->total_kjk }} Menit</td>
+                                        <td class="px-6 py-5 text-center">
+                                            <span class="inline-flex items-center rounded-full px-4 py-2 font-bold {{ $rekap->nilai_presensi < 100 ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-700' }}">
+                                                {{ $rekap->nilai_presensi }}
+                                            </span>
                                         </td>
                                     </tr>
                                 @endforeach

@@ -10,14 +10,25 @@
     <div class="py-12" style="font-family: 'Hanken Grotesk', sans-serif;">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
+            @if ($errors->any())
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-md shadow-sm" role="alert">
+                    <p class="font-bold mb-1">Terjadi Kesalahan Validasi</p>
+                    <ul class="list-disc ml-5 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @if (session('success'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-r-md shadow-sm" role="alert">
                     <p>{{ session('success') }}</p>
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-md shadow-sm" role="alert">
                     <p>{{ session('error') }}</p>
                 </div>
             @endif
@@ -28,40 +39,49 @@
                 </button>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4 text-[#1d1d1b]">Daftar Periode Penilaian</h3>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-0">
+                <div class="p-6">
                     
                     @if(count($periodes) > 0)
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto rounded-2xl bg-white shadow-lg ring-1 ring-gray-200">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="bg-gray-100 border-b">
-                                        <th class="p-3 font-semibold text-sm">Nama Periode</th>
-                                        <th class="p-3 font-semibold text-sm">Tanggal Mulai</th>
-                                        <th class="p-3 font-semibold text-sm">Tanggal Selesai</th>
-                                        <th class="p-3 font-semibold text-sm">Status</th>
-                                        <th class="p-3 font-semibold text-sm">Aksi</th>
+                                    <tr class="bg-slate-50 border-b border-slate-200">
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Nama Periode</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Masa Persiapan</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Masa Voting</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Tanggal Selesai</th>
+                                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Status</th>
+                                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-slate-100">
                                     @foreach($periodes as $p)
-                                        <tr class="border-b hover:bg-gray-50">
-                                            <td class="p-3 text-sm font-medium">{{ $p->nama }}</td>
-                                            <td class="p-3 text-sm">{{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d M Y') }}</td>
-                                            <td class="p-3 text-sm">{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') }}</td>
-                                            <td class="p-3 text-sm">
-                                                <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                                    {{ $p->status == 'selesai' ? 'bg-gray-200 text-gray-800' : 'bg-blue-100 text-blue-800' }}">
+                                        <tr class="hover:bg-slate-50 transition-colors duration-200">
+                                            <td class="px-6 py-5 text-sm font-semibold text-slate-800">{{ $p->nama }}</td>
+                                            <td class="px-6 py-5 text-sm text-slate-600">
+                                                {{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d M Y') }}<br>
+                                                <span class="text-xs text-slate-400">s/d</span><br>
+                                                {{ \Carbon\Carbon::parse($p->tanggal_selesai_persiapan ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(4))->format('d M Y') }}
+                                            </td>
+                                            <td class="px-6 py-5 text-sm text-slate-600">
+                                                {{ \Carbon\Carbon::parse($p->tanggal_mulai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(5))->format('d M Y') }}<br>
+                                                <span class="text-xs text-slate-400">s/d</span><br>
+                                                {{ \Carbon\Carbon::parse($p->tanggal_selesai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(7))->format('d M Y') }}
+                                            </td>
+                                            <td class="px-6 py-5 text-sm text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') }}</td>
+                                            <td class="px-6 py-5 text-center">
+                                                <span class="inline-flex px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full 
+                                                    {{ $p->status == 'selesai' ? 'bg-slate-100 text-slate-600' : 'bg-green-100 text-green-700' }}">
                                                     {{ ucfirst(str_replace('_', ' ', $p->status)) }}
                                                 </span>
                                             </td>
-                                            <td class="p-3 text-sm">
-                                                <button onclick="openEditModal({{ $p->id }}, '{{ $p->triwulan }}', '{{ $p->tahun }}', '{{ $p->tanggal_mulai }}', '{{ $p->tanggal_selesai }}', '{{ $p->status }}')" class="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
+                                            <td class="px-6 py-5 text-center space-x-2 whitespace-nowrap">
+                                                <button onclick="openEditModal({{ $p->id }}, '{{ $p->triwulan }}', '{{ $p->tahun }}', '{{ $p->tanggal_mulai }}', '{{ $p->tanggal_selesai_persiapan ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(4)->format('Y-m-d') }}', '{{ $p->tanggal_mulai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(5)->format('Y-m-d') }}', '{{ $p->tanggal_selesai_voting ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(7)->format('Y-m-d') }}', '{{ $p->tanggal_review_kepala ?? \Carbon\Carbon::parse($p->tanggal_mulai)->addDays(8)->format('Y-m-d') }}', '{{ $p->tanggal_selesai }}', '{{ $p->status }}')" class="text-sky-600 hover:text-sky-800 font-medium transition-colors p-2 bg-sky-50 rounded-md hover:bg-sky-100 text-sm px-3">Edit</button>
                                                 <form action="{{ route('admin.periode.destroy', $p->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus periode ini?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                                                    <button type="submit" class="text-red-600 hover:text-red-800 font-medium transition-colors p-2 bg-red-50 rounded-md hover:bg-red-100 text-sm px-3">Hapus</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -70,8 +90,9 @@
                             </table>
                         </div>
                     @else
-                        <div class="text-center py-8 text-gray-500">
-                            Belum ada data periode.
+                        <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-10 text-center">
+                            <div class="w-20 h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-4xl mb-4">📋</div>
+                            <h3 class="font-semibold text-slate-700">Belum Ada Data Periode</h3>
                         </div>
                     @endif
                 </div>
@@ -108,13 +129,35 @@
                         <input type="number" name="tahun" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ date('Y') }}" min="2000">
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                    <input type="date" name="tanggal_mulai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Mulai Persiapan</label>
+                        <input type="date" name="tanggal_mulai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Selesai Persiapan</label>
+                        <input type="date" name="tanggal_selesai_persiapan" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
-                    <input type="date" name="tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Mulai Voting</label>
+                        <input type="date" name="tanggal_mulai_voting" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Selesai Voting</label>
+                        <input type="date" name="tanggal_selesai_voting" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                </div>
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Review Kepala</label>
+                        <input type="date" name="tanggal_review_kepala" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Pengumuman</label>
+                        <input type="date" name="tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Status</label>
@@ -163,13 +206,35 @@
                         <input type="number" name="tahun" id="edit_tahun" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" min="2000">
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                    <input type="date" name="tanggal_mulai" id="edit_tanggal_mulai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Mulai Persiapan</label>
+                        <input type="date" name="tanggal_mulai" id="edit_tanggal_mulai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Selesai Persiapan</label>
+                        <input type="date" name="tanggal_selesai_persiapan" id="edit_tanggal_selesai_persiapan" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
-                    <input type="date" name="tanggal_selesai" id="edit_tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Mulai Voting</label>
+                        <input type="date" name="tanggal_mulai_voting" id="edit_tanggal_mulai_voting" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Selesai Voting</label>
+                        <input type="date" name="tanggal_selesai_voting" id="edit_tanggal_selesai_voting" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                </div>
+                <div class="mb-4 flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Review Kepala</label>
+                        <input type="date" name="tanggal_review_kepala" id="edit_tanggal_review_kepala" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700">Tgl Pengumuman</label>
+                        <input type="date" name="tanggal_selesai" id="edit_tanggal_selesai" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Status</label>
@@ -212,10 +277,14 @@
         }, 300);
     }
 
-    function openEditModal(id, triwulan, tahun, tanggal_mulai, tanggal_selesai, status) {
+    function openEditModal(id, triwulan, tahun, tanggal_mulai, tanggal_selesai_persiapan, tanggal_mulai_voting, tanggal_selesai_voting, tanggal_review_kepala, tanggal_selesai, status) {
         document.getElementById('edit_triwulan').value = triwulan;
         document.getElementById('edit_tahun').value = tahun;
         document.getElementById('edit_tanggal_mulai').value = tanggal_mulai;
+        document.getElementById('edit_tanggal_selesai_persiapan').value = tanggal_selesai_persiapan;
+        document.getElementById('edit_tanggal_mulai_voting').value = tanggal_mulai_voting;
+        document.getElementById('edit_tanggal_selesai_voting').value = tanggal_selesai_voting;
+        document.getElementById('edit_tanggal_review_kepala').value = tanggal_review_kepala;
         document.getElementById('edit_tanggal_selesai').value = tanggal_selesai;
         document.getElementById('edit_status').value = status;
         

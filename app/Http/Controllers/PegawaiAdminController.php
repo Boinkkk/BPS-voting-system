@@ -11,9 +11,17 @@ use Illuminate\Validation\Rule;
 
 class PegawaiAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pegawai = Pegawai::with(['departemen', 'role'])->orderBy('nama')->paginate(10);
+        $query = Pegawai::with(['departemen', 'role']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nip', 'like', "%{$search}%");
+        }
+
+        $pegawai = $query->orderBy('nama')->paginate(10)->withQueryString();
         $departemens = Departemen::all();
         $roles = Role::all();
         return view('admin.pegawai.index', compact('pegawai', 'departemens', 'roles'));

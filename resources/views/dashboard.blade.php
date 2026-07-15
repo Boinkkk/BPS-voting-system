@@ -1,114 +1,181 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-6">
+<div class="mb-4">
     <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
     <p class="text-gray-500 text-sm mt-1">Sistem Pemilihan Pegawai Terbaik BerAKHLAK BPS</p>
 </div>
+
+@if(isset($activePeriode) && isset($phaseDetails))
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-6 mt-4 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+            <div>
+                <h3 class="text-lg font-bold text-gray-900">Timeline Periode Aktif</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ $activePeriode->nama }}</p>
+            </div>
+            @if($phaseDetails['next_phase'])
+            <div class="mt-4 md:mt-0 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center shadow-sm">
+                <div class="bg-blue-100 p-2 rounded-full mr-3">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mb-0.5">Reminder</p>
+                    <p class="text-sm text-blue-900 font-medium">
+                        @if($phaseDetails['days_left'] == 0)
+                            <span class="font-bold">Hari ini</span> masuk ke <span class="font-bold text-blue-700">{{ $phaseDetails['next_phase'] }}</span>
+                        @else
+                            Tinggal <span class="font-bold text-blue-700">{{ $phaseDetails['days_left'] }} hari</span> lagi masuk ke <span class="font-bold text-blue-700">{{ $phaseDetails['next_phase'] }}</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+            @endif
+        </div>
+
+            @include('components.calendar-grid')
+        </div>
+    </div>
+@endif
 
 @if(isset($top3) && $top3->count() > 0)
     <!-- Confetti Overlay -->
     <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden" id="confetti-container"></div>
 
-    <div class="text-center mb-12">
-        <span class="bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">HASIL PEMILIHAN KARYAWAN TERBAIK</span>
-        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">KARYAWAN TERBAIK BPS</h2>
-        <p class="text-lg text-gray-500 max-w-2xl mx-auto">Merayakan integritas, dedikasi, dan profesionalisme para insan statistik terbaik pada <b>{{ $pemenangTerakhir->periode->nama }}</b>.</p>
-    </div>
+    <div class="relative bg-gradient-to-br from-[#0f172a] via-[#1e3a8a] to-[#0091d5] rounded-[2rem] p-6 lg:p-10 shadow-2xl overflow-hidden mt-4 border border-blue-800/30">
+        <!-- Abstract Background Decor -->
+        <div class="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-yellow-400 opacity-20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute -bottom-32 -left-32 w-[30rem] h-[30rem] bg-sky-400 opacity-20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute inset-0 bg-white/5 backdrop-blur-[2px] pointer-events-none"></div>
+        <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTAgMGwyMCAyMEw0MCAwaC0xTDIwIDE5LjUgMSAwem0wIDQwbDIwLTIwTDAgMHYxbDE5LjUgMjBMMCAzOXptNDAgMGwtMjAtMjBMMCA0MGgxTDIwIDIwLjUgMzkgNDB6bTAtNDBMMjAgMjAgNDAgNDB2LTFsLTE5LjUtMjBMMzkgMHoiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPgo8L3N2Zz4=')] opacity-50 pointer-events-none"></div>
 
-    <!-- Podium Section -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-16 px-2">
-
-        <!-- 2nd Place -->
-        @if($top3->has(1))
-        <div class="order-2 md:order-1 transform transition duration-300 hover:-translate-y-2">
-            <div class="flex flex-col items-center">
-                <div class="relative mb-6">
-                    <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-300 overflow-hidden bg-white shadow-lg flex items-center justify-center">
-                        @if($top3[1]->kandidat->pegawai->foto_profil)
-                            <img src="{{ $top3[1]->kandidat->pegawai->foto_profil_url }}" alt="{{ $top3[1]->kandidat->pegawai->nama }}" class="w-full h-full object-cover">
-                        @else
-                            <span class="text-4xl font-bold text-gray-500">{{ substr($top3[1]->kandidat->pegawai->nama, 0, 1) }}</span>
-                        @endif
-                    </div>
-                    <div class="absolute -bottom-2 -right-2 bg-gray-400 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">2</div>
-                </div>
-                <div class="bg-white w-full rounded-t-xl p-6 text-center border-t border-x border-gray-200 shadow-sm min-h-[140px]">
-                    <h3 class="text-xl font-bold text-gray-900 truncate" title="{{ $top3[1]->kandidat->pegawai->nama }}">{{ $top3[1]->kandidat->pegawai->nama }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">NIP. {{ $top3[1]->kandidat->pegawai->nip }}</p>
-                    <p class="text-sm font-semibold mt-2 text-gray-700 truncate" title="{{ $top3[1]->kandidat->pegawai->jabatan }}">{{ $top3[1]->kandidat->pegawai->jabatan }}</p>
-                </div>
-            </div>
-        </div>
-        @else
-        <div class="order-2 md:order-1"></div>
-        @endif
-
-        <!-- 1st Place (Winner) -->
-        <div class="order-1 md:order-2 transform transition duration-300 hover:-translate-y-2 relative z-10">
-            <div class="flex flex-col items-center">
-                <div class="relative mb-6 group">
-                    <div class="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-yellow-400 overflow-hidden bg-white shadow-2xl relative z-10 flex items-center justify-center">
-                        @if($top3[0]->kandidat->pegawai->foto_profil)
-                            <img src="{{ $top3[0]->kandidat->pegawai->foto_profil_url }}" alt="{{ $top3[0]->kandidat->pegawai->nama }}" class="w-full h-full object-cover">
-                        @else
-                            <span class="text-6xl font-bold text-yellow-600">{{ substr($top3[0]->kandidat->pegawai->nama, 0, 1) }}</span>
-                        @endif
-                    </div>
-                    <div class="absolute -bottom-4 -right-2 bg-gradient-to-br from-yellow-400 to-yellow-600 text-white rounded-full w-14 h-14 flex items-center justify-center font-bold text-2xl border-4 border-white z-20 shadow-xl">&#x1F3C6;</div>
-                    <div class="absolute -top-6 left-1/2 z-20 -translate-x-1/2 text-yellow-500 flex flex-col items-center animate-bounce">
-                        <span class="text-4xl">&#x2B50;</span>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-b from-blue-600 to-blue-800 text-white w-full rounded-t-2xl p-6 text-center shadow-2xl relative overflow-hidden min-h-[180px]">
-                    <div class="absolute inset-0 opacity-10 pointer-events-none">
-                        <svg height="100%" preserveAspectRatio="none" viewBox="0 0 100 100" width="100%"><path d="M0 100 L50 0 L100 100 Z" fill="currentColor"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-1 relative z-10" title="{{ $top3[0]->kandidat->pegawai->nama }}">{{ $top3[0]->kandidat->pegawai->nama }}</h3>
-                    <p class="text-sm opacity-90 relative z-10">NIP. {{ $top3[0]->kandidat->pegawai->nip }}</p>
-                    <p class="text-base font-bold mt-3 text-blue-200 relative z-10 truncate" title="{{ $top3[0]->kandidat->pegawai->jabatan }}">{{ $top3[0]->kandidat->pegawai->jabatan }}</p>
-                    <div class="mt-4 inline-flex items-center gap-1 px-4 py-1.5 bg-white/20 rounded-full text-xs font-bold relative z-10">JUARA 1 TERBAIK</div>
-                </div>
-            </div>
-            @if($pemenangTerakhir->catatan_kepala)
-            <div class="mt-4 bg-yellow-50 border border-yellow-200 p-4 rounded-xl shadow-sm">
-                <h4 class="text-xs font-bold text-yellow-800 uppercase tracking-wide mb-1">Catatan Pimpinan</h4>
-                <p class="text-gray-700 text-sm italic">"{{ $pemenangTerakhir->catatan_kepala }}"</p>
-                <p class="text-xs text-gray-500 mt-2 text-right">- {{ $pemenangTerakhir->pemilih->nama ?? 'Kepala Bagian' }}</p>
-            </div>
-            @endif
+        <div class="relative z-10 text-center mb-10">
+            <span class="bg-yellow-400/20 border border-yellow-400/50 text-yellow-300 px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4 inline-block shadow-lg">HASIL PEMILIHAN KARYAWAN TERBAIK</span>
+            <h2 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-white mb-3 drop-shadow-sm">KARYAWAN TERBAIK BPS</h2>
+            <p class="text-blue-100 text-lg max-w-2xl mx-auto font-light">Merayakan integritas, dedikasi, dan profesionalisme para insan statistik terbaik pada <b class="font-bold text-white">{{ $pemenangTerakhir->periode->nama }}</b>.</p>
         </div>
 
-        <!-- 3rd Place -->
-        @if($top3->has(2))
-        <div class="order-3 transform transition duration-300 hover:-translate-y-2">
-            <div class="flex flex-col items-center">
-                <div class="relative mb-6">
-                    <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-amber-600 overflow-hidden bg-white shadow-lg flex items-center justify-center">
-                        @if($top3[2]->kandidat->pegawai->foto_profil)
-                            <img src="{{ $top3[2]->kandidat->pegawai->foto_profil_url }}" alt="{{ $top3[2]->kandidat->pegawai->nama }}" class="w-full h-full object-cover">
-                        @else
-                            <span class="text-4xl font-bold text-amber-700">{{ substr($top3[2]->kandidat->pegawai->nama, 0, 1) }}</span>
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-4 gap-10">
+            
+            <!-- Podium Section (Takes 3 columns) -->
+            <div class="lg:col-span-3">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end px-2">
+                    <!-- 2nd Place -->
+                    @if($top3->has(1))
+                    <div class="order-2 md:order-1 transform transition-all duration-300 hover:-translate-y-2 group">
+                        <div class="flex flex-col items-center">
+                            <div class="relative mb-6">
+                                <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-slate-300 overflow-hidden bg-slate-100 shadow-[0_0_20px_rgba(203,213,225,0.3)] flex items-center justify-center transition-transform group-hover:scale-105">
+                                    @if($top3[1]->kandidat->pegawai->foto_profil)
+                                        <img src="{{ $top3[1]->kandidat->pegawai->foto_profil_url }}" alt="{{ $top3[1]->kandidat->pegawai->nama }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-4xl font-black text-slate-400">{{ substr($top3[1]->kandidat->pegawai->nama, 0, 1) }}</span>
+                                    @endif
+                                </div>
+                                <div class="absolute -bottom-3 -right-1 bg-gradient-to-br from-slate-300 to-slate-500 text-slate-900 rounded-full w-12 h-12 flex items-center justify-center font-black text-xl border-4 border-[#1e3a8a] shadow-lg">2</div>
+                            </div>
+                            <div class="bg-white/95 backdrop-blur-md w-full rounded-t-2xl p-6 text-center border-t border-x border-slate-200/50 shadow-xl min-h-[150px]">
+                                <h3 class="text-xl font-bold text-slate-800 truncate" title="{{ $top3[1]->kandidat->pegawai->nama }}">{{ $top3[1]->kandidat->pegawai->nama }}</h3>
+                                <p class="text-xs text-slate-500 mt-1 font-semibold">NIP. {{ $top3[1]->kandidat->pegawai->nip }}</p>
+                                <p class="text-sm font-semibold mt-3 text-slate-600 truncate bg-slate-100/80 py-1.5 px-2 rounded-lg" title="{{ $top3[1]->kandidat->pegawai->jabatan }}">{{ $top3[1]->kandidat->pegawai->jabatan }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <div class="order-2 md:order-1"></div>
+                    @endif
+
+                    <!-- 1st Place (Winner) -->
+                    <div class="order-1 md:order-2 transform transition-all duration-300 hover:-translate-y-3 relative z-20">
+                        <div class="flex flex-col items-center">
+                            <div class="relative mb-8 group">
+                                <div class="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity animate-pulse"></div>
+                                <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-yellow-400 overflow-hidden bg-white shadow-[0_0_30px_rgba(250,204,21,0.5)] relative z-10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    @if($top3[0]->kandidat->pegawai->foto_profil)
+                                        <img src="{{ $top3[0]->kandidat->pegawai->foto_profil_url }}" alt="{{ $top3[0]->kandidat->pegawai->nama }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-7xl font-black text-yellow-500">{{ substr($top3[0]->kandidat->pegawai->nama, 0, 1) }}</span>
+                                    @endif
+                                </div>
+                                <div class="absolute -bottom-5 -right-2 bg-gradient-to-br from-yellow-300 to-yellow-600 text-yellow-900 rounded-full w-16 h-16 flex items-center justify-center font-bold text-3xl border-4 border-[#1e3a8a] z-20 shadow-2xl">&#x1F3C6;</div>
+                                <div class="absolute -top-8 left-1/2 z-20 -translate-x-1/2 text-yellow-400 flex flex-col items-center animate-bounce">
+                                    <svg class="w-16 h-16 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"/></svg>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-b from-yellow-400 to-amber-600 text-white w-full rounded-t-3xl p-8 text-center shadow-2xl relative overflow-hidden min-h-[190px] border border-yellow-300/50">
+                                <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                                <h3 class="text-3xl font-black mb-1 relative z-10 drop-shadow-md" title="{{ $top3[0]->kandidat->pegawai->nama }}">{{ $top3[0]->kandidat->pegawai->nama }}</h3>
+                                <p class="text-sm opacity-90 relative z-10 font-medium">NIP. {{ $top3[0]->kandidat->pegawai->nip }}</p>
+                                <p class="text-sm font-bold mt-3 text-yellow-100 relative z-10 truncate bg-black/10 py-2 px-3 rounded-xl backdrop-blur-sm shadow-inner" title="{{ $top3[0]->kandidat->pegawai->jabatan }}">{{ $top3[0]->kandidat->pegawai->jabatan }}</p>
+                            </div>
+                        </div>
+                        @if($pemenangTerakhir->catatan_kepala)
+                        <div class="mt-4 bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl shadow-xl relative overflow-hidden">
+                            <div class="absolute top-2 left-2 text-yellow-400/20">
+                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 32 32"><path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-2.2 1.8-4 4-4V8zm16 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-2.2 1.8-4 4-4V8z"></path></svg>
+                            </div>
+                            <h4 class="text-xs font-black text-yellow-300 uppercase tracking-widest mb-2 relative z-10">Catatan Pimpinan</h4>
+                            <p class="text-white text-sm italic relative z-10 font-light leading-relaxed">"{{ $pemenangTerakhir->catatan_kepala }}"</p>
+                            <p class="text-xs text-blue-200 mt-3 text-right font-bold relative z-10">- {{ $pemenangTerakhir->pemilih->nama ?? 'Kepala Bagian' }}</p>
+                        </div>
                         @endif
                     </div>
-                    <div class="absolute -bottom-2 -right-2 bg-amber-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">3</div>
-                </div>
-                <div class="bg-white w-full rounded-t-xl p-6 text-center border-t border-x border-gray-200 shadow-sm min-h-[140px]">
-                    <h3 class="text-xl font-bold text-gray-900 truncate" title="{{ $top3[2]->kandidat->pegawai->nama }}">{{ $top3[2]->kandidat->pegawai->nama }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">NIP. {{ $top3[2]->kandidat->pegawai->nip }}</p>
-                    <p class="text-sm font-semibold mt-2 text-gray-700 truncate" title="{{ $top3[2]->kandidat->pegawai->jabatan }}">{{ $top3[2]->kandidat->pegawai->jabatan }}</p>
+
+                    <!-- 3rd Place -->
+                    @if($top3->has(2))
+                    <div class="order-3 transform transition-all duration-300 hover:-translate-y-2 group">
+                        <div class="flex flex-col items-center">
+                            <div class="relative mb-6">
+                                <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-orange-400 overflow-hidden bg-slate-100 shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center justify-center transition-transform group-hover:scale-105">
+                                    @if($top3[2]->kandidat->pegawai->foto_profil)
+                                        <img src="{{ $top3[2]->kandidat->pegawai->foto_profil_url }}" alt="{{ $top3[2]->kandidat->pegawai->nama }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-4xl font-black text-orange-400">{{ substr($top3[2]->kandidat->pegawai->nama, 0, 1) }}</span>
+                                    @endif
+                                </div>
+                                <div class="absolute -bottom-3 -right-1 bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-black text-xl border-4 border-[#1e3a8a] shadow-lg">3</div>
+                            </div>
+                            <div class="bg-white/95 backdrop-blur-md w-full rounded-t-2xl p-6 text-center border-t border-x border-orange-200/50 shadow-xl min-h-[150px]">
+                                <h3 class="text-xl font-bold text-slate-800 truncate" title="{{ $top3[2]->kandidat->pegawai->nama }}">{{ $top3[2]->kandidat->pegawai->nama }}</h3>
+                                <p class="text-xs text-slate-500 mt-1 font-semibold">NIP. {{ $top3[2]->kandidat->pegawai->nip }}</p>
+                                <p class="text-sm font-semibold mt-3 text-slate-600 truncate bg-orange-50 py-1.5 px-2 rounded-lg text-orange-900" title="{{ $top3[2]->kandidat->pegawai->jabatan }}">{{ $top3[2]->kandidat->pegawai->jabatan }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <div class="order-3"></div>
+                    @endif
                 </div>
             </div>
+
+            <!-- Motivational Quote Sidebar (Takes 1 column) -->
+            <div class="lg:col-span-1 flex flex-col justify-center mt-8 lg:mt-0">
+                <div class="bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-3xl shadow-2xl h-full flex flex-col items-center justify-center text-center relative overflow-hidden group hover:bg-white/15 transition-all duration-500">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-yellow-400/20 rounded-full blur-xl group-hover:bg-yellow-400/30 transition-all"></div>
+                    <div class="absolute -left-4 -bottom-4 w-24 h-24 bg-blue-400/20 rounded-full blur-xl group-hover:bg-blue-400/30 transition-all"></div>
+                    
+                    <svg class="w-12 h-12 text-yellow-400 mb-6 drop-shadow-md transform group-hover:scale-110 transition-transform duration-500" fill="currentColor" viewBox="0 0 32 32">
+                        <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-2.2 1.8-4 4-4V8zm16 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-2.2 1.8-4 4-4V8z"></path>
+                    </svg>
+                    
+                    <p class="text-lg font-medium text-white mb-8 leading-relaxed relative z-10 italic">
+                        "Karyawan terbaik bukan hanya tentang memiliki kinerja luar biasa, tetapi juga tentang bagaimana menginspirasi sekelilingnya dengan nilai-nilai luhur <b>BerAKHLAK</b>."
+                    </p>
+                    
+                    <div class="w-16 h-1.5 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full mb-6 shadow-sm"></div>
+                    
+                    <div class="relative z-10 flex flex-col items-center">
+                        <span class="text-sm text-blue-100 font-bold uppercase tracking-widest mb-1">Jadilah Inspirasi</span>
+                        <span class="text-xs text-blue-300/80 font-medium">BPS Kabupaten Tegal</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        @else
-        <div class="order-3"></div>
-        @endif
     </div>
 
 @elseif(isset($activePeriode) && isset($votingProgress))
     <!-- Progress Voting -->
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-8">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-8 mt-4">
         <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-900">Progress Voting</h3>
@@ -147,7 +214,7 @@
 
 @else
     <!-- Empty state -->
-    <div class="w-full bg-white border border-gray-200 rounded-xl shadow-sm min-h-[24rem] flex flex-col items-center justify-center p-8 text-center">
+    <div class="w-full bg-white border border-gray-200 rounded-xl shadow-sm min-h-[24rem] flex flex-col items-center justify-center p-8 text-center mt-4">
         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
             <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
