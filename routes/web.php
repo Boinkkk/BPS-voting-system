@@ -60,7 +60,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'destroy'])->name('admin.glosarium.destroy');
 
         // Pengumuman
-        Route::get('/admin/pengumuman', [\App\Http\Controllers\PengumumanController::class, 'index'])->name('admin.pengumuman.index');
+        Route::resource('/admin/pengumuman', \App\Http\Controllers\PengumumanController::class)->names('admin.pengumuman');
+        
+        // Dev Time Control
+        if (!app()->environment('production')) {
+            Route::post('/dev/time/set', [\App\Http\Controllers\DevTimeController::class, 'setTime'])->name('dev.time.set');
+            Route::post('/dev/time/reset', [\App\Http\Controllers\DevTimeController::class, 'resetTime'])->name('dev.time.reset');
+        }
     });
 
     // ==========================
@@ -121,5 +127,10 @@ Route::middleware('auth')->group(function () {
     // ==========================
     Route::get('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'index'])->name('pegawai.survey.index');
     Route::post('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store');
+
+    // ==========================
+    // PENGUMUMAN READ
+    // ==========================
+    Route::post('/pengumuman/{id}/read', [\App\Http\Controllers\PengumumanController::class, 'markAsRead'])->name('pengumuman.read');
 
 }); // <-- auth

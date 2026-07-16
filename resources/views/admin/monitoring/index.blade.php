@@ -113,7 +113,7 @@
                                     @elseif($index == 2)
                                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-bold border border-orange-200 shadow-sm">3</span>
                                     @else
-                                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-500 font-medium border border-gray-200">{{ $index + 1 }}</span>
+                                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-bps-bg text-gray-500 font-medium border border-gray-200">{{ $index + 1 }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">

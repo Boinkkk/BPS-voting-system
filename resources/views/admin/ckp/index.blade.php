@@ -63,7 +63,7 @@
                         <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="w-full text-sm border border-gray-300 rounded-md p-[7px] bg-white">
                     </div>
                     <div class="w-full md:w-auto">
-                        <button type="submit" class="w-full px-5 py-[9px] bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors">
+                        <button type="submit" class="w-full px-5 py-[9px] bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-bps-secondary transition-colors">
                             Upload Data
                         </button>
                     </div>

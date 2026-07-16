@@ -32,9 +32,11 @@ class SurveyPegawaiController extends Controller
                                         ->where('user_id', $user->id)
                                         ->exists();
 
+        $isVotingDitunda = !$periodeAktif->isDataLengkap();
+
         $pertanyaans = PertanyaanSurvei::orderBy('nomor_urut')->get();
 
-        return view('pegawai.survey.index', compact('periodeAktif', 'kandidats', 'sudahIsi', 'pertanyaans'));
+        return view('pegawai.survey.index', compact('periodeAktif', 'kandidats', 'sudahIsi', 'pertanyaans', 'isVotingDitunda'));
     }
 
     public function store(Request $request)
@@ -50,6 +52,9 @@ class SurveyPegawaiController extends Controller
         ]);
 
         $periodeAktif = PeriodePenilaian::where('status', 'voting')->first();
+        if (!$periodeAktif || !$periodeAktif->isDataLengkap()) {
+            return redirect()->route('pegawai.survey.index')->with('error', 'Pemilihan sedang ditunda. Data kandidat belum lengkap.');
+        }
 
         // 1. Simpan nilai ke jawaban_survei tanpa id user atau session (100% anonim)
         foreach ($request->jawaban as $pertanyaan_id => $kandidatScores) {

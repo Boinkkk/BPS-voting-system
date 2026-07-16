@@ -4,6 +4,14 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
+    /* Custom BPS Theme Colors */
+    --color-bps-primary: #0F4C81;
+    --color-bps-secondary: #2563EB;
+    --color-bps-accent: #F59E0B;
+    --color-bps-bg: #F8FAFC;
+    --color-bps-surface: #FFFFFF;
+    --color-bps-text: #1F2937;
+
     --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --color-biru: #0093DD;
     --color-orange: #EB891B;

@@ -19,11 +19,16 @@ class MonitoringSurveiController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Halaman ini khusus Admin dan Kepala Kantor.');
         }
 
-        $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
-        $periode_id = $request->input('periode_id');
+        $requested_periode_id = $request->input('periode_id');
+        $periodeData = PeriodePenilaian::getRecentAndDefault($requested_periode_id);
+        
+        $periodes = $periodeData['periodes'];
+        $periode_id = $periodeData['default_id'];
 
-        if (!$periode_id && $periodes->isNotEmpty()) {
-            $periode_id = $periodes->first()->id;
+        if ($periode_id != $requested_periode_id && !$requested_periode_id) {
+            return redirect()->route('admin.monitoring.index', array_merge($request->query(), [
+                'periode_id' => $periode_id
+            ]));
         }
 
         $kandidats = collect();

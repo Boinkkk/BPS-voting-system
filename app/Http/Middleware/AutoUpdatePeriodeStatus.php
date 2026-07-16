@@ -27,7 +27,7 @@ class AutoUpdatePeriodeStatus
                 
                 // Jika status berubah ke review_kepala, otomatis generate top 3 kandidat
                 if ($newStatus === 'review_kepala') {
-                    app(\App\Http\Controllers\KandidatAdminController::class)->generateTop3ForPeriode($periode->id);
+                    \App\Services\KandidatService::generateTop3Kandidat($periode->id);
                 }
             }
         }

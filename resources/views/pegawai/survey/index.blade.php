@@ -115,6 +115,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-6 text-center text-gray-500">
                 {{ $error }}
             </div>
+        @elseif(isset($isVotingDitunda) && $isVotingDitunda)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-10 text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+                    <svg class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Voting Ditunda Sementara</h3>
+                <p class="text-gray-500">Pemilihan untuk periode <strong>{{ $periodeAktif->nama }}</strong> sedang ditunda karena Kepala Umum belum menyelesaikan kelengkapan data (Nilai CKP atau Absensi 3 bulan). Harap kembali lagi nanti.</p>
+            </div>
         @elseif($sudahIsi)
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-10 text-center">
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
@@ -132,7 +142,7 @@
         @else
             <!-- Header Informasi -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
-                <div class="p-4 border-b bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between">
+                <div class="p-4 border-b bg-bps-bg flex flex-col sm:flex-row sm:items-center justify-between">
                     <div>
                         <h3 class="text-lg font-medium text-gray-900">Periode: {{ $periodeAktif->nama }}</h3>
                         <p class="text-sm text-gray-500 mt-1">Sistem akan menyimpan jawaban Anda secara otomatis di memori browser.</p>
@@ -229,7 +239,7 @@
                     <div class="flex flex-col-reverse md:flex-row justify-between items-center mt-6 mb-10 gap-4">
                         <div class="w-full md:w-auto">
                             @if(!$loop->first)
-                            <button type="button" onclick="changeStep({{ $loop->iteration - 1 }})" class="w-full md:w-auto justify-center px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 shadow-sm transition-colors flex items-center">
+                            <button type="button" onclick="changeStep({{ $loop->iteration - 1 }})" class="w-full md:w-auto justify-center px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-bps-bg shadow-sm transition-colors flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                                 Sebelumnya
                             </button>
@@ -245,7 +255,7 @@
 
                             @if($loop->last)
                                 @if(in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']))
-                                <button type="submit" class="w-full md:w-auto justify-center px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-blue-600 shadow-md transition-colors flex items-center">
+                                <button type="submit" class="w-full md:w-auto justify-center px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-bps-secondary shadow-md transition-colors flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Kirim Semua Penilaian
                                 </button>

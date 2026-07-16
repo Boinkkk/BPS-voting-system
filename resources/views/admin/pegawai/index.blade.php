@@ -59,7 +59,7 @@
         </div>
     @endif
 
-    <div class="bg-gray-50 overflow-hidden shadow-none sm:rounded-lg border-0">
+    <div class="bg-bps-bg overflow-hidden shadow-none sm:rounded-lg border-0">
         <div class="p-6">
             
             <!-- Mobile Card View -->

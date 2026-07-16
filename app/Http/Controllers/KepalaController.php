@@ -71,12 +71,11 @@ class KepalaController extends Controller
             $hasilAkhir->catatan_kepala = $request->input('catatan');
             $hasilAkhir->save();
 
-            // Ubah status periode menjadi selesai
-            $periode->status = 'selesai';
-            $periode->save();
+            // $periode->status = 'selesai';
+            // $periode->save();
 
             DB::commit();
-            return redirect()->route('dashboard')->with('success', 'Pegawai terbaik berhasil ditetapkan! Pemilihan periode ini telah selesai.');
+            return redirect()->route('dashboard')->with('success', 'Pegawai terbaik berhasil ditetapkan! Anda masih dapat mengubah pilihan sebelum masa pengumuman.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -15,16 +15,20 @@ class CkpController extends Controller
 {
     public function index(Request $request)
     {
-        $periode_id = $request->input('periode_id');
+        $requested_periode_id = $request->input('periode_id');
+        $periodeData = PeriodePenilaian::getRecentAndDefault($requested_periode_id);
+        
+        $periodes = $periodeData['periodes'];
+        $periode_id = $periodeData['default_id'];
+        
+        if ($periode_id != $requested_periode_id && !$requested_periode_id) {
+            return redirect()->route('admin.ckp.index', array_merge($request->query(), [
+                'periode_id' => $periode_id
+            ]));
+        }
+        
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
-
-        $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
-        if (!$periode_id && $periodes->isNotEmpty()) {
-            $periode_id = $periodes->first()->id;
-        }
-
-
 
         $query = NilaiCkp::with('pegawai')
             ->where('periode_id', $periode_id);

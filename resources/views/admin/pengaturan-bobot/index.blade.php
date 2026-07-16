@@ -47,15 +47,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Bobot CKP (%)</label>
-                            <input type="number" name="ckp" id="ckp" value="{{ $bobot->ckp }}" min="0" max="100" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bobot-input">
+                            <input type="number" name="ckp" id="ckp" value="{{ $bobot->ckp }}" min="0" max="100" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary bobot-input">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Bobot Absensi (%)</label>
-                            <input type="number" name="absensi" id="absensi" value="{{ $bobot->absensi }}" min="0" max="100" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bobot-input">
+                            <input type="number" name="absensi" id="absensi" value="{{ $bobot->absensi }}" min="0" max="100" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary bobot-input">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Bobot Survei (%)</label>
-                            <input type="number" name="survey" id="survey" value="{{ $bobot->survey }}" min="0" max="100" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bobot-input">
+                            <input type="number" name="survey" id="survey" value="{{ $bobot->survey }}" min="0" max="100" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary bobot-input">
                         </div>
                     </div>
 
@@ -70,7 +70,7 @@
                             <!-- Bobot HT Dihapus -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Bobot TK</label>
-                                <input type="number" step="0.01" name="bobot_tk" value="{{ $bobot->bobot_tk ?? 2 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                <input type="number" step="0.01" name="bobot_tk" value="{{ $bobot->bobot_tk ?? 2 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 <p class="text-xs text-gray-500 mt-1">Default 2.</p>
                             </div>
                             <div class="md:col-span-1 lg:col-span-2"></div>
@@ -78,57 +78,57 @@
                             <!-- PSW -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Bobot Total PSW</label>
-                                <input type="number" step="0.01" name="bobot_psw" value="{{ $bobot->bobot_psw ?? 1 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                <input type="number" step="0.01" name="bobot_psw" value="{{ $bobot->bobot_psw ?? 1 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 <p class="text-xs text-gray-500 mt-1">Dipakai jika bobot PSW 1-4 bernilai 0.</p>
                             </div>
                             <div class="col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">PSW 1</label>
-                                    <input type="number" step="0.01" name="bobot_psw1" value="{{ $bobot->bobot_psw1 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_psw1" value="{{ $bobot->bobot_psw1 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">PSW 2</label>
-                                    <input type="number" step="0.01" name="bobot_psw2" value="{{ $bobot->bobot_psw2 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_psw2" value="{{ $bobot->bobot_psw2 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">PSW 3</label>
-                                    <input type="number" step="0.01" name="bobot_psw3" value="{{ $bobot->bobot_psw3 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_psw3" value="{{ $bobot->bobot_psw3 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">PSW 4</label>
-                                    <input type="number" step="0.01" name="bobot_psw4" value="{{ $bobot->bobot_psw4 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_psw4" value="{{ $bobot->bobot_psw4 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                             </div>
 
                             <!-- TL -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Bobot Total TL</label>
-                                <input type="number" step="0.01" name="bobot_tl" value="{{ $bobot->bobot_tl ?? 1 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                <input type="number" step="0.01" name="bobot_tl" value="{{ $bobot->bobot_tl ?? 1 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 <p class="text-xs text-gray-500 mt-1">Dipakai jika bobot TL 1-4 bernilai 0.</p>
                             </div>
                             <div class="col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">TL 1</label>
-                                    <input type="number" step="0.01" name="bobot_tl1" value="{{ $bobot->bobot_tl1 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_tl1" value="{{ $bobot->bobot_tl1 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">TL 2</label>
-                                    <input type="number" step="0.01" name="bobot_tl2" value="{{ $bobot->bobot_tl2 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_tl2" value="{{ $bobot->bobot_tl2 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">TL 3</label>
-                                    <input type="number" step="0.01" name="bobot_tl3" value="{{ $bobot->bobot_tl3 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_tl3" value="{{ $bobot->bobot_tl3 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-1">TL 4</label>
-                                    <input type="number" step="0.01" name="bobot_tl4" value="{{ $bobot->bobot_tl4 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <input type="number" step="0.01" name="bobot_tl4" value="{{ $bobot->bobot_tl4 ?? 0 }}" min="0" class="w-full text-sm border-gray-300 rounded-md focus:ring-bps-secondary focus:border-bps-secondary">
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex justify-end border-t pt-4">
-                        <button type="submit" id="submitBtn" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <button type="submit" id="submitBtn" class="px-4 py-2 bg-bps-secondary text-white font-medium rounded-md hover:bg-bps-secondary/90 focus:outline-none focus:ring-2 focus:ring-bps-secondary focus:ring-offset-2">
                             Simpan Perubahan
                         </button>
                     </div>

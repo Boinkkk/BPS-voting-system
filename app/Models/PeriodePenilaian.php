@@ -130,4 +130,73 @@ class PeriodePenilaian extends Model
         
         return $this->status;
     }
+    public function isDataLengkap()
+    {
+        // 1. Cek CKP
+        $hasCkp = \App\Models\NilaiCkp::where('periode_id', $this->id)->exists();
+        if (!$hasCkp) {
+            return false;
+        }
+
+        // 2. Cek Absensi (harus ada di 3 bulan triwulan ini)
+        $expectedMonths = [];
+        switch ((int)$this->triwulan) {
+            case 1: $expectedMonths = [1, 2, 3]; break;
+            case 2: $expectedMonths = [4, 5, 6]; break;
+            case 3: $expectedMonths = [7, 8, 9]; break;
+            case 4: $expectedMonths = [10, 11, 12]; break;
+        }
+
+        $existingMonths = \App\Models\AbsensiPegawai::where('periode_id', $this->id)
+            ->select('bulan')
+            ->distinct()
+            ->pluck('bulan')
+            ->map(function ($val) { return (int) $val; })
+            ->toArray();
+
+        $intersect = array_intersect($expectedMonths, $existingMonths);
+        
+        if (count($intersect) < 3) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function getRecentAndDefault($requested_periode_id = null)
+    {
+        $currentYear = (int) date('Y');
+        $periodes = self::where('tahun', '>=', $currentYear - 1)
+                        ->orderBy('tanggal_mulai', 'desc')
+                        ->get();
+
+        $default_id = $requested_periode_id;
+
+        if (!$default_id && $periodes->isNotEmpty()) {
+            $now = now();
+            $closestPeriode = $periodes->sortBy(function ($p) use ($now) {
+                if ($p->tanggal_mulai_voting && $p->tanggal_selesai_voting) {
+                    $start = \Carbon\Carbon::parse($p->tanggal_mulai_voting);
+                    $end = \Carbon\Carbon::parse($p->tanggal_selesai_voting);
+                    
+                    if ($now->between($start, $end)) {
+                        return 0;
+                    }
+                    
+                    $diffStart = abs($now->diffInSeconds($start));
+                    $diffEnd = abs($now->diffInSeconds($end));
+                    
+                    return min($diffStart, $diffEnd);
+                }
+                return PHP_INT_MAX;
+            })->first();
+
+            $default_id = $closestPeriode ? $closestPeriode->id : $periodes->first()->id;
+        }
+
+        return [
+            'periodes' => $periodes,
+            'default_id' => $default_id
+        ];
+    }
 }

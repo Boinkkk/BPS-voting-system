@@ -82,7 +82,7 @@
                                 @csrf
                                 <input type="hidden" name="periode_id" value="{{ $periode_id }}">
                                 @if($isPenginputan)
-                                    <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
+                                    <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-[#0091d5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-bps-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bps-secondary" onclick="return confirm('Proses ini akan mengkalkulasi ulang seluruh skor akhir pegawai berdasarkan Nilai CKP dan Absensi pada periode terpilih, lalu menimpa data 10 kandidat sebelumnya. Lanjutkan?')">
                                         Kalkulasi 10 Kandidat
                                     </button>
                                 @else

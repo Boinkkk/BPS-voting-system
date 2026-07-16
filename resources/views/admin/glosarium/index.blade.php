@@ -3,11 +3,11 @@
 @section('content')
 <div class="mb-6 flex justify-between items-end">
     <div>
-        <h1 class="text-2xl font-bold text-[#1D1D1B] mb-1">Manajemen Glosarium</h1>
+        <h1 class="text-2xl font-bold text-bps-text mb-1">Manajemen Glosarium</h1>
         <p class="text-sm text-gray-500">Kelola istilah dan definisi yang digunakan dalam aplikasi.</p>
     </div>
     <div>
-        <a href="{{ route('admin.glosarium.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#0091DA] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0091DA]">
+        <a href="{{ route('admin.glosarium.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-bps-secondary hover:bg-bps-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bps-secondary">
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -36,7 +36,7 @@
 <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-bps-bg">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                         Istilah
@@ -51,8 +51,8 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($glosariums as $item)
-                <tr class="hover:bg-gray-50 transition-colors duration-200">
-                    <td class="px-6 py-4 text-sm font-medium text-[#1D1D1B]">
+                <tr class="hover:bg-bps-bg transition-colors duration-200">
+                    <td class="px-6 py-4 text-sm font-medium text-bps-text">
                         {{ $item->istilah }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
@@ -60,7 +60,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex items-center justify-end space-x-3">
-                            <a href="{{ route('admin.glosarium.edit', $item->id) }}" class="text-[#0091DA] hover:text-blue-800 transition-colors duration-200" title="Edit">
+                            <a href="{{ route('admin.glosarium.edit', $item->id) }}" class="text-bps-secondary hover:text-blue-800 transition-colors duration-200" title="Edit">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>

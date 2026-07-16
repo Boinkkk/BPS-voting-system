@@ -20,7 +20,7 @@
 
         @if(!$periodeReview)
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-50 mb-6 border border-gray-100 shadow-inner">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-bps-bg mb-6 border border-gray-100 shadow-inner">
                     <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 mb-2">Belum Ada Periode Review</h3>
@@ -83,7 +83,7 @@
                             <div class="p-6 flex-grow flex flex-col">
                                 <div class="space-y-4 flex-grow">
                                     <!-- CKP -->
-                                    <div class="bg-gray-50/50 rounded-2xl p-3 border border-gray-100">
+                                    <div class="bg-bps-bg/50 rounded-2xl p-3 border border-gray-100">
                                         <div class="flex justify-between items-center mb-1.5">
                                             <span class="text-xs text-gray-500 font-bold uppercase tracking-wider flex items-center">
                                                 <svg class="w-4 h-4 mr-1.5 text-[#0091d5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -97,7 +97,7 @@
                                     </div>
 
                                     <!-- Absensi -->
-                                    <div class="bg-gray-50/50 rounded-2xl p-3 border border-gray-100">
+                                    <div class="bg-bps-bg/50 rounded-2xl p-3 border border-gray-100">
                                         <div class="flex justify-between items-center mb-1.5">
                                             <span class="text-xs text-gray-500 font-bold uppercase tracking-wider flex items-center">
                                                 <svg class="w-4 h-4 mr-1.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -111,7 +111,7 @@
                                     </div>
 
                                     <!-- Survei -->
-                                    <div class="bg-gray-50/50 rounded-2xl p-3 border border-gray-100">
+                                    <div class="bg-bps-bg/50 rounded-2xl p-3 border border-gray-100">
                                         <div class="flex justify-between items-center mb-1.5">
                                             <span class="text-xs text-gray-500 font-bold uppercase tracking-wider flex items-center">
                                                 <svg class="w-4 h-4 mr-1.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>
@@ -133,17 +133,21 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Action Area -->
                                 <div class="mt-6 pt-5 border-t border-gray-100">
                                     <form id="form-pilih-{{ $h->id }}" action="{{ route('kepala.review.pilih', $h->id) }}" method="POST">
                                         @csrf
                                         <div class="mb-4">
                                             <label class="block text-xs font-semibold text-gray-600 mb-2">Catatan Penetapan (Opsional)</label>
-                                            <textarea name="catatan" rows="2" class="w-full border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0091d5]/20 focus:border-[#0091d5] bg-gray-50 resize-none transition-all placeholder-gray-400" placeholder="Berikan ucapan selamat atau alasan penetapan kandidat ini..."></textarea>
+                                            <textarea name="catatan" rows="2" class="w-full border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0091d5]/20 focus:border-[#0091d5] bg-bps-bg resize-none transition-all placeholder-gray-400" placeholder="Berikan ucapan selamat atau alasan penetapan kandidat ini...">{{ $h->catatan_kepala }}</textarea>
                                         </div>
-                                        <button type="button" onclick="openConfirmModal('{{ $h->id }}', '{{ addslashes($h->kandidat->pegawai->nama) }}')" class="w-full py-4 bg-gray-900 hover:bg-[#0091d5] text-white shadow-lg shadow-gray-900/20 font-bold rounded-xl transition-all hover:-translate-y-0.5 flex justify-center items-center group">
-                                            <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            Tetapkan Sebagai Terbaik
+                                        <button type="button" onclick="openConfirmModal('{{ $h->id }}', '{{ addslashes($h->kandidat->pegawai->nama) }}')" class="w-full py-4 {{ $h->is_terpilih ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-[#0091d5]' }} text-white shadow-lg shadow-gray-900/20 font-bold rounded-xl transition-all hover:-translate-y-0.5 flex justify-center items-center group">
+                                            @if($h->is_terpilih)
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                Pilihan Saat Ini (Perbarui)
+                                            @else
+                                                <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Tetapkan Sebagai Terbaik
+                                            @endif
                                         </button>
                                     </form>
                                 </div>
@@ -154,7 +158,7 @@
             </div>
             
             @if($kandidats->isEmpty())
-                <div class="text-center py-16 text-gray-500 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50 mt-6">
+                <div class="text-center py-16 text-gray-500 border-2 border-dashed border-gray-200 rounded-3xl bg-bps-bg mt-6">
                     <p class="font-medium text-gray-600 text-lg">Data nominasi top 3 belum tersedia.</p>
                     <p class="text-sm mt-2">Silakan hubungi Administrator untuk memproses tahapan penilaian ini.</p>
                 </div>
@@ -185,15 +189,15 @@
                 <p class="text-sm text-gray-500 leading-relaxed max-w-sm">
                     Anda akan menetapkan <br><strong id="modalKandidatName" class="text-[#0091d5] text-base mt-1 block"></strong>
                     sebagai Pegawai Terbaik.<br>
-                    <span class="text-xs text-red-600 font-semibold mt-4 block bg-red-50 py-2 px-3 rounded-lg border border-red-100">Peringatan: Tindakan ini akan mengakhiri seluruh proses pemilihan dan tidak dapat dibatalkan.</span>
+                    <span class="text-xs text-blue-600 font-semibold mt-4 block bg-blue-50 py-2 px-3 rounded-lg border border-blue-100">Informasi: Anda masih dapat mengubah pilihan ini sebelum masa pengumuman dimulai.</span>
                 </p>
             </div>
         </div>
-        <div class="bg-gray-50/80 px-6 py-5 sm:flex sm:flex-row-reverse border-t border-gray-100 gap-3">
+        <div class="bg-bps-bg/80 px-6 py-5 sm:flex sm:flex-row-reverse border-t border-gray-100 gap-3">
             <button type="button" onclick="submitForm()" class="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-md px-5 py-3.5 bg-[#0091d5] text-base font-bold text-white hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0091d5] transition-all transform hover:-translate-y-0.5">
                 Ya, Tetapkan Sekarang
             </button>
-            <button type="button" onclick="closeConfirmModal()" class="mt-3 sm:mt-0 w-full inline-flex justify-center items-center rounded-xl border border-gray-300 shadow-sm px-5 py-3.5 bg-white text-base font-bold text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-all">
+            <button type="button" onclick="closeConfirmModal()" class="mt-3 sm:mt-0 w-full inline-flex justify-center items-center rounded-xl border border-gray-300 shadow-sm px-5 py-3.5 bg-white text-base font-bold text-gray-700 hover:bg-bps-bg hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-all">
                 Batal
             </button>
         </div>

@@ -13,7 +13,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Form Penunjukan -->
     <div class="lg:col-span-1 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+        <div class="p-4 border-b border-gray-100 bg-bps-bg rounded-t-lg">
             <h3 class="font-medium text-gray-900">Penunjukan Tim Penilai Baru</h3>
         </div>
         <div class="p-5">
@@ -68,13 +68,13 @@
 
     <!-- Daftar Periode -->
     <div class="lg:col-span-2 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+        <div class="p-4 border-b border-gray-100 bg-bps-bg rounded-t-lg">
             <h3 class="font-medium text-gray-900">Daftar Periode & Tim Penilai</h3>
         </div>
         
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-bps-bg">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Periode</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -87,7 +87,7 @@
                         @php
                             $tim = \App\Models\TimPenilai::where('periode_id', $p->id)->with('pegawai')->get();
                         @endphp
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-bps-bg">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $p->nama }}</div>
                                 <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d M') }} - {{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') }}</div>
@@ -110,7 +110,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 @if($tim->count() > 0)
-                                    <a href="{{ route('kepala.tim_penilai.cetak', $p->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0091d5]">
+                                    <a href="{{ route('kepala.tim_penilai.cetak', $p->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-bps-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0091d5]">
                                         <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                         Cetak Surat Tugas
                                     </a>

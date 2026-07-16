@@ -114,7 +114,7 @@
     <div id="addPeriodeModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <!-- Background backdrop -->
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-md mx-auto" style="min-width: min(100%, 400px);">
             <div class="flex justify-between items-center mb-4">
@@ -182,7 +182,7 @@
     <div id="editPeriodeModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <!-- Background backdrop -->
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-md mx-auto" style="min-width: min(100%, 400px);">
             <div class="flex justify-between items-center mb-4">
@@ -239,7 +239,7 @@
                 </div>
 
                 <div class="flex justify-end mt-6">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Simpan Perubahan</button>
+                    <button type="submit" class="bg-bps-secondary text-white px-4 py-2 rounded shadow hover:bg-bps-secondary/90">Simpan Perubahan</button>
                 </div>
             </form>
         </div>

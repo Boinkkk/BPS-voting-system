@@ -11,11 +11,16 @@ class KandidatAdminController extends Controller
 {
     public function index(Request $request)
     {
-        $periode_id = $request->input('periode_id');
-        $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
+        $requested_periode_id = $request->input('periode_id');
+        $periodeData = PeriodePenilaian::getRecentAndDefault($requested_periode_id);
         
-        if (!$periode_id && $periodes->isNotEmpty()) {
-            $periode_id = $periodes->first()->id;
+        $periodes = $periodeData['periodes'];
+        $periode_id = $periodeData['default_id'];
+        
+        if ($periode_id != $requested_periode_id && !$requested_periode_id) {
+            return redirect()->route('admin.kandidat.index', array_merge($request->query(), [
+                'periode_id' => $periode_id
+            ]));
         }
 
         $kandidats = [];

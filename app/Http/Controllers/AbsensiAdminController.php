@@ -16,13 +16,10 @@ class AbsensiAdminController extends Controller
         $requested_periode_id = $request->input('periode_id');
         $requested_bulan = $request->input('bulan');
 
-        $periode_id = $requested_periode_id;
+        $periodeData = PeriodePenilaian::getRecentAndDefault($requested_periode_id);
+        $periodes = $periodeData['periodes'];
+        $periode_id = $periodeData['default_id'];
         $bulan = $requested_bulan;
-
-        $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
-        if (!$periode_id && $periodes->isNotEmpty()) {
-            $periode_id = $periodes->first()->id;
-        }
 
         if ($periode_id) {
             $periode = $periodes->firstWhere('id', $periode_id);

@@ -97,7 +97,7 @@
         <!-- Modal Input Manual -->
         <div id="manualInputModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeManualModal()"></div>
+                <div class="fixed inset-0 bg-bps-bg0 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeManualModal()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -206,7 +206,7 @@
         <!-- Modal Detail Absensi -->
         <div id="detailAbsensiModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
+                <div class="fixed inset-0 bg-bps-bg0 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -234,8 +234,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeDetailModal()">
+                    <div class="bg-bps-bg px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-bps-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeDetailModal()">
                             Tutup
                         </button>
                     </div>
@@ -356,7 +356,7 @@
                                     <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Nama Pegawai</th>
                                     <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Total TK (Triwulan)</th>
                                     <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-600">Total KJK (Triwulan)</th>
-                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-blue-600">Nilai Presensi Akhir</th>
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-bps-secondary">Nilai Presensi Akhir</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -510,7 +510,7 @@
             const val = item.value || 0;
             const textColor = (item.highlight && val > 0) ? 'text-red-600 font-bold' : 'text-gray-900';
             htmlContent += `
-                <div class="border rounded p-2 bg-gray-50 flex flex-col items-center justify-center text-center">
+                <div class="border rounded p-2 bg-bps-bg flex flex-col items-center justify-center text-center">
                     <div class="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-1">${item.label}</div>
                     <div class="text-base ${textColor}">${val}</div>
                 </div>

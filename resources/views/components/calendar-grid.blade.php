@@ -31,7 +31,7 @@
     </div>
 
     <div class="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-        <div class="bg-gray-50 py-3 px-4 border-b border-gray-200 flex justify-between items-center">
+        <div class="bg-bps-bg py-3 px-4 border-b border-gray-200 flex justify-between items-center">
             <a href="{{ $currentUrl }}?month={{ $prevMonth }}&year={{ $prevYear }}" class="p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition-colors">
                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>

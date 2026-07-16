@@ -1,10 +1,184 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-4">
-    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-    <p class="text-gray-500 text-sm mt-1">Sistem Pemilihan Pegawai Terbaik BerAKHLAK BPS</p>
+<div class="mb-4 flex justify-between items-end">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-gray-500 text-sm mt-1">Sistem Pemilihan Pegawai Terbaik BerAKHLAK BPS</p>
+    </div>
 </div>
+
+@if(isset($popupPengumuman) && $popupPengumuman)
+<!-- POPUP PENGUMUMAN -->
+<div id="pengumumanPopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform transition-all">
+        <div class="bg-blue-600 p-4 text-center">
+            <h3 class="text-xl font-bold text-white uppercase tracking-wider">PENGUMUMAN PENTING</h3>
+        </div>
+        <div class="p-6">
+            <h4 class="text-lg font-bold text-gray-900 mb-2">{{ $popupPengumuman->judul }}</h4>
+            <div class="text-gray-700 text-sm mb-6 whitespace-pre-wrap">{{ $popupPengumuman->konten }}</div>
+            
+            @if(is_array($popupPengumuman->lampiran) && count($popupPengumuman->lampiran) > 0)
+                <div class="mb-6">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">Lampiran:</p>
+                    <div class="flex flex-col gap-2">
+                        @foreach($popupPengumuman->lampiran as $lampiran)
+                            <a href="{{ Storage::url($lampiran) }}" target="_blank" class="text-blue-600 text-sm hover:underline flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                {{ basename($lampiran) }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+            
+            <button id="btnSayaMengerti" data-id="{{ $popupPengumuman->id }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Saya Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(isset($stickyPengumumans) && $stickyPengumumans->count() > 0)
+<!-- STICKY PENGUMUMAN / BANNER (Medium Priority) -->
+<div class="space-y-4 mb-6 sticky top-0 z-30 bg-bps-bg/90 backdrop-blur-sm py-2">
+    @foreach($stickyPengumumans as $sticky)
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-r-xl shadow-md p-5 relative overflow-hidden group">
+        <div class="absolute right-0 top-0 text-blue-500 opacity-10 group-hover:opacity-20 transition-opacity">
+            <svg class="w-24 h-24 -mt-4 -mr-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+                <span class="text-xl">📢</span>
+            </div>
+            <div class="ml-3 w-full">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-sm font-bold text-blue-900">{{ $sticky->judul }}</h3>
+                    <span class="text-xs text-blue-500 font-medium bg-blue-100 px-2 py-0.5 rounded">{{ strtoupper($sticky->prioritas) }}</span>
+                </div>
+                <div class="text-sm text-blue-800 whitespace-pre-wrap">{{ $sticky->konten }}</div>
+                
+                @if(is_array($sticky->lampiran) && count($sticky->lampiran) > 0)
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        @foreach($sticky->lampiran as $lampiran)
+                            <a href="{{ Storage::url($lampiran) }}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-white text-blue-700 px-2 py-1 rounded border border-blue-200 hover:bg-blue-50 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                {{ basename($lampiran) }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
+
+@if(isset($bannerPengumumans) && $bannerPengumumans->count() > 0)
+<!-- NON-STICKY BANNER PENGUMUMAN (Normal/Low Priority) -->
+<div class="space-y-4 mb-6">
+    @foreach($bannerPengumumans as $banner)
+    <div class="bg-gradient-to-r from-gray-50 to-slate-50 border-l-4 border-gray-400 rounded-r-xl shadow-sm p-5 relative overflow-hidden group">
+        <div class="absolute right-0 top-0 text-gray-400 opacity-10 group-hover:opacity-20 transition-opacity">
+            <svg class="w-24 h-24 -mt-4 -mr-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+                <span class="text-xl">ℹ️</span>
+            </div>
+            <div class="ml-3 w-full">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-sm font-bold text-gray-900">{{ $banner->judul }}</h3>
+                    <span class="text-xs text-gray-500 font-medium bg-gray-200 px-2 py-0.5 rounded">{{ strtoupper($banner->prioritas) }}</span>
+                </div>
+                <div class="text-sm text-gray-700 whitespace-pre-wrap">{{ $banner->konten }}</div>
+                
+                @if(is_array($banner->lampiran) && count($banner->lampiran) > 0)
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        @foreach($banner->lampiran as $lampiran)
+                            <a href="{{ Storage::url($lampiran) }}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-white text-gray-700 px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                {{ basename($lampiran) }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
+
+@if(isset($regularPengumumans) && $regularPengumumans->count() > 0)
+<!-- REGULAR PENGUMUMAN -->
+<div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-6 mt-4 mb-8">
+    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3m0 0l3-3m-3 3V8"></path></svg>
+        Pengumuman Terbaru
+    </h3>
+    <div class="space-y-4">
+        @foreach($regularPengumumans as $pengumuman)
+        @php
+            $color = 'blue';
+            $dotColor = 'bg-blue-500';
+            if($pengumuman->prioritas == 'Critical') {
+                $color = 'red';
+                $dotColor = 'bg-red-500';
+            } elseif($pengumuman->prioritas == 'High') {
+                $color = 'orange';
+                $dotColor = 'bg-orange-500';
+            } elseif($pengumuman->kategori == 'Hasil') {
+                $color = 'green';
+                $dotColor = 'bg-green-500';
+            }
+        @endphp
+        <div class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+            <div class="flex items-start">
+                <div class="mt-1.5 mr-3 w-2 h-2 rounded-full {{ $dotColor }} flex-shrink-0 animate-pulse"></div>
+                <div class="w-full">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <h4 class="text-base font-semibold text-gray-900">{{ $pengumuman->judul }}</h4>
+                        <span class="text-xs text-gray-400 mt-1 sm:mt-0">{{ $pengumuman->publish_at ? $pengumuman->publish_at->format('d M Y') : $pengumuman->created_at->format('d M Y') }}</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-{{ $color }}-600 bg-{{ $color }}-50 px-2 py-0.5 rounded">{{ $pengumuman->kategori }}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">{{ Str::limit($pengumuman->konten, 150) }}</p>
+                    
+                    <div x-data="{ open: false }">
+                        @if(strlen($pengumuman->konten) > 150 || (is_array($pengumuman->lampiran) && count($pengumuman->lampiran) > 0))
+                            <button @click="open = !open" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors" x-text="open ? 'Tutup' : 'Lihat Selengkapnya'"></button>
+                        @endif
+                        
+                        <div x-show="open" x-transition class="mt-3 pt-3 border-t border-gray-100" style="display: none;">
+                            <div class="text-sm text-gray-800 whitespace-pre-wrap">{{ $pengumuman->konten }}</div>
+                            
+                            @if(is_array($pengumuman->lampiran) && count($pengumuman->lampiran) > 0)
+                                <div class="mt-4">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Lampiran</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($pengumuman->lampiran as $lampiran)
+                                            <a href="{{ Storage::url($lampiran) }}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 hover:border-gray-300 transition-all">
+                                                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                {{ basename($lampiran) }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
 
 @if(isset($activePeriode) && isset($phaseDetails))
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-6 mt-4 mb-8">
@@ -16,10 +190,10 @@
             @if($phaseDetails['next_phase'])
             <div class="mt-4 md:mt-0 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center shadow-sm">
                 <div class="bg-blue-100 p-2 rounded-full mr-3">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-5 h-5 text-bps-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mb-0.5">Reminder</p>
+                    <p class="text-xs text-bps-secondary font-bold uppercase tracking-wider mb-0.5">Reminder</p>
                     <p class="text-sm text-blue-900 font-medium">
                         @if($phaseDetails['days_left'] == 0)
                             <span class="font-bold">Hari ini</span> masuk ke <span class="font-bold text-blue-700">{{ $phaseDetails['next_phase'] }}</span>
@@ -34,7 +208,6 @@
 
             @include('components.calendar-grid')
         </div>
-    </div>
 @endif
 
 @if(isset($top3) && $top3->count() > 0)
@@ -174,6 +347,22 @@
     </div>
 
 @elseif(isset($activePeriode) && isset($votingProgress))
+    @if(isset($quorumWarning) && $quorumWarning)
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4 rounded-r-xl shadow-sm">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-bold text-yellow-800">
+                        Peringatan: Tingkat partisipasi voting saat ini masih di bawah 50% ({{ round($percentVoting, 1) }}%). Hasil pemilihan mungkin belum sepenuhnya representatif.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
     <!-- Progress Voting -->
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-8 mt-4">
         <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -188,7 +377,7 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             @foreach($votingProgress as $vp)
-                <div class="flex items-center p-3 rounded-xl border {{ $vp['sudah_voting'] ? 'border-green-200 bg-green-50/40' : 'border-gray-100 bg-gray-50/40' }}">
+                <div class="flex items-center p-3 rounded-xl border {{ $vp['sudah_voting'] ? 'border-green-200 bg-green-50/40' : 'border-gray-100 bg-bps-bg/40' }}">
                     <div class="relative flex-shrink-0">
                         @if($vp['foto'])
                             <img src="{{ $vp['foto'] }}" class="w-12 h-12 rounded-full object-cover border-2 {{ $vp['sudah_voting'] ? 'border-green-500' : 'border-gray-200' }}">
@@ -250,6 +439,31 @@
     }
     if (document.getElementById('confetti-container')) {
         window.addEventListener('load', createConfetti);
+    }
+    
+    // Popup Logic
+    const btnSayaMengerti = document.getElementById('btnSayaMengerti');
+    if (btnSayaMengerti) {
+        btnSayaMengerti.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const popup = document.getElementById('pengumumanPopup');
+            
+            // UI Update first for responsiveness
+            popup.classList.add('opacity-0');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+            
+            // Send AJAX
+            fetch(`/pengumuman/${id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({})
+            }).catch(err => console.error(err));
+        });
     }
 </script>
 @endpush

@@ -29,7 +29,7 @@
                     <h3 class="text-lg font-medium text-gray-900">Daftar Pertanyaan Survey</h3>
                     <p class="text-sm text-gray-500">Master data pertanyaan untuk survey kinerja pegawai.</p>
                 </div>
-                <button onclick="openAddModal()" class="px-4 py-2 bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors">
+                <button onclick="openAddModal()" class="px-4 py-2 bg-[#0091d5] text-white text-sm font-medium rounded-md hover:bg-bps-secondary transition-colors">
                     + Tambah Pertanyaan
                 </button>
             </div>
@@ -80,7 +80,7 @@
     <!-- Modal Tambah -->
     <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-bps-bg">
                 <h3 class="text-lg font-bold text-gray-900">Tambah Pertanyaan Survey</h3>
                 <button type="button" onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none focus:outline-none">&times;</button>
             </div>
@@ -100,9 +100,9 @@
                         <textarea name="pertanyaan" rows="4" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm text-sm p-2 border"></textarea>
                     </div>
                 </div>
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                    <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-[#0091d5] text-white rounded-md hover:bg-blue-600 text-sm font-medium transition-colors">Simpan</button>
+                <div class="px-6 py-4 bg-bps-bg border-t border-gray-200 flex justify-end space-x-3">
+                    <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-bps-bg text-sm font-medium transition-colors">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-[#0091d5] text-white rounded-md hover:bg-bps-secondary text-sm font-medium transition-colors">Simpan</button>
                 </div>
             </form>
         </div>
@@ -111,7 +111,7 @@
     <!-- Modal Edit -->
     <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-bps-bg">
                 <h3 class="text-lg font-bold text-gray-900">Edit Pertanyaan Survey</h3>
                 <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none focus:outline-none">&times;</button>
             </div>
@@ -132,9 +132,9 @@
                         <textarea id="edit_pertanyaan" name="pertanyaan" rows="4" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm text-sm p-2 border"></textarea>
                     </div>
                 </div>
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-[#0091d5] text-white rounded-md hover:bg-blue-600 text-sm font-medium transition-colors">Simpan Perubahan</button>
+                <div class="px-6 py-4 bg-bps-bg border-t border-gray-200 flex justify-end space-x-3">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-bps-bg text-sm font-medium transition-colors">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-[#0091d5] text-white rounded-md hover:bg-bps-secondary text-sm font-medium transition-colors">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -152,11 +152,11 @@
                 <h3 class="text-lg font-bold text-gray-900 text-center mb-2">Hapus Pertanyaan Survey</h3>
                 <p class="text-sm text-gray-500 text-center">Apakah Anda yakin ingin menghapus pertanyaan ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
             </div>
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-center space-x-3">
+            <div class="px-6 py-4 bg-bps-bg border-t border-gray-200 flex justify-center space-x-3">
                 <form id="delete_form" method="POST" class="w-full flex space-x-3">
                     @csrf
                     @method('DELETE')
-                    <button type="button" onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors">Batal</button>
+                    <button type="button" onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-bps-bg text-sm font-medium transition-colors">Batal</button>
                     <button type="submit" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium transition-colors">Ya, Hapus</button>
                 </form>
             </div>

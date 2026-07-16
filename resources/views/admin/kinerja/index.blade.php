@@ -40,7 +40,7 @@
                     </form>
 
                     <!-- Upload Excel Form -->
-                    <form action="{{ route('admin.kinerja.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto bg-gray-50 p-4 rounded-md border">
+                    <form action="{{ route('admin.kinerja.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto bg-bps-bg p-4 rounded-md border">
                         @csrf
                         <div class="w-full sm:w-auto">
                             <label class="block text-xs text-gray-500 mb-1">Target Periode</label>
@@ -99,7 +99,7 @@
                                         $namaBulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
                                     @endphp
                                     @foreach($kinerja as $k)
-                                        <tr class="border-b hover:bg-gray-50">
+                                        <tr class="border-b hover:bg-bps-bg">
                                             <td class="p-3 text-sm font-medium">{{ $k->pegawai->nama }}</td>
                                             <td class="p-3 text-sm">{{ $namaBulan[$k->bulan] ?? '-' }}</td>
                                             <td class="p-3 text-sm">{{ number_format($k->rata_rata_hasil_kerja, 2, ',', '.') }}</td>
