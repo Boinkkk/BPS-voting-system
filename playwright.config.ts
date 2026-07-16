@@ -12,8 +12,8 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './e2e',
-  globalSetup: './e2e/global-setup.ts',
+  testDir: './tests/e2e',
+  // globalSetup: './e2e/global-setup.ts',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -31,6 +31,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    headless: false,
+    launchOptions: {
+      slowMo: 1000,
+    }
   },
 
   /* Configure projects for major browsers */
@@ -51,14 +55,22 @@ export default defineConfig({
     },
 
     /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Galaxy A55'] },
+    },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Galaxy Tab S9 landscape'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 13'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 15 Pro Max'] },
+    },
 
     /* Test against branded browsers. */
     // {

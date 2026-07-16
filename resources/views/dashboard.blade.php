@@ -184,8 +184,7 @@
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm w-full p-6 mt-4 mb-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
-                <h3 class="text-lg font-bold text-gray-900">Timeline Periode Aktif</h3>
-                <p class="text-sm text-gray-500 mt-1">{{ $activePeriode->nama }}</p>
+                <h3 class="text-3xl font-extrabold text-gray-900">Kalender Timeline</h3>
             </div>
             @if($phaseDetails['next_phase'])
             <div class="mt-4 md:mt-0 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center shadow-sm">
