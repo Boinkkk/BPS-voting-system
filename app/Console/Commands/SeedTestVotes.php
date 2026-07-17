@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\PeriodePenilaian;
 use App\Models\Kandidat;
 use App\Models\PertanyaanSurvei;
-use App\Models\User;
+use App\Models\Pegawai;
 use App\Models\JawabanSurvei;
 use App\Models\SurveyProgress;
 use Illuminate\Support\Str;
@@ -49,7 +49,7 @@ class SeedTestVotes extends Command
         }
 
         // Get eligible voters (Pegawai and Kepala Umum)
-        $voters = User::whereHas('role', function ($query) {
+        $voters = Pegawai::whereHas('role', function ($query) {
             $query->whereIn('tipe', ['Pegawai', 'Kepala Umum', 'Kepala_Umum']);
         })->get();
 

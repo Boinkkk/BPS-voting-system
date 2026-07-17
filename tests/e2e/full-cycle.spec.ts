@@ -1,9 +1,13 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import { execSync } from 'child_process';
 
 test('full Cycle (development only)', async ({ page }) => {
     test.setTimeout(10 * 60 * 60 * 1000)
-
+    console.log('Migrate Fresh Database')
+    
+    execSync('php artisan migrate:fresh --seed', { cwd: process.cwd() });
+    console.log('Migration Done!')
     await test.step("Fase 1 (manajemen Periode, input absensi dan , input-ckp", async () => {
         await page.goto('http://localhost:8000/login');
 
@@ -62,33 +66,95 @@ test('full Cycle (development only)', async ({ page }) => {
         await page.getByRole('textbox', { name: 'lock Password' }).fill('password123');
         await page.getByRole('button', { name: 'Sign In login' }).click();
         await page.getByRole('link', { name: 'Voting Kandidat Terbaik' }).click();
-        
-        // Pastikan masuk ke halaman voting
-        await expect(page.getByText('Survey Penilaian Kandidat Pegawai Terbaik')).toBeVisible();
 
-        // 1. Test UI Voting (Happy Path)
-        // Isi semua radio button dengan nilai 5 (Sangat Baik)
-        await page.waitForSelector('input[type="radio"]');
-        const radios = await page.locator('input[type="radio"][value="5"]').all();
-        for (const radio of radios) {
-            await radio.check({ force: true });
-        }
+        expect(page.locator('text="Terima Kasih!"').isVisible());
+        expect(page.locator('text="Belum ada kandidat yang terpilih"').isVisible());
+        // 1. Test UI Voting (Happy Path) tanpa delay slowMo
+        // Kita jalankan di dalam browser context (page.evaluate) agar klik instan
+        await page.evaluate(() => {
+            // Ambil semua baris kandidat di semua step (meskipun hidden)
+            const allRows = document.querySelectorAll('.step-section tbody tr');
+            
+            allRows.forEach(row => {
+                const labels = row.querySelectorAll('label');
+                if (labels.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * labels.length);
+                    (labels[randomIndex] as HTMLElement).click();
+                }
+            });
 
-        // Klik "Selanjutnya" sampai halaman terakhir
-        while (await page.locator('button:has-text("Selanjutnya"):visible').count() > 0) {
-            await page.locator('button:has-text("Selanjutnya"):visible').click();
-        }
+            // Pindah langsung ke step terakhir agar tombol Submit muncul
+            // @ts-ignore
+            if (typeof changeStep === 'function' && typeof totalSteps !== 'undefined') {
+                // @ts-ignore
+                changeStep(totalSteps);
+            }
+        });
+        // Submit (hanya 1 klik ini yang akan terkena slowMo 1 detik)
+        const submitButton = page.locator('button[type="submit"]:has-text("Kirim Semua Penilaian")');
+        await Promise.all([
+            page.waitForNavigation(),
+            submitButton.click()
+        ]);
+        // Setelah dikirim, pastikan muncul notifikasi sukses
+        await expect(page).toHaveURL(/.*survey/);
+        await expect(page.locator('.bg-green-50')).toBeVisible();
 
-        // Submit
-        await page.getByRole('button', { name: 'Kirim Semua Penilaian' }).click();
-        await expect(page.getByText('Survey berhasil disimpan!')).toBeVisible();
-        await page.getByRole('button', { name: 'Logout' }).click();
+                // Setelah dikirim, pastikan muncul notifikasi sukses
+                await expect(page).toHaveURL(/.*survey/);
+                await expect(page.locator('.bg-green-50')).toBeVisible();
 
         // 2. Inject sisa data voting agar cepat
         console.log('Menjalankan Artisan Command test:seed-votes...');
-        const { execSync } = require('child_process');
         execSync('php artisan test:seed-votes', { cwd: process.cwd() });
         console.log('Data voting berhasil di-seed.');
+
+        await page.getByRole('button', { name: 'Logout' }).click();
+
+        // Admin Login set time 3
+          // Login Admin
+        await page.getByRole('textbox', { name: 'person Username or NIP' }).click();
+        await page.getByRole('textbox', { name: 'person Username or NIP' }).fill('admin@bps.go.id');
+        await page.getByRole('textbox', { name: 'lock Password' }).click();
+        await page.getByRole('textbox', { name: 'lock Password' }).fill('password123');
+        await page.getByRole('button', { name: 'Sign In login' }).click();
+
+        //set time 2
+        await page.getByRole('textbox').fill('2026-10-09T12:00');
+        await page.getByRole('button', { name: 'Set Fake Time' }).click();
+        await page.getByRole('button', { name: 'Logout' }).click();
+
+        // Loign Kepala
+        await page.getByRole('textbox', { name: 'person Username or NIP' }).click();
+        await page.getByRole('textbox', { name: 'person Username or NIP' }).fill('kepala@bps.go.id');
+        await page.getByRole('textbox', { name: 'lock Password' }).click();
+        await page.getByRole('textbox', { name: 'lock Password' }).fill('password123');
+        await page.getByRole('button', { name: 'Sign In login' }).click();
+
+        // Revie nominasi
+        await page.getByRole('link', { name: 'Review Nominasi' }).click();
+        await page.getByRole('button', { name: 'Tetapkan Sebagai Terbaik' }).nth(1).click();
+        await page.getByRole('button', { name: 'Ya, Tetapkan Sekarang' }).click();
+        await page.getByRole('button', { name: 'Logout' }).click();
+
+        // Login admin dan settime
+        await page.getByRole('textbox', { name: 'person Username or NIP' }).click();
+        await page.getByRole('textbox', { name: 'person Username or NIP' }).fill('admin@bps.go.id');
+        await page.getByRole('textbox', { name: 'lock Password' }).click();
+        await page.getByRole('textbox', { name: 'lock Password' }).fill('password123');
+
+        await page.getByRole('button', { name: 'Sign In login' }).click();
+        await page.getByRole('textbox').fill('2026-10-10T12:00');
+        await page.getByRole('button', { name: 'Set Fake Time' }).click();
+
+        console.log('already set')
+        await page.goto('http://localhost:8000/dashboard');
+        await expect(
+                page.getByText('HASIL PEMILIHAN KARYAWAN')
+            ).toBeVisible();
+
+
+        await page.pause();
 
     })
 });

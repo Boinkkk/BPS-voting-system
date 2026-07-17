@@ -97,7 +97,7 @@ class PengumumanController extends Controller
             'lampiran.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:5120',
         ]);
 
-        $data = $request->except('lampiran');
+        $data = $request->except(['lampiran', 'remove_lampiran']);
         
         $data['is_sticky'] = $request->has('is_sticky');
         $data['is_popup'] = $request->has('is_popup');
@@ -162,11 +162,10 @@ class PengumumanController extends Controller
         $pengumuman = Pengumuman::findOrFail($id);
         $user = Auth::user();
         
-        // Make sure user has a pegawai profile
-        if ($user && $user->pegawai) {
+        if ($user) {
             PengumumanRead::firstOrCreate([
                 'pengumuman_id' => $pengumuman->id,
-                'pegawai_id' => $user->pegawai->id
+                'pegawai_id' => $user->id
             ]);
         }
         

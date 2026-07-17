@@ -159,9 +159,14 @@ class DashboardController extends Controller
         }
 
         if ($pemenangTerakhir && $activePeriode) {
-            // Jika sudah ada periode baru yang aktif (mulai masa persiapan dst), 
-            // sembunyikan banner pemenang periode sebelumnya
-            $pemenangTerakhir = null;
+            // Hanya sembunyikan banner jika waktu saat ini sudah masuk (atau lewat) tanggal_mulai dari periode baru tersebut.
+            // Jika admin membuat periode untuk bulan depan, banner pemenang saat ini tidak boleh hilang dulu.
+            $now = \Carbon\Carbon::now()->startOfDay();
+            $mulaiPeriodeBaru = \Carbon\Carbon::parse($activePeriode->tanggal_mulai)->startOfDay();
+            
+            if ($now->greaterThanOrEqualTo($mulaiPeriodeBaru)) {
+                $pemenangTerakhir = null;
+            }
         }
 
         if ($pemenangTerakhir) {
