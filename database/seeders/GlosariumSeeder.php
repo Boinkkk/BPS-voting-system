@@ -34,21 +34,9 @@ class GlosariumSeeder extends Seeder
                 'definisi' => 'Rentang waktu (misalnya bulanan atau triwulan) dimana evaluasi kinerja dan pemilihan dilakukan dalam sistem ini.'
             ],
             [
-                'istilah' => 'Perhitungan Bobot Absensi',
-                'definisi' => 'Cara menghitung poin absensi: nilai default maksimal (misal 100) dikurangi total penalti dari setiap jenis ketidakhadiran (alfa, sakit, dll). Contoh: 100 - (Jumlah Alfa × Bobot Penalti Alfa).'
-            ],
-            [
-                'istilah' => 'Perhitungan Bobot Penilaian',
-                'definisi' => 'Sistem menggunakan persentase untuk masing-masing komponen penilaian (contoh: CKP 40%, Survei 30%, Absensi 30%). Nilai akhir adalah penjumlahan dari (Nilai Komponen × Bobot Komponen).'
-            ],
-            [
                 'istilah' => 'Alur Voting (Fase 1 - 3)',
                 'definisi' => "Fase 1: Filter otomatis Kandidat berdasarkan nilai kuantitatif (CKP dan Absensi) yang memenuhi ambang batas.\nFase 2: Survei/Voting oleh rekan kerja dan atasan (kuantifikasi subjektif) terhadap kandidat hasil Fase 1.\nFase 3: Pleno/Keputusan akhir oleh Kepala Unit untuk memilih pemenang utama dari top kandidat hasil akumulasi seluruh nilai."
             ],
-            [
-                'istilah' => 'Hasil Akhir',
-                'definisi' => 'Akumulasi total dari perhitungan nilai CKP, Nilai Survei (Voting), dan Nilai Kehadiran setelah dikalikan dengan bobot penilaian.'
-            ]
         ];
 
         foreach ($glosariums as $g) {

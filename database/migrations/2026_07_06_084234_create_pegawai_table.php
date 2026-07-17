@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nip', 50)->unique();
             $table->string('email', 150)->unique();
             $table->string('password');
+            $table->string('foto_profil')->nullable();
             $table->date('tanggal_masuk');
             $table->enum('status_pegawai', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();

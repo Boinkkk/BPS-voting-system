@@ -1,0 +1,1348 @@
+﻿<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignUuid('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->mediumText('value');
+            $table->bigInteger('expiration')->index();
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->bigInteger('expiration')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedSmallInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->string('connection');
+            $table->string('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+
+            $table->index(['connection', 'queue', 'failed_at']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('departemen', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama', 100);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('departemen');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('role', function (Blueprint $table) {
+            $table->id();
+            $table->string('tipe', 50)->unique();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('role');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('tipe_absen', function (Blueprint $table) {
+            $table->id();
+            $table->string('status', 50)->unique();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('tipe_absen');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('pegawai', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('role_id')->constrained('role')->restrictOnDelete();
+            $table->foreignId('departemen_id')->nullable()->constrained('departemen')->nullOnDelete();
+            $table->string('jabatan', 100);
+            $table->string('nama', 150);
+            $table->string('nip', 50)->unique();
+            $table->string('email', 150)->unique();
+            $table->string('password');
+            $table->date('tanggal_masuk');
+            $table->enum('status_pegawai', ['aktif', 'nonaktif'])->default('aktif');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('pegawai');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('periode_penilaian', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama', 150);
+            $table->date('tanggal_mulai');
+            $table->date('tanggal_selesai');
+            $table->date('tanggal_mulai_voting')->nullable();
+            $table->date('tanggal_selesai_voting')->nullable();
+            $table->enum('status', ['penginputan', 'voting', 'selesai'])->default('penginputan');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('periode_penilaian');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('kriteria_penilaian', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->string('nama', 100);
+            $table->decimal('bobot', 3, 2);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kriteria_penilaian');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('kinerja_pegawai', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
+            $table->decimal('rata_rata_hasil_kerja', 4, 2);
+            $table->decimal('rata_rata_perilaku', 4, 2);
+            $table->decimal('nilai_kjk', 4, 2)->nullable();
+            $table->decimal('nilai_tl_psw', 4, 2)->nullable();
+            $table->timestamps();
+            
+            $table->index(['periode_id', 'id_pegawai']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kinerja_pegawai');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('absensi_pegawai', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignId('id_tipe_absensi')->constrained('tipe_absen')->restrictOnDelete();
+            $table->timestamp('waktu_absensi');
+            $table->timestamps();
+            
+            $table->index(['periode_id', 'id_pegawai']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('absensi_pegawai');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('survei', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->string('nama', 150);
+            $table->enum('tipe', ['voting_terbaik', 'kepuasan', 'lainnya'])->default('voting_terbaik');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('survei');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('pertanyaan_survei', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('survei_id')->constrained('survei')->cascadeOnDelete();
+            $table->integer('nomor_urut');
+            $table->text('pertanyaan');
+            $table->string('kategori', 100)->nullable();
+            $table->decimal('bobot', 3, 2)->default(1.00);
+            $table->timestamps();
+            
+            $table->index(['survei_id', 'nomor_urut']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('pertanyaan_survei');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('kandidat', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->decimal('skor', 5, 2)->default(0);
+            $table->integer('ranking_sistem')->nullable();
+            $table->enum('status', ['aktif', 'diskualifikasi'])->default('aktif');
+            $table->timestamps();
+            
+            $table->unique(['periode_id', 'pegawai_id']);
+            $table->index('periode_id');
+            $table->index(['periode_id', 'skor']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kandidat');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('voting_session', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->string('session_code', 64)->unique();
+            $table->boolean('sudah_selesai')->default(false);
+            $table->timestamp('waktu_mulai')->useCurrent();
+            $table->timestamp('waktu_selesai')->nullable();
+            
+            $table->index('periode_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('voting_session');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('jawaban_survei', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('session_id')->constrained('voting_session')->cascadeOnDelete();
+            $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
+            $table->foreignUuid('pertanyaan_id')->constrained('pertanyaan_survei')->cascadeOnDelete();
+            $table->integer('nilai');
+            $table->timestamp('waktu_jawab')->useCurrent();
+            
+            $table->unique(['session_id', 'kandidat_id', 'pertanyaan_id'], 'uq_jawaban_session_kandidat_pert');
+            $table->index(['periode_id', 'kandidat_id']);
+            $table->index('session_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('jawaban_survei');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('status_voting', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->boolean('sudah_voting')->default(false);
+            $table->timestamp('waktu_voting')->nullable();
+            
+            $table->unique(['periode_id', 'user_id']);
+            $table->index('periode_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('status_voting');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('hasil_akhir', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
+            $table->integer('ranking_final');
+            $table->foreignUuid('dipilih_oleh')->constrained('pegawai')->restrictOnDelete();
+            $table->timestamp('waktu_penetapan')->useCurrent();
+            $table->text('catatan_kepala')->nullable();
+            
+            $table->unique(['periode_id', 'ranking_final']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('hasil_akhir');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
+        DB::unprepared("DROP VIEW IF EXISTS v_ranking_kandidat_voting;");
+        DB::unprepared("
+            CREATE VIEW v_ranking_kandidat_voting AS
+            SELECT 
+                k.id AS kandidat_id,
+                k.periode_id,
+                p.nama AS nama_pegawai,
+                p.nip,
+                COUNT(js.id) AS total_jawaban,
+                SUM(js.nilai) AS total_skor,
+                ROUND(AVG(js.nilai), 2) AS rata_rata_kumulatif
+            FROM kandidat k
+            JOIN pegawai p ON k.pegawai_id = p.id
+            LEFT JOIN jawaban_survei js ON k.id = js.kandidat_id AND k.periode_id = js.periode_id
+            GROUP BY k.id, k.periode_id, p.nama, p.nip
+            ORDER BY rata_rata_kumulatif DESC;
+        ");
+
+        DB::unprepared("DROP VIEW IF EXISTS v_progress_voting;");
+        DB::unprepared("
+            CREATE VIEW v_progress_voting AS
+            SELECT 
+                pp.id AS periode_id,
+                pp.nama AS nama_periode,
+                p.id AS pegawai_id,
+                p.nama AS nama_pegawai,
+                COALESCE(sv.sudah_voting, FALSE) AS sudah_voting,
+                sv.waktu_voting
+            FROM periode_penilaian pp
+            CROSS JOIN pegawai p
+            LEFT JOIN status_voting sv ON pp.id = sv.periode_id AND p.id = sv.user_id
+            WHERE p.status_pegawai = 'aktif';
+        ");
+    }
+
+    public function down(): void
+    {
+        DB::unprepared("DROP VIEW IF EXISTS v_progress_voting;");
+        DB::unprepared("DROP VIEW IF EXISTS v_ranking_kandidat_voting;");
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('kinerja_pegawai', function (Blueprint $table) {
+            $table->integer('bulan')->after('id_pegawai')->default(1);
+            $table->index(['periode_id', 'id_pegawai', 'bulan'], 'kinerja_pegawai_periode_pegawai_bulan_index');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('kinerja_pegawai', function (Blueprint $table) {
+            $table->dropIndex('kinerja_pegawai_periode_pegawai_bulan_index');
+            $table->dropColumn('bulan');
+            $table->index(['periode_id', 'id_pegawai']);
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('kinerja_pegawai', function (Blueprint $table) {
+            $table->decimal('rata_rata_hasil_kerja', 5, 2)->change();
+            $table->decimal('rata_rata_perilaku', 5, 2)->change();
+            $table->decimal('nilai_kjk', 5, 2)->nullable()->change();
+            $table->decimal('nilai_tl_psw', 5, 2)->nullable()->change();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('kinerja_pegawai', function (Blueprint $table) {
+            $table->decimal('rata_rata_hasil_kerja', 4, 2)->change();
+            $table->decimal('rata_rata_perilaku', 4, 2)->change();
+            $table->decimal('nilai_kjk', 4, 2)->nullable()->change();
+            $table->decimal('nilai_tl_psw', 4, 2)->nullable()->change();
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('tipe_absen', function (Blueprint $table) {
+            $table->decimal('bobot', 4, 2)->default(0)->after('status');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('tipe_absen', function (Blueprint $table) {
+            $table->dropColumn('bobot');
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Drop tabel lama jika ada
+        Schema::dropIfExists('absensi_pegawai');
+        Schema::dropIfExists('tipe_absen');
+
+        // Buat tabel absensi_pegawai baru untuk menyimpan rekap bulanan
+        Schema::create('absensi_pegawai', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->integer('bulan'); // 1 - 12
+            
+            // Metrik Utama
+            $table->integer('hk')->default(0)->comment('Hari Kerja');
+            $table->integer('hd')->default(0)->comment('Hadir');
+            $table->integer('tk')->default(0)->comment('Tanpa Kabar');
+            $table->integer('tl')->default(0)->comment('Tugas Luar');
+            $table->integer('tb')->default(0)->comment('Tugas Belajar');
+            $table->integer('pd')->default(0)->comment('Perjalanan Dinas');
+            $table->integer('dk')->default(0)->comment('Diklat/Pelatihan');
+            $table->integer('kn')->default(0)->comment('Konsinyasi');
+            
+            // PSW
+            $table->integer('psw')->default(0);
+            $table->integer('psw1')->default(0);
+            $table->integer('psw2')->default(0);
+            $table->integer('psw3')->default(0);
+            $table->integer('psw4')->default(0);
+            
+            // Keterlambatan
+            $table->integer('ht')->default(0);
+            $table->integer('tl1')->default(0);
+            $table->integer('tl2')->default(0);
+            $table->integer('tl3')->default(0);
+            $table->integer('tl4')->default(0);
+            
+            // Cuti
+            $table->integer('cb')->default(0);
+            $table->integer('cl')->default(0);
+            $table->integer('cm')->default(0);
+            $table->integer('cp')->default(0);
+            $table->integer('cs')->default(0);
+            $table->integer('ct10')->default(0);
+            $table->integer('ct11')->default(0);
+            $table->integer('ct12')->default(0);
+            
+            // Variasi Cuti
+            $table->integer('cst1')->default(0);
+            $table->integer('cst2')->default(0);
+            $table->integer('cs1')->default(0);
+            $table->integer('cp1')->default(0);
+            $table->integer('cm1')->default(0);
+            $table->integer('cb1')->default(0);
+            
+            // KJK (Kekurangan Jam Kerja)
+            // Akan disimpan dalam menit untuk perhitungan, meski excelnya bisa format HH:MM
+            $table->integer('kjk_ht')->default(0)->comment('KJK HT dalam menit');
+            $table->integer('kjk_pc')->default(0)->comment('KJK PC dalam menit');
+            $table->integer('kjk')->default(0)->comment('Total KJK dalam menit');
+
+            $table->timestamps();
+
+            // Constraint agar tiap pegawai hanya punya 1 rekap per bulan di tiap periode
+            $table->unique(['periode_id', 'pegawai_id', 'bulan'], 'absensi_pegawai_unik');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('absensi_pegawai');
+        // Tidak merevert tabel tipe_absen karena sudah di-deprecate
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('bobot_penalti', function (Blueprint $table) {
+            $table->id();
+            $table->string('kategori')->comment('Ringan, Sedang, Berat, atau KJK');
+            $table->string('kode_absen')->unique()->comment('Misal: TL1, TK, KJK_PER_JAM');
+            $table->string('keterangan');
+            $table->decimal('bobot', 5, 2)->default(0);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('bobot_penalti');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('pertanyaan_survei', function (Blueprint $table) {
+            // Hapus index dan FK survei_id
+            $table->dropForeign(['survei_id']);
+            $table->dropIndex(['survei_id', 'nomor_urut']);
+            $table->dropColumn('survei_id');
+            
+            // Kita biarkan kolom lain (id, nomor_urut, pertanyaan, kategori, bobot) karena masih bisa dipakai
+            // kategori -> Berorientasi Pelayanan
+            // pertanyaan -> Deskripsinya
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('pertanyaan_survei', function (Blueprint $table) {
+            $table->foreignUuid('survei_id')->nullable()->constrained('survei')->cascadeOnDelete();
+            $table->index(['survei_id', 'nomor_urut']);
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // 1. Ubah tabel jawaban_survei agar anonim
+        Schema::table('jawaban_survei', function (Blueprint $table) {
+            $table->dropForeign(['session_id']);
+            $table->dropUnique('uq_jawaban_session_kandidat_pert');
+            $table->dropIndex(['session_id']);
+            $table->dropColumn('session_id');
+        });
+
+        // 2. Buat tabel survey_progress
+        Schema::create('survey_progress', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
+            $table->timestamps();
+
+            $table->unique(['periode_id', 'user_id', 'kandidat_id'], 'uq_survey_progress');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('survey_progress');
+
+        Schema::table('jawaban_survei', function (Blueprint $table) {
+            $table->foreignUuid('session_id')->constrained('voting_session')->cascadeOnDelete();
+            $table->unique(['session_id', 'kandidat_id', 'pertanyaan_id'], 'uq_jawaban_session_kandidat_pert');
+            $table->index('session_id');
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+        // Because Doctrine DBAL doesn't support altering ENUM columns easily,
+        // we can run a raw SQL statement to modify the ENUM.
+        DB::statement("ALTER TABLE periode_penilaian MODIFY COLUMN status ENUM('penginputan', 'voting', 'review_kepala', 'selesai') DEFAULT 'penginputan'");
+    }
+
+    public function down(): void
+    {
+        // Reverting the enum (might fail if there are 'review_kepala' values)
+        DB::statement("ALTER TABLE periode_penilaian MODIFY COLUMN status ENUM('penginputan', 'voting', 'selesai') DEFAULT 'penginputan'");
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('hasil_akhir', function (Blueprint $table) {
+            $table->boolean('is_terpilih')->default(false)->after('ranking_final');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('hasil_akhir', function (Blueprint $table) {
+            $table->dropColumn('is_terpilih');
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('hasil_akhir', function (Blueprint $table) {
+            $table->uuid('dipilih_oleh')->nullable()->change();
+            $table->timestamp('waktu_penetapan')->nullable()->change();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('hasil_akhir', function (Blueprint $table) {
+            $table->uuid('dipilih_oleh')->nullable(false)->change();
+            $table->timestamp('waktu_penetapan')->useCurrent()->nullable(false)->change();
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tim_penilai', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
+            $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->string('peran'); // 'Penanggung Jawab', 'Ketua', 'Anggota'
+            $table->timestamps();
+
+            $table->unique(['periode_id', 'peran']); // 1 peran per periode (opsional, tapi disarankan)
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tim_penilai');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('periode_penilaian', function (Blueprint $table) {
+            $table->integer('triwulan')->nullable()->after('id');
+            $table->integer('tahun')->nullable()->after('triwulan');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('periode_penilaian', function (Blueprint $table) {
+            $table->dropColumn(['triwulan', 'tahun']);
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('nilai_ckp', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('periode_id')->constrained('periode_penilaian')->onDelete('cascade');
+            $table->foreignUuid('pegawai_id')->constrained('pegawai')->onDelete('cascade');
+            $table->integer('bulan');
+            $table->decimal('nilai', 8, 2)->default(0);
+            $table->timestamps();
+            
+            // Optional: Ensure a unique combination
+            // $table->unique(['periode_id', 'pegawai_id', 'bulan']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('nilai_ckp');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('nilai_ckp', function (Blueprint $table) {
+            $table->dropColumn('bulan');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('nilai_ckp', function (Blueprint $table) {
+            $table->integer('bulan')->after('pegawai_id');
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('pertanyaan_survei', function (Blueprint $table) {
+            $table->string('grup_kategori')->default('BerAKHLAK')->after('nomor_urut');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('pertanyaan_survei', function (Blueprint $table) {
+            $table->dropColumn('grup_kategori');
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('pengaturan_bobots', function (Blueprint $table) {
+            $table->id();
+            $table->integer('ckp')->default(50);
+            $table->integer('absensi')->default(25);
+            $table->integer('survey')->default(25);
+            $table->timestamps();
+        });
+        
+        // Insert default row
+        DB::table('pengaturan_bobots')->insert([
+            'ckp' => 50,
+            'absensi' => 25,
+            'survey' => 25,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('pengaturan_bobots');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('kandidat', function (Blueprint $table) {
+            $table->decimal('skor_ckp', 5, 2)->default(0)->after('skor');
+            $table->decimal('skor_absensi', 5, 2)->default(0)->after('skor_ckp');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('kandidat', function (Blueprint $table) {
+            $table->dropColumn(['skor_ckp', 'skor_absensi']);
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('pegawai', function (Blueprint $table) {
+            $table->string('foto_profil')->nullable()->after('password');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('pegawai', function (Blueprint $table) {
+            $table->dropColumn('foto_profil');
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('pengaturan_bobots', function (Blueprint $table) {
+            $table->decimal('bobot_ht', 8, 2)->default(4);
+            $table->decimal('bobot_psw', 8, 2)->default(1);
+            $table->decimal('bobot_psw1', 8, 2)->default(0);
+            $table->decimal('bobot_psw2', 8, 2)->default(0);
+            $table->decimal('bobot_psw3', 8, 2)->default(0);
+            $table->decimal('bobot_psw4', 8, 2)->default(0);
+            $table->decimal('bobot_tl', 8, 2)->default(1);
+            $table->decimal('bobot_tl1', 8, 2)->default(0);
+            $table->decimal('bobot_tl2', 8, 2)->default(0);
+            $table->decimal('bobot_tl3', 8, 2)->default(0);
+            $table->decimal('bobot_tl4', 8, 2)->default(0);
+            $table->decimal('bobot_tk', 8, 2)->default(2);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('pengaturan_bobots', function (Blueprint $table) {
+            $table->dropColumn([
+                'bobot_ht', 'bobot_psw', 'bobot_psw1', 'bobot_psw2', 'bobot_psw3', 'bobot_psw4',
+                'bobot_tl', 'bobot_tl1', 'bobot_tl2', 'bobot_tl3', 'bobot_tl4', 'bobot_tk'
+            ]);
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('periode_penilaian', function (Blueprint $table) {
+            $table->date('tanggal_selesai_persiapan')->nullable()->after('tanggal_mulai');
+            $table->date('tanggal_review_kepala')->nullable()->after('tanggal_selesai_voting');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('periode_penilaian', function (Blueprint $table) {
+            $table->dropColumn(['tanggal_selesai_persiapan', 'tanggal_review_kepala']);
+        });
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('glosariums', function (Blueprint $table) {
+            $table->id();
+            $table->string('istilah');
+            $table->text('definisi');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('glosariums');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('pengumuman', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('judul');
+            $table->string('kategori');
+            $table->string('status')->default('Draft');
+            $table->string('prioritas')->default('Normal');
+            $table->string('target')->nullable();
+            $table->dateTime('publish_at')->nullable();
+            $table->dateTime('expire_at')->nullable();
+            $table->text('konten');
+            $table->json('lampiran')->nullable();
+            $table->boolean('is_sticky')->default(false);
+            $table->boolean('is_popup')->default(false);
+            $table->boolean('kirim_notifikasi')->default(false);
+            $table->boolean('has_notified')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('pengumuman');
+    }
+};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('pengumuman_reads', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('pengumuman_id')->constrained('pengumuman')->cascadeOnDelete();
+            $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
+            $table->dateTime('read_at')->useCurrent();
+            $table->timestamps();
+            
+            $table->unique(['pengumuman_id', 'pegawai_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('pengumuman_reads');
+    }
+};

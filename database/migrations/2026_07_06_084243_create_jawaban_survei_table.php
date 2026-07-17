@@ -11,15 +11,12 @@ return new class extends Migration
         Schema::create('jawaban_survei', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
-            $table->foreignUuid('session_id')->constrained('voting_session')->cascadeOnDelete();
             $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
             $table->foreignUuid('pertanyaan_id')->constrained('pertanyaan_survei')->cascadeOnDelete();
             $table->integer('nilai');
             $table->timestamp('waktu_jawab')->useCurrent();
             
-            $table->unique(['session_id', 'kandidat_id', 'pertanyaan_id'], 'uq_jawaban_session_kandidat_pert');
             $table->index(['periode_id', 'kandidat_id']);
-            $table->index('session_id');
         });
     }
 

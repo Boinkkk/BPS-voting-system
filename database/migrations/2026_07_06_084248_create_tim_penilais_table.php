@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('tim_penilai', function (Blueprint $table) {
@@ -18,13 +15,10 @@ return new class extends Migration
             $table->string('peran'); // 'Penanggung Jawab', 'Ketua', 'Anggota'
             $table->timestamps();
 
-            $table->unique(['periode_id', 'peran']); // 1 peran per periode (opsional, tapi disarankan)
+            $table->unique(['periode_id', 'peran']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('tim_penilai');

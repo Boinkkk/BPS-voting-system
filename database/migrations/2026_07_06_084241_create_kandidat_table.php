@@ -13,6 +13,8 @@ return new class extends Migration
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
             $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->decimal('skor', 5, 2)->default(0);
+            $table->decimal('skor_ckp', 5, 2)->default(0);
+            $table->decimal('skor_absensi', 5, 2)->default(0);
             $table->integer('ranking_sistem')->nullable();
             $table->enum('status', ['aktif', 'diskualifikasi'])->default('aktif');
             $table->timestamps();

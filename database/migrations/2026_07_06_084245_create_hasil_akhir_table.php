@@ -13,8 +13,9 @@ return new class extends Migration
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
             $table->foreignUuid('kandidat_id')->constrained('kandidat')->cascadeOnDelete();
             $table->integer('ranking_final');
-            $table->foreignUuid('dipilih_oleh')->constrained('pegawai')->restrictOnDelete();
-            $table->timestamp('waktu_penetapan')->useCurrent();
+            $table->boolean('is_terpilih')->default(false);
+            $table->foreignUuid('dipilih_oleh')->nullable()->constrained('pegawai')->restrictOnDelete();
+            $table->timestamp('waktu_penetapan')->nullable();
             $table->text('catatan_kepala')->nullable();
             
             $table->unique(['periode_id', 'ranking_final']);

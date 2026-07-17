@@ -8,15 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('tipe_absen', function (Blueprint $table) {
-            $table->decimal('bobot', 4, 2)->default(0)->after('status');
+        Schema::create('glosariums', function (Blueprint $table) {
+            $table->id();
+            $table->string('istilah');
+            $table->text('definisi');
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::table('tipe_absen', function (Blueprint $table) {
-            $table->dropColumn('bobot');
-        });
+        Schema::dropIfExists('glosariums');
     }
 };

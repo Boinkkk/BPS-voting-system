@@ -10,12 +10,16 @@ return new class extends Migration
     {
         Schema::create('periode_penilaian', function (Blueprint $table) {
             $table->id();
+            $table->integer('triwulan')->nullable();
+            $table->integer('tahun')->nullable();
             $table->string('nama', 150);
             $table->date('tanggal_mulai');
+            $table->date('tanggal_selesai_persiapan')->nullable();
             $table->date('tanggal_selesai');
             $table->date('tanggal_mulai_voting')->nullable();
             $table->date('tanggal_selesai_voting')->nullable();
-            $table->enum('status', ['penginputan', 'voting', 'selesai'])->default('penginputan');
+            $table->date('tanggal_review_kepala')->nullable();
+            $table->enum('status', ['penginputan', 'voting', 'review_kepala', 'selesai'])->default('penginputan');
             $table->timestamps();
         });
     }

@@ -12,13 +12,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
             $table->foreignUuid('id_pegawai')->constrained('pegawai')->cascadeOnDelete();
-            $table->decimal('rata_rata_hasil_kerja', 4, 2);
-            $table->decimal('rata_rata_perilaku', 4, 2);
-            $table->decimal('nilai_kjk', 4, 2)->nullable();
-            $table->decimal('nilai_tl_psw', 4, 2)->nullable();
+            $table->integer('bulan')->default(1);
+            $table->decimal('rata_rata_hasil_kerja', 5, 2);
+            $table->decimal('rata_rata_perilaku', 5, 2);
+            $table->decimal('nilai_kjk', 5, 2)->nullable();
+            $table->decimal('nilai_tl_psw', 5, 2)->nullable();
             $table->timestamps();
             
-            $table->index(['periode_id', 'id_pegawai']);
+            $table->index(['periode_id', 'id_pegawai', 'bulan'], 'kinerja_pegawai_periode_pegawai_bulan_index');
         });
     }
 

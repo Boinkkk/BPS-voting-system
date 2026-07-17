@@ -48,6 +48,9 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
         DB::unprepared("DROP VIEW IF EXISTS v_progress_voting;");
         DB::unprepared("DROP VIEW IF EXISTS v_ranking_kandidat_voting;");
     }
