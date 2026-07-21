@@ -51,7 +51,7 @@ class KinerjaAdminController extends Controller
     {
         $request->validate([
             'periode_id' => 'required',
-            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+            'file' => ['required', \Illuminate\Validation\Rules\File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024)],
         ]);
 
         try {

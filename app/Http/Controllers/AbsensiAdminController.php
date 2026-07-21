@@ -170,7 +170,7 @@ class AbsensiAdminController extends Controller
         $request->validate([
             'periode_id' => 'required|exists:periode_penilaian,id',
             'bulan'      => 'required|integer|min:1|max:12',
-            'file'       => 'required|mimes:xlsx,xls'
+            'file'       => ['required', \Illuminate\Validation\Rules\File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024)],
         ]);
 
         $periode = PeriodePenilaian::find($request->periode_id);

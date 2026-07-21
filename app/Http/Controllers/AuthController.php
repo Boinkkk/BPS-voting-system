@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\Pegawai;
 
 class AuthController extends Controller
@@ -39,8 +40,19 @@ class AuthController extends Controller
 
         if (Auth::attempt(['email' => $email, 'password' => $password], $request->has('remember'))) {
             $request->session()->regenerate();
+            
+            Log::channel('audit')->info("Pegawai berhasil login", [
+                'ip' => $request->ip(),
+                'email' => $email
+            ]);
+            
             return redirect()->intended('dashboard');
         }
+
+        Log::channel('audit')->warning("Percobaan login gagal", [
+            'ip' => $request->ip(),
+            'identifier' => $identifier
+        ]);
 
         return back()->withErrors([
             'identifier' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
@@ -49,6 +61,14 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        if ($user) {
+            Log::channel('audit')->info("Pegawai logout", [
+                'ip' => $request->ip(),
+                'email' => $user->email
+            ]);
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

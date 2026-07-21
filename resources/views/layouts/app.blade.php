@@ -147,6 +147,14 @@
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.pengumuman.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Pengumuman</span>
                 </a>
+                <a href="{{ route('admin.audit.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.audit.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.audit.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Audit Log</span>
+                </a>
+                <a href="{{ url('/telescope') }}" target="_blank" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-bps-bg hover:text-gray-900">
+                    <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">System Monitor <svg class="inline w-3 h-3 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></span>
+                </a>
             </div>
             @endif
 
@@ -817,6 +825,27 @@
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Idle Timeout Script (60 minutes) -->
+    <script>
+        let idleTimer;
+        const idleTime = 60 * 60 * 1000; // 60 minutes
+
+        function resetTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                window.location.href = "{{ route('login') }}?timeout=1";
+            }, idleTime);
+        }
+
+        window.onload = resetTimer;
+        window.onmousemove = resetTimer;
+        window.onmousedown = resetTimer; 
+        window.onclick = resetTimer;
+        window.onscroll = resetTimer;
+        window.onkeypress = resetTimer;
+    </script>
+
     @stack('scripts')
 </body>
 </html>

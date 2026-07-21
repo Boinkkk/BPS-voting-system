@@ -9,7 +9,7 @@ class ProfileController extends Controller
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'foto_profil' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto_profil' => ['required', \Illuminate\Validation\Rules\File::image()->max(2 * 1024)],
         ]);
 
         $user = \Illuminate\Support\Facades\Auth::user();

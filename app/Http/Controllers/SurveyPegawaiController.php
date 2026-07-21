@@ -9,6 +9,7 @@ use App\Models\SurveyProgress;
 use App\Models\JawabanSurvei;
 use App\Models\PeriodePenilaian;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SurveyPegawaiController extends Controller
 {
@@ -75,6 +76,15 @@ class SurveyPegawaiController extends Controller
                 ]);
             }
         }
+
+        Log::channel('audit')->info("Pegawai telah mensubmit evaluasi/voting", [
+            'ip' => $request->ip(),
+            'pegawai_id' => $user->id,
+            'nama_pegawai' => $user->nama,
+            'nip' => $user->nip,
+            'periode_id' => $periodeAktif->id,
+            'nama_periode' => $periodeAktif->nama
+        ]);
 
         return redirect()->route('pegawai.survey.index')->with('success', 'Survey berhasil disimpan!');
     }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PeriodePenilaian;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PeriodeController extends Controller
 {
@@ -82,6 +84,15 @@ class PeriodeController extends Controller
         ]);
         $periode->status = $periode->computeStatusBasedOnDate(true) ?? 'penginputan';
         $periode->save();
+        
+        $admin = Auth::user();
+        Log::channel('audit')->info("Admin membuat periode penilaian baru", [
+            'ip' => $request->ip(),
+            'admin_id' => $admin ? $admin->id : null,
+            'nama_admin' => $admin ? $admin->nama : null,
+            'periode_id' => $periode->id,
+            'nama_periode' => $periode->nama
+        ]);
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian baru berhasil ditambahkan.');
     }
@@ -127,14 +138,35 @@ class PeriodeController extends Controller
         if ($periode->status === 'review_kepala' && $oldStatus !== 'review_kepala') {
             app(\App\Http\Controllers\KandidatAdminController::class)->generateTop3ForPeriode($id);
         }
+        
+        $admin = Auth::user();
+        Log::channel('audit')->info("Admin mengubah data/status periode penilaian", [
+            'ip' => $request->ip(),
+            'admin_id' => $admin ? $admin->id : null,
+            'nama_admin' => $admin ? $admin->nama : null,
+            'periode_id' => $periode->id,
+            'nama_periode' => $periode->nama,
+            'old_status' => $oldStatus,
+            'new_status' => $periode->status
+        ]);
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $periode = PeriodePenilaian::findOrFail($id);
+        $nama_periode = $periode->nama;
         $periode->delete();
+        
+        $admin = Auth::user();
+        Log::channel('audit')->warning("Admin menghapus periode penilaian", [
+            'ip' => $request->ip(),
+            'admin_id' => $admin ? $admin->id : null,
+            'nama_admin' => $admin ? $admin->nama : null,
+            'periode_id' => $id,
+            'nama_periode' => $nama_periode
+        ]);
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian berhasil dihapus.');
     }

@@ -4,13 +4,22 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
-Route::get('/', function () {
-    return redirect()->route('login');
-});
-
 Route::middleware('guest')->group(function () {
+    Route::get('/', function () {
+        $pemenangTerbaru = \App\Models\HasilAkhir::with(['kandidat.pegawai', 'periode'])
+            ->where('is_terpilih', 1)
+            ->orderBy('waktu_penetapan', 'desc')
+            ->first();
+            
+        $statPegawai = \App\Models\Pegawai::where('status_pegawai', 'Aktif')->count();
+        $statVoting = \App\Models\SurveyProgress::count();
+        $statPeriode = \App\Models\PeriodePenilaian::count();
+            
+        return view('welcome', compact('pemenangTerbaru', 'statPegawai', 'statVoting', 'statPeriode'));
+    })->name('beranda');
+
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
 
 Route::middleware('auth')->group(function () {
@@ -19,7 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/kalender', [\App\Http\Controllers\CalendarController::class, 'index'])->name('kalender');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
-    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo')->middleware('throttle:10,1');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::get('/glosarium', [\App\Http\Controllers\GlosariumController::class, 'index'])->name('glosarium.index');
     // ==========================
@@ -39,6 +48,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/admin/pegawai/{id}', [\App\Http\Controllers\PegawaiAdminController::class, 'update'])->name('admin.pegawai.update');
         Route::put('/admin/pegawai/{id}/password', [\App\Http\Controllers\PegawaiAdminController::class, 'updatePassword'])->name('admin.pegawai.password');
 
+        // Audit Log
+        Route::get('/admin/audit-log', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('admin.audit.index');
 
 
         // Periode
@@ -76,19 +87,19 @@ Route::middleware('auth')->group(function () {
 
         // Kinerja
         Route::get('/admin/kinerja', [\App\Http\Controllers\KinerjaAdminController::class, 'index'])->name('admin.kinerja.index');
-        Route::post('/admin/kinerja/upload', [\App\Http\Controllers\KinerjaAdminController::class, 'upload'])->name('admin.kinerja.upload');
+        Route::post('/admin/kinerja/upload', [\App\Http\Controllers\KinerjaAdminController::class, 'upload'])->name('admin.kinerja.upload')->middleware('throttle:10,1');
         Route::post('/admin/kinerja/manual', [\App\Http\Controllers\KinerjaAdminController::class, 'storeManual'])->name('admin.kinerja.manual');
 
         // Absensi
         Route::get('/admin/absensi', [\App\Http\Controllers\AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
         Route::get('/admin/absensi/template', [\App\Http\Controllers\AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
-        Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload');
+        Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload')->middleware('throttle:10,1');
         Route::post('/admin/absensi/manual', [\App\Http\Controllers\AbsensiAdminController::class, 'storeManual'])->name('admin.absensi.manual');
         Route::post('/admin/absensi/bobot', [\App\Http\Controllers\AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
 
         // Nilai CKP
         Route::get('/admin/ckp', [\App\Http\Controllers\CkpController::class, 'index'])->name('admin.ckp.index');
-        Route::post('/admin/ckp/upload', [\App\Http\Controllers\CkpController::class, 'upload'])->name('admin.ckp.upload');
+        Route::post('/admin/ckp/upload', [\App\Http\Controllers\CkpController::class, 'upload'])->name('admin.ckp.upload')->middleware('throttle:10,1');
         Route::post('/admin/ckp/manual', [\App\Http\Controllers\CkpController::class, 'manual'])->name('admin.ckp.manual');
     });
 
@@ -126,7 +137,7 @@ Route::middleware('auth')->group(function () {
     // SURVEY PEGAWAI
     // ==========================
     Route::get('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'index'])->name('pegawai.survey.index');
-    Route::post('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store');
+    Route::post('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store')->middleware('throttle:10,1');
 
     // ==========================
     // PENGUMUMAN READ

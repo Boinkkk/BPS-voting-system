@@ -24,3 +24,6 @@ Schedule::call(function () {
         ->update(['status' => 'Expired']);
 })->everyMinute();
 
+// Database Backup Schedule
+Schedule::command('backup:run --only-db')->dailyAt('23:00');
+

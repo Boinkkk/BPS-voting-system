@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\PeriodePenilaian;
 use App\Models\Kandidat;
 use App\Services\KandidatService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class KandidatAdminController extends Controller
 {
@@ -82,6 +84,16 @@ class KandidatAdminController extends Controller
 
         try {
             KandidatService::generateTop10Kandidat($request->periode_id);
+            
+            $admin = Auth::user();
+            Log::channel('audit')->info("Admin mengenerate 10 kandidat terbaik", [
+                'ip' => $request->ip(),
+                'admin_id' => $admin ? $admin->id : null,
+                'nama_admin' => $admin ? $admin->nama : null,
+                'periode_id' => $periode->id,
+                'nama_periode' => $periode->nama
+            ]);
+
             return redirect()->back()->with('success', '10 Kandidat terbaik berhasil dikalkulasi ulang dan disimpan untuk periode ini.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghasilkan kandidat: ' . $e->getMessage());
@@ -101,6 +113,16 @@ class KandidatAdminController extends Controller
 
         try {
             KandidatService::generateTop3Kandidat($request->periode_id);
+            
+            $admin = Auth::user();
+            Log::channel('audit')->info("Admin mengenerate 3 kandidat terbaik (Fase 2)", [
+                'ip' => $request->ip(),
+                'admin_id' => $admin ? $admin->id : null,
+                'nama_admin' => $admin ? $admin->nama : null,
+                'periode_id' => $periode->id,
+                'nama_periode' => $periode->nama
+            ]);
+
             return redirect()->back()->with('success', '3 Kandidat terbaik berhasil dikalkulasi ulang berdasarkan Nilai CKP, Absensi, dan Hasil Voting Survei.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal mengkalkulasi ulang kandidat: ' . $e->getMessage());

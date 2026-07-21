@@ -84,7 +84,7 @@ class CkpController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+            'file' => ['required', \Illuminate\Validation\Rules\File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024)],
             'periode_id' => 'required|exists:periode_penilaian,id',
         ]);
 
