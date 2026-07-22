@@ -164,7 +164,7 @@
                 @csrf
                 
                 @foreach($pertanyaans as $index => $p)
-                <div class="step-section" id="step-{{ $loop->iteration }}" style="display: none; transition: opacity 0.3s ease;">
+                <div class="step-section" id="step-{{ $loop->iteration }}" style="{{ $loop->iteration == 1 ? '' : 'display: none;' }} transition: opacity 0.3s ease;">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
                         
                         <div class="p-6 border-b bg-sky-50 flex flex-col md:flex-row md:items-start justify-between">
@@ -357,19 +357,19 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Restore step
-        const savedStep = localStorage.getItem(storagePrefix + 'currentStep');
-        if (savedStep) {
-            const parsedStep = parseInt(savedStep, 10);
-            if (parsedStep >= 1 && parsedStep <= totalSteps) {
-                currentStep = parsedStep;
-            }
+    // Restore step and UI immediately (elements are already parsed)
+    const savedStep = localStorage.getItem(storagePrefix + 'currentStep');
+    if (savedStep) {
+        const parsedStep = parseInt(savedStep, 10);
+        if (parsedStep >= 1 && parsedStep <= totalSteps) {
+            currentStep = parsedStep;
         }
+    }
 
-        loadFromLocal();
-        updateUI();
+    loadFromLocal();
+    updateUI();
 
+    document.addEventListener('DOMContentLoaded', () => {
         // Attach event listener to the form to capture changes via event delegation
         document.getElementById('surveyForm').addEventListener('change', function(e) {
             if (e.target && e.target.type === 'radio') {

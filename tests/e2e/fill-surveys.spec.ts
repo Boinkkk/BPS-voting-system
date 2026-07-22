@@ -38,7 +38,10 @@ test.describe('Survey Automation untuk Semua User', () => {
             test.setTimeout(1000 * 60 * 15); // Beri batas waktu 15 menit per user
 
             const context = await browser.newContext({
-                baseURL: 'http://localhost:8000'
+                baseURL: 'https://opposite-uneven-stadium.ngrok-free.dev/',
+                extraHTTPHeaders: {
+                    'ngrok-skip-browser-warning': '1'
+                }
             });
             const page = await context.newPage();
 

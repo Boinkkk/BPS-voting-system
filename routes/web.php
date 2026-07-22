@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+Route::get('/faq', [\App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');
+
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {
         $pemenangTerbaru = \App\Models\HasilAkhir::with(['kandidat.pegawai', 'periode'])
@@ -69,6 +71,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/glosarium/{id}/edit', [\App\Http\Controllers\GlosariumAdminController::class, 'edit'])->name('admin.glosarium.edit');
         Route::put('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'update'])->name('admin.glosarium.update');
         Route::delete('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'destroy'])->name('admin.glosarium.destroy');
+
+        // FAQ Admin
+        Route::resource('/admin/faq', \App\Http\Controllers\FaqAdminController::class)->names('admin.faq');
 
         // Pengumuman
         Route::resource('/admin/pengumuman', \App\Http\Controllers\PengumumanController::class)->names('admin.pengumuman');

@@ -6,7 +6,7 @@ test('full Cycle (development only)', async ({ page }) => {
     test.setTimeout(10 * 60 * 60 * 1000)
     console.log('Migrate Fresh Database')
     
-    execSync('php artisan migrate:fresh --seed', { cwd: process.cwd() });
+    execSync('php artisan migrate:fresh --seed --force', { cwd: process.cwd() });
     console.log('Migration Done!')
     await test.step("Fase 1 (manajemen Periode, input absensi dan , input-ckp", async () => {
         await page.goto('http://localhost:8000/login');

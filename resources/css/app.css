@@ -1,4 +1,10 @@
 @import 'tailwindcss';
+@import '@fontsource/hanken-grotesk';
+
+@import '@fontsource/plus-jakarta-sans';
+@import 'tom-select/dist/css/tom-select.css';
+@import 'cropperjs/dist/cropper.css';
+@import 'sweetalert2/dist/sweetalert2.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -70,15 +76,15 @@
     --spacing-margin-desktop: 32px;
     --spacing-gutter: 24px;
     --spacing-base: 8px;
-    --font-label-sm: 'Hanken Grotesk';
-    --font-label-md: 'Hanken Grotesk';
-    --font-headline-md: 'Hanken Grotesk';
-    --font-headline-lg: 'Hanken Grotesk';
-    --font-display-lg: 'Hanken Grotesk';
-    --font-body-sm: 'Hanken Grotesk';
-    --font-headline-sm: 'Hanken Grotesk';
-    --font-body-lg: 'Hanken Grotesk';
-    --font-body-md: 'Hanken Grotesk';
+    --font-label-sm: 'Hanken Grotesk', sans-serif;
+    --font-label-md: 'Hanken Grotesk', sans-serif;
+    --font-headline-md: 'Hanken Grotesk', sans-serif;
+    --font-headline-lg: 'Hanken Grotesk', sans-serif;
+    --font-display-lg: 'Hanken Grotesk', sans-serif;
+    --font-body-sm: 'Hanken Grotesk', sans-serif;
+    --font-headline-sm: 'Hanken Grotesk', sans-serif;
+    --font-body-lg: 'Hanken Grotesk', sans-serif;
+    --font-body-md: 'Hanken Grotesk', sans-serif;
     --text-label-sm: 12px;
     --text-label-md: 14px;
     --text-headline-md: 24px;

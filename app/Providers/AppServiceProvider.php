@@ -19,8 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // TODO: Hapus atau comment kode ini setelah pengujian selesai
-        \Carbon\Carbon::setTestNow('2026-07-19 12:00:00');
+        // Waktu uji coba sudah dihapus agar sistem menggunakan waktu aktual (waktu server lokal)
         
         \Illuminate\Support\Facades\View::composer('layouts.app', function ($view) {
             if (\Illuminate\Support\Facades\Auth::check()) {

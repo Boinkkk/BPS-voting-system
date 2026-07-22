@@ -274,7 +274,7 @@
                                 </div>
                             </div>
                             <div class="bg-gradient-to-b from-yellow-400 to-amber-600 text-white w-full rounded-t-3xl p-8 text-center shadow-2xl relative overflow-hidden min-h-[190px] border border-yellow-300/50">
-                                <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                                <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay bg-[url('/images/cubes.png')]"></div>
                                 <h3 class="text-3xl font-black mb-1 relative z-10 drop-shadow-md" title="{{ $top3[0]->kandidat->pegawai->nama }}">{{ $top3[0]->kandidat->pegawai->nama }}</h3>
                                 <p class="text-sm opacity-90 relative z-10 font-medium">NIP. {{ $top3[0]->kandidat->pegawai->nip }}</p>
                                 <p class="text-sm font-bold mt-3 text-yellow-100 relative z-10 truncate bg-black/10 py-2 px-3 rounded-xl backdrop-blur-sm shadow-inner" title="{{ $top3[0]->kandidat->pegawai->jabatan }}">{{ $top3[0]->kandidat->pegawai->jabatan }}</p>

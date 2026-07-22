@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('header')
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <h2 class="text-xl font-semibold leading-tight text-gray-800">
     Rekap Absensi Bulanan Pegawai
 </h2>
@@ -525,7 +524,6 @@
         document.getElementById('detailAbsensiModal').classList.add('hidden');
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         if (document.getElementById('manual_pegawai')) {

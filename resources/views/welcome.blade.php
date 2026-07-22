@@ -6,38 +6,10 @@
     <title>SIVOTA - Sistem Informasi Voting Terpadu</title>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
     <!-- Styles -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            bps: {
-                                primary: '#0F4C81',
-                                secondary: '#2563EB',
-                                accent: '#F59E0B',
-                                green: '#10b981',
-                                dark: '#0a192f'
-                            }
-                        }
-                    }
-                }
-            }
-        </script>
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- GSAP for Animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -271,7 +243,7 @@
                     <a href="#" class="text-sm font-semibold text-white border-b-2 border-bps-accent pb-1">Beranda</a>
                     <a href="#mekanisme" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Mekanisme</a>
                     <a href="#tentang" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Tentang</a>
-                    <a href="#faq" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">FAQ</a>
+                    <a href="{{ route('faq.index') }}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">FAQ</a>
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -324,12 +296,9 @@
                             </a>
                         @else
                             <a href="{{ route('login') }}" class="btn-green btn-ripple px-8 py-3.5 rounded-full text-base font-bold tracking-wide flex items-center justify-center gap-2">
-                                Mulai Sekarang
+                                Login
                             </a>
                         @endauth
-                        <a href="#mekanisme" class="btn-yellow btn-ripple px-8 py-3.5 rounded-full text-base font-bold tracking-wide flex items-center justify-center text-white">
-                            Info Lebih Lanjut
-                        </a>
                     </div>
                 </div>
 
@@ -560,7 +529,6 @@
                     <div class="text-4xl font-bold text-bps-primary mb-2 counter" data-target="{{ $statPegawai }}">0</div>
                     <div class="text-sm text-gray-500">Pegawai Aktif</div>
                 </div>
-
                 <!-- Stat 2 -->
                 <div class="stat-card p-8 text-center gsap-stat">
                     <div class="w-14 h-14 rounded-full bg-bps-accent text-white flex items-center justify-center mx-auto -mt-14 mb-4 shadow-lg">
