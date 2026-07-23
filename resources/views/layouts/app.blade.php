@@ -228,7 +228,7 @@
             </div>
             @endif
 
-            @if(Auth::user() && Auth::user()->role && in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']))
+            @if(Auth::user() && Auth::user()->role && in_array(Auth::user()->role->tipe, ['Admin', 'Pegawai', 'Kepala Umum', 'Kepala_Umum']))
             <div class="mb-2 mt-4">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Menu Pegawai</span></p>
                 <a href="{{ route('pegawai.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
@@ -551,16 +551,82 @@
             <h3 class="text-center font-bold text-gray-800 mb-4">Menu Lainnya</h3>
             
             <div class="grid grid-cols-4 gap-4 pb-4">
-                @if($tipe == 'Pegawai' || $tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum' || $tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
-                    <a href="{{ route('kalender') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
-                        <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <span class="text-[10px] text-center leading-tight">Kalender</span>
-                    </a>
-                @endif
+                <!-- 1. Kalender (Semua Role) -->
+                <a href="{{ route('kalender') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span class="text-[10px] text-center leading-tight">Kalender</span>
+                </a>
+
+                <!-- 2. FAQ Bantuan (Semua Role) -->
+                <a href="{{ route('faq.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-[10px] text-center leading-tight">FAQ</span>
+                </a>
                 
+                <!-- 3. Dashboard (Khusus Kepala Umum, karena yang lain sudah ada di navbar bawah utama) -->
+                @if($tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
+                <a href="{{ route('dashboard') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    </div>
+                    <span class="text-[10px] text-center leading-tight">Dashboard</span>
+                </a>
+                @endif
+
+                <!-- 4. Kandidat Terbaik (Admin & Kepala Umum) -->
+                @if($tipe == 'Admin' || $tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
+                <a href="{{ route('admin.kandidat.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                    </div>
+                    <span class="text-[10px] text-center leading-tight">Kandidat Terbaik</span>
+                </a>
+                @endif
+
+                <!-- 5. Glosarium (Admin) -->
                 @if($tipe == 'Admin')
+                <a href="{{ route('glosarium.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <span class="text-[10px] text-center leading-tight">Glosarium</span>
+                </a>
+                @endif
+
+                <!-- 6. Voting (Admin, Kepala Kantor, Kepala Bagian) -->
+                @if($tipe == 'Admin' || $tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
+                <a href="{{ route('pegawai.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                    </div>
+                    <span class="text-[10px] text-center leading-tight">Voting</span>
+                </a>
+                @endif
+
+                <!-- ADMIN EXCLUSIVE -->
+                @if($tipe == 'Admin')
+                    <a href="{{ route('admin.pengumuman.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                        <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                        </div>
+                        <span class="text-[10px] text-center leading-tight">Pengumuman</span>
+                    </a>
+                    <a href="{{ route('admin.audit.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                        <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </div>
+                        <span class="text-[10px] text-center leading-tight">Audit Log</span>
+                    </a>
+                    <a href="{{ url('/telescope') }}" target="_blank" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                        <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </div>
+                        <span class="text-[10px] text-center leading-tight">Monitor</span>
+                    </a>
                     <a href="{{ route('admin.pengaturan-bobot.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
@@ -571,25 +637,25 @@
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         </div>
-                        <span class="text-[10px] text-center leading-tight">Glosarium</span>
+                        <span class="text-[10px] text-center leading-tight">Kelola Glosarium</span>
                     </a>
-                    <a href="{{ route('admin.kandidat.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.faq.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
-                        <span class="text-[10px] text-center leading-tight">Kandidat Terbaik</span>
+                        <span class="text-[10px] text-center leading-tight">Kelola FAQ</span>
                     </a>
-                    <a href="{{ route('admin.pengumuman.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.absensi.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         </div>
-                        <span class="text-[10px] text-center leading-tight">Pengumuman</span>
+                        <span class="text-[10px] text-center leading-tight">Presensi</span>
                     </a>
-                    <a href="{{ route('kalender') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.ckp.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <span class="text-[10px] text-center leading-tight">Kalender</span>
+                        <span class="text-[10px] text-center leading-tight">Input CKP</span>
                     </a>
                     <a href="{{ route('admin.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
@@ -598,8 +664,9 @@
                         <span class="text-[10px] text-center leading-tight">Survey</span>
                     </a>
                 @endif
-                
-                @if($tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum' || $tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
+
+                <!-- Kinerja (Admin, Kepala Umum) -->
+                @if($tipe == 'Admin' || $tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
                     <a href="{{ route('admin.kinerja.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
@@ -607,28 +674,14 @@
                         <span class="text-[10px] text-center leading-tight">Kinerja</span>
                     </a>
                 @endif
-
-                @if($tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
-                    <a href="{{ route('dashboard') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
-                        <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                        </div>
-                        <span class="text-[10px] text-center leading-tight">Dashboard</span>
-                    </a>
-                @endif
-
+                
+                <!-- Tim Penilai (Kepala Kantor / Bagian) -->
                 @if($tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
                     <a href="{{ route('kepala.tim_penilai.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Tim Penilai</span>
-                    </a>
-                    <a href="{{ route('pegawai.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
-                        <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                        </div>
-                        <span class="text-[10px] text-center leading-tight">Voting</span>
                     </a>
                 @endif
             </div>

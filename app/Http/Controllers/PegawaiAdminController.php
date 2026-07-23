@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Pegawai;
 use App\Models\Departemen;
+use App\Models\Pegawai;
 use App\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class PegawaiAdminController extends Controller
 {
@@ -20,12 +19,13 @@ class PegawaiAdminController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nip', 'like', "%{$search}%");
+                ->orWhere('nip', 'like', "%{$search}%");
         }
 
         $pegawai = $query->orderBy('nama')->paginate(10)->withQueryString();
         $departemens = Departemen::all();
         $roles = Role::all();
+
         return view('admin.pegawai.index', compact('pegawai', 'departemens', 'roles'));
     }
 
@@ -54,16 +54,16 @@ class PegawaiAdminController extends Controller
             'tanggal_masuk' => $request->tanggal_masuk,
             'status_pegawai' => $request->status_pegawai,
         ]);
-        
+
         $admin = Auth::user();
-        Log::channel('audit')->info("Admin menambahkan pegawai baru", [
+        activity()->causedBy($admin)->withProperties([
             'ip' => $request->ip(),
             'admin_id' => $admin ? $admin->id : null,
             'nama_admin' => $admin ? $admin->nama : null,
             'pegawai_id' => $pegawai->id,
             'nama_pegawai' => $pegawai->nama,
-            'nip_pegawai' => $pegawai->nip
-        ]);
+            'nip_pegawai' => $pegawai->nip,
+        ])->log('Admin menambahkan pegawai baru');
 
         return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil ditambahkan.');
     }
@@ -93,16 +93,16 @@ class PegawaiAdminController extends Controller
             'tanggal_masuk' => $request->tanggal_masuk,
             'status_pegawai' => $request->status_pegawai,
         ]);
-        
+
         $admin = Auth::user();
-        Log::channel('audit')->info("Admin mengubah data pegawai", [
+        activity()->causedBy($admin)->withProperties([
             'ip' => $request->ip(),
             'admin_id' => $admin ? $admin->id : null,
             'nama_admin' => $admin ? $admin->nama : null,
             'pegawai_id' => $pegawai->id,
             'nama_pegawai' => $pegawai->nama,
-            'nip_pegawai' => $pegawai->nip
-        ]);
+            'nip_pegawai' => $pegawai->nip,
+        ])->log('Admin mengubah data pegawai');
 
         return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
     }
@@ -118,16 +118,16 @@ class PegawaiAdminController extends Controller
         $pegawai->update([
             'password' => Hash::make($request->password),
         ]);
-        
+
         $admin = Auth::user();
-        Log::channel('audit')->warning("Admin mengubah password pegawai", [
+        activity()->causedBy($admin)->withProperties([
             'ip' => $request->ip(),
             'admin_id' => $admin ? $admin->id : null,
             'nama_admin' => $admin ? $admin->nama : null,
             'pegawai_id' => $pegawai->id,
             'nama_pegawai' => $pegawai->nama,
-            'nip_pegawai' => $pegawai->nip
-        ]);
+            'nip_pegawai' => $pegawai->nip,
+        ])->log('Admin mengubah password pegawai');
 
         return redirect()->route('admin.pegawai.index')->with('success', 'Password pegawai berhasil diubah.');
     }

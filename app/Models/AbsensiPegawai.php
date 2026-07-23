@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class AbsensiPegawai extends Model
 {
-    use HasUuids;
+    use HasUuids, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     protected $table = 'absensi_pegawai';
 
@@ -15,12 +26,12 @@ class AbsensiPegawai extends Model
         'periode_id',
         'pegawai_id',
         'bulan',
-        'hk', 'hd', 'tk', 'tl', 'tb', 'pd', 'dk', 'kn', 
-        'psw', 'psw1', 'psw2', 'psw3', 'psw4', 
-        'ht', 'tl1', 'tl2', 'tl3', 'tl4', 
-        'cb', 'cl', 'cm', 'cp', 'cs', 'ct10', 'ct11', 'ct12', 
-        'cst1', 'cst2', 'cs1', 'cp1', 'cm1', 'cb1', 
-        'kjk_ht', 'kjk_pc', 'kjk'
+        'hk', 'hd', 'tk', 'tl', 'tb', 'pd', 'dk', 'kn',
+        'psw', 'psw1', 'psw2', 'psw3', 'psw4',
+        'ht', 'tl1', 'tl2', 'tl3', 'tl4',
+        'cb', 'cl', 'cm', 'cp', 'cs', 'ct10', 'ct11', 'ct12',
+        'cst1', 'cst2', 'cs1', 'cp1', 'cm1', 'cb1',
+        'kjk_ht', 'kjk_pc', 'kjk',
     ];
 
     public function pegawai()
@@ -42,13 +53,13 @@ class AbsensiPegawai extends Model
         $penalti = 0;
 
         // Ambil bobot dari cache atau DB
-        $bobot = \Illuminate\Support\Facades\Cache::rememberForever('bobot_penalti', function () {
-            return \App\Models\BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
+        $bobot = Cache::rememberForever('bobot_penalti', function () {
+            return BobotPenalti::all()->pluck('bobot', 'kode_absen')->toArray();
         });
 
         // Helper untuk memanggil bobot atau default jika terhapus
         $getBobot = function ($kode, $default) use ($bobot) {
-            return isset($bobot[$kode]) ? (float)$bobot[$kode] : $default;
+            return isset($bobot[$kode]) ? (float) $bobot[$kode] : $default;
         };
 
         // Penalti Ringan
@@ -56,16 +67,16 @@ class AbsensiPegawai extends Model
         $penalti -= $this->tl2 * $getBobot('TL2', 0.5);
         $penalti -= $this->psw1 * $getBobot('PSW1', 0.5);
         $penalti -= $this->psw2 * $getBobot('PSW2', 0.5);
-        
+
         // Penalti Sedang
         $penalti -= $this->tl3 * $getBobot('TL3', 1.0);
         $penalti -= $this->psw3 * $getBobot('PSW3', 1.0);
-        
+
         // Penalti Berat
         $penalti -= $this->tk * $getBobot('TK', 2.5);
         $penalti -= $this->tl4 * $getBobot('TL4', 2.5);
         $penalti -= $this->psw4 * $getBobot('PSW4', 2.5);
-        
+
         // KJK
         if ($this->kjk > 0) {
             $penalti -= ($this->kjk / 60) * $getBobot('KJK_PER_JAM', 0.5);
@@ -100,11 +111,11 @@ class AbsensiPegawai extends Model
         }
 
         // Ambil pengaturan bobot (jika kosong, gunakan default via dummy object atau array)
-        $bobot = \Illuminate\Support\Facades\Cache::rememberForever('pengaturan_bobot_absensi', function () {
-            return \App\Models\PengaturanBobot::first();
+        $bobot = Cache::rememberForever('pengaturan_bobot_absensi', function () {
+            return PengaturanBobot::first();
         });
 
-        if (!$bobot) {
+        if (! $bobot) {
             // Jika belum ada di database, kembalikan baseScore (atau bisa set default value)
             return $baseScore;
         }
@@ -118,9 +129,9 @@ class AbsensiPegawai extends Model
         // 4. Kurangi dengan PSW
         if ($bobot->bobot_psw1 > 0 || $bobot->bobot_psw2 > 0 || $bobot->bobot_psw3 > 0 || $bobot->bobot_psw4 > 0) {
             $baseScore -= (
-                ($this->psw1 * $bobot->bobot_psw1) + 
-                ($this->psw2 * $bobot->bobot_psw2) + 
-                ($this->psw3 * $bobot->bobot_psw3) + 
+                ($this->psw1 * $bobot->bobot_psw1) +
+                ($this->psw2 * $bobot->bobot_psw2) +
+                ($this->psw3 * $bobot->bobot_psw3) +
                 ($this->psw4 * $bobot->bobot_psw4)
             );
         } else {
@@ -130,9 +141,9 @@ class AbsensiPegawai extends Model
         // 5. Kurangi dengan TL
         if ($bobot->bobot_tl1 > 0 || $bobot->bobot_tl2 > 0 || $bobot->bobot_tl3 > 0 || $bobot->bobot_tl4 > 0) {
             $baseScore -= (
-                ($this->tl1 * $bobot->bobot_tl1) + 
-                ($this->tl2 * $bobot->bobot_tl2) + 
-                ($this->tl3 * $bobot->bobot_tl3) + 
+                ($this->tl1 * $bobot->bobot_tl1) +
+                ($this->tl2 * $bobot->bobot_tl2) +
+                ($this->tl3 * $bobot->bobot_tl3) +
                 ($this->tl4 * $bobot->bobot_tl4)
             );
         } else {

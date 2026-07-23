@@ -324,7 +324,11 @@
         document.getElementById('main-progress-bar').style.width = progress + '%';
     }
 
+    const isReadOnly = {{ !in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']) ? 'true' : 'false' }};
+
     function validateStep(step) {
+        if (isReadOnly) return true;
+
         const stepDiv = document.getElementById('step-' + step);
         if(!stepDiv) return true;
 

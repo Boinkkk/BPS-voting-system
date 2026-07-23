@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\PeriodePenilaian;
 use App\Models\HasilAkhir;
+use App\Models\JawabanSurvei;
+use App\Models\PengaturanBobot;
+use App\Models\PeriodePenilaian;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class KepalaController extends Controller
@@ -14,34 +17,34 @@ class KepalaController extends Controller
     {
         // Cari periode yang sedang review_kepala
         $periodeReview = PeriodePenilaian::where('status', 'review_kepala')->first();
-        
+
         $kandidats = collect();
         if ($periodeReview) {
             $kandidats = HasilAkhir::with('kandidat.pegawai')
                 ->where('periode_id', $periodeReview->id)
                 ->orderBy('ranking_final', 'asc')
                 ->get();
-            
-            $pengaturan = \App\Models\PengaturanBobot::first();
+
+            $pengaturan = PengaturanBobot::first();
             $ckpWeight = $pengaturan ? $pengaturan->ckp : 50;
             $absensiWeight = $pengaturan ? $pengaturan->absensi : 25;
             $surveyWeight = $pengaturan ? $pengaturan->survey : 25;
 
             foreach ($kandidats as $ha) {
                 $kandidat = $ha->kandidat;
-                
-                $rataRata = \App\Models\JawabanSurvei::where('periode_id', $periodeReview->id)
+
+                $rataRata = JawabanSurvei::where('periode_id', $periodeReview->id)
                     ->where('kandidat_id', $kandidat->id)
                     ->avg('nilai');
                 $surveyNormalized = $rataRata ? ($rataRata / 5) * 100 : 0;
-                
+
                 $nilaiCkp = $kandidat->skor_ckp;
                 $nilaiAbsensi = $kandidat->skor_absensi;
-                
-                $finalScore = ($nilaiCkp * ($ckpWeight / 100)) + 
-                              ($nilaiAbsensi * ($absensiWeight / 100)) + 
+
+                $finalScore = ($nilaiCkp * ($ckpWeight / 100)) +
+                              ($nilaiAbsensi * ($absensiWeight / 100)) +
                               ($surveyNormalized * ($surveyWeight / 100));
-                              
+
                 $ha->skor_survey_normalized = round($surveyNormalized, 2);
                 $ha->skor_akhir_voting = round($finalScore, 2);
             }
@@ -75,10 +78,13 @@ class KepalaController extends Controller
             // $periode->save();
 
             DB::commit();
+            Cache::forget("dashboard_top3_{$periode->id}");
+
             return redirect()->route('dashboard')->with('success', 'Pegawai terbaik berhasil ditetapkan! Anda masih dapat mengubah pilihan sebelum masa pengumuman.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 }

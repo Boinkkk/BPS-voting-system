@@ -2,39 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\PeriodePenilaian;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class PeriodeController extends Controller
 {
     public function index()
     {
         $tahunSekarang = date('Y');
-        
+
         for ($i = 1; $i <= 4; $i++) {
             $exists = PeriodePenilaian::where('tahun', $tahunSekarang)->where('triwulan', $i)->exists();
-            if (!$exists) {
+            if (! $exists) {
                 $bulanPersiapan = ($i - 1) * 3 + 4; // T1=4, T2=7, T3=10, T4=13
                 $tahun = $tahunSekarang;
-                
+
                 if ($bulanPersiapan > 12) {
                     $bulanPersiapan -= 12;
                     $tahun++;
                 }
 
-                $tanggalMulai = \Carbon\Carbon::create($tahun, $bulanPersiapan, 1)->format('Y-m-d');
-                $tanggalSelesaiPersiapan = \Carbon\Carbon::create($tahun, $bulanPersiapan, 5)->format('Y-m-d');
-                $tanggalMulaiVoting = \Carbon\Carbon::create($tahun, $bulanPersiapan, 6)->format('Y-m-d');
-                $tanggalSelesaiVoting = \Carbon\Carbon::create($tahun, $bulanPersiapan, 8)->format('Y-m-d');
-                $tanggalReviewKepala = \Carbon\Carbon::create($tahun, $bulanPersiapan, 9)->format('Y-m-d');
-                $tanggalSelesai = \Carbon\Carbon::create($tahun, $bulanPersiapan, 10)->format('Y-m-d');
-                
+                $tanggalMulai = Carbon::create($tahun, $bulanPersiapan, 1)->format('Y-m-d');
+                $tanggalSelesaiPersiapan = Carbon::create($tahun, $bulanPersiapan, 5)->format('Y-m-d');
+                $tanggalMulaiVoting = Carbon::create($tahun, $bulanPersiapan, 6)->format('Y-m-d');
+                $tanggalSelesaiVoting = Carbon::create($tahun, $bulanPersiapan, 8)->format('Y-m-d');
+                $tanggalReviewKepala = Carbon::create($tahun, $bulanPersiapan, 9)->format('Y-m-d');
+                $tanggalSelesai = Carbon::create($tahun, $bulanPersiapan, 10)->format('Y-m-d');
+
                 PeriodePenilaian::create([
                     'triwulan' => $i,
                     'tahun' => $tahunSekarang,
-                    'nama' => 'Triwulan ' . $i . ' Tahun ' . $tahunSekarang,
+                    'nama' => 'Triwulan '.$i.' Tahun '.$tahunSekarang,
                     'tanggal_mulai' => $tanggalMulai,
                     'tanggal_selesai_persiapan' => $tanggalSelesaiPersiapan,
                     'tanggal_mulai_voting' => $tanggalMulaiVoting,
@@ -47,6 +47,7 @@ class PeriodeController extends Controller
         }
 
         $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
+
         return view('admin.periode.index', compact('periodes'));
     }
 
@@ -69,7 +70,7 @@ class PeriodeController extends Controller
             'tanggal_selesai.after' => 'Pengumuman harus setelah Pemilihan Kepala (tidak boleh bertabrakan).',
         ]);
 
-        $nama = 'Triwulan ' . $request->triwulan . ' Tahun ' . $request->tahun;
+        $nama = 'Triwulan '.$request->triwulan.' Tahun '.$request->tahun;
 
         $periode = new PeriodePenilaian([
             'triwulan' => $request->triwulan,
@@ -84,15 +85,15 @@ class PeriodeController extends Controller
         ]);
         $periode->status = $periode->computeStatusBasedOnDate(true) ?? 'penginputan';
         $periode->save();
-        
+
         $admin = Auth::user();
-        Log::channel('audit')->info("Admin membuat periode penilaian baru", [
+        activity()->causedBy($admin)->withProperties([
             'ip' => $request->ip(),
             'admin_id' => $admin ? $admin->id : null,
             'nama_admin' => $admin ? $admin->nama : null,
             'periode_id' => $periode->id,
-            'nama_periode' => $periode->nama
-        ]);
+            'nama_periode' => $periode->nama,
+        ])->log('Admin membuat periode penilaian baru');
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian baru berhasil ditambahkan.');
     }
@@ -116,11 +117,11 @@ class PeriodeController extends Controller
             'tanggal_selesai.after' => 'Pengumuman harus setelah Pemilihan Kepala (tidak boleh bertabrakan).',
         ]);
 
-        $nama = 'Triwulan ' . $request->triwulan . ' Tahun ' . $request->tahun;
+        $nama = 'Triwulan '.$request->triwulan.' Tahun '.$request->tahun;
 
         $periode = PeriodePenilaian::findOrFail($id);
         $oldStatus = $periode->status;
-        
+
         $periode->fill([
             'triwulan' => $request->triwulan,
             'tahun' => $request->tahun,
@@ -136,19 +137,19 @@ class PeriodeController extends Controller
         $periode->save();
 
         if ($periode->status === 'review_kepala' && $oldStatus !== 'review_kepala') {
-            app(\App\Http\Controllers\KandidatAdminController::class)->generateTop3ForPeriode($id);
+            app(KandidatAdminController::class)->generateTop3ForPeriode($id);
         }
-        
+
         $admin = Auth::user();
-        Log::channel('audit')->info("Admin mengubah data/status periode penilaian", [
+        activity()->causedBy($admin)->withProperties([
             'ip' => $request->ip(),
             'admin_id' => $admin ? $admin->id : null,
             'nama_admin' => $admin ? $admin->nama : null,
             'periode_id' => $periode->id,
             'nama_periode' => $periode->nama,
             'old_status' => $oldStatus,
-            'new_status' => $periode->status
-        ]);
+            'new_status' => $periode->status,
+        ])->log('Admin mengubah data/status periode penilaian');
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian berhasil diperbarui.');
     }
@@ -158,15 +159,15 @@ class PeriodeController extends Controller
         $periode = PeriodePenilaian::findOrFail($id);
         $nama_periode = $periode->nama;
         $periode->delete();
-        
+
         $admin = Auth::user();
-        Log::channel('audit')->warning("Admin menghapus periode penilaian", [
+        activity()->causedBy($admin)->withProperties([
             'ip' => $request->ip(),
             'admin_id' => $admin ? $admin->id : null,
             'nama_admin' => $admin ? $admin->nama : null,
             'periode_id' => $id,
-            'nama_periode' => $nama_periode
-        ]);
+            'nama_periode' => $nama_periode,
+        ])->log('Admin menghapus periode penilaian');
 
         return redirect()->route('admin.periode.index')->with('success', 'Periode Penilaian berhasil dihapus.');
     }

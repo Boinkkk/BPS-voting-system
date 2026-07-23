@@ -2,38 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\JawabanSurvei;
 use App\Models\Kandidat;
+use App\Models\PeriodePenilaian;
 use App\Models\PertanyaanSurvei;
 use App\Models\SurveyProgress;
-use App\Models\JawabanSurvei;
-use App\Models\PeriodePenilaian;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class SurveyPegawaiController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        
+
         $periodeAktif = PeriodePenilaian::where('status', 'voting')->first();
-        if (!$periodeAktif) {
+        if (! $periodeAktif) {
             return view('pegawai.survey.index', ['error' => 'Tidak ada periode penilaian yang aktif saat ini.']);
         }
 
         $kandidats = Kandidat::with('pegawai')
-                        ->where('periode_id', $periodeAktif->id)
-                        ->where('pegawai_id', '!=', $user->id)
-                        ->orderBy('skor', 'desc')
-                        ->take(10)
-                        ->get();
+            ->where('periode_id', $periodeAktif->id)
+            ->where('pegawai_id', '!=', $user->id)
+            ->orderBy('skor', 'desc')
+            ->take(10)
+            ->get();
 
         $sudahIsi = SurveyProgress::where('periode_id', $periodeAktif->id)
-                                        ->where('user_id', $user->id)
-                                        ->exists();
+            ->where('user_id', $user->id)
+            ->exists();
 
-        $isVotingDitunda = !$periodeAktif->isDataLengkap();
+        $isVotingDitunda = ! $periodeAktif->isDataLengkap();
 
         $pertanyaans = PertanyaanSurvei::orderBy('nomor_urut')->get();
 
@@ -43,7 +42,7 @@ class SurveyPegawaiController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if (!in_array($user->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum'])) {
+        if (! in_array($user->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum'])) {
             return redirect()->route('pegawai.survey.index')->with('error', 'Hanya pegawai dan Kepala Umum yang dapat mensubmit survei. Anda hanya memiliki akses pratinjau (read-only).');
         }
 
@@ -53,7 +52,7 @@ class SurveyPegawaiController extends Controller
         ]);
 
         $periodeAktif = PeriodePenilaian::where('status', 'voting')->first();
-        if (!$periodeAktif || !$periodeAktif->isDataLengkap()) {
+        if (! $periodeAktif || ! $periodeAktif->isDataLengkap()) {
             return redirect()->route('pegawai.survey.index')->with('error', 'Pemilihan sedang ditunda. Data kandidat belum lengkap.');
         }
 
@@ -77,14 +76,14 @@ class SurveyPegawaiController extends Controller
             }
         }
 
-        Log::channel('audit')->info("Pegawai telah mensubmit evaluasi/voting", [
+        activity()->causedBy($user)->withProperties([
             'ip' => $request->ip(),
             'pegawai_id' => $user->id,
             'nama_pegawai' => $user->nama,
             'nip' => $user->nip,
             'periode_id' => $periodeAktif->id,
-            'nama_periode' => $periodeAktif->nama
-        ]);
+            'nama_periode' => $periodeAktif->nama,
+        ])->log('Pegawai telah mensubmit evaluasi/voting');
 
         return redirect()->route('pegawai.survey.index')->with('success', 'Survey berhasil disimpan!');
     }

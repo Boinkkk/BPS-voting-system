@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use App\Models\Pegawai;
 
 class AuthController extends Controller
 {
@@ -17,15 +16,17 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'identifier' => 'required|string',
+            'identifier' => ['required', 'string', 'regex:/^[a-zA-Z0-9@\.\_\-]+$/'],
             'password' => 'required|string',
+        ], [
+            'identifier.regex' => 'Format identifier tidak valid. Gunakan hanya huruf, angka, @, titik, garis bawah, atau strip.',
         ]);
 
         $identifier = $request->identifier;
         $password = $request->password;
-        
+
         $email = $identifier;
-        
+
         // Cek apakah identifier adalah NIP (berupa angka)
         if (is_numeric($identifier)) {
             $pegawai = Pegawai::where('nip', $identifier)->first();
@@ -40,19 +41,19 @@ class AuthController extends Controller
 
         if (Auth::attempt(['email' => $email, 'password' => $password], $request->has('remember'))) {
             $request->session()->regenerate();
-            
-            Log::channel('audit')->info("Pegawai berhasil login", [
+
+            activity()->causedBy(Auth::user())->withProperties([
                 'ip' => $request->ip(),
-                'email' => $email
-            ]);
-            
+                'email' => $email,
+            ])->log('Pegawai berhasil login');
+
             return redirect()->intended('dashboard');
         }
 
-        Log::channel('audit')->warning("Percobaan login gagal", [
+        activity()->withProperties([
             'ip' => $request->ip(),
-            'identifier' => $identifier
-        ]);
+            'identifier' => $identifier,
+        ])->log('Percobaan login gagal');
 
         return back()->withErrors([
             'identifier' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
@@ -63,10 +64,10 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         if ($user) {
-            Log::channel('audit')->info("Pegawai logout", [
+            activity()->causedBy($user)->withProperties([
                 'ip' => $request->ip(),
-                'email' => $user->email
-            ]);
+                'email' => $user->email,
+            ])->log('Pegawai logout');
         }
 
         Auth::logout();

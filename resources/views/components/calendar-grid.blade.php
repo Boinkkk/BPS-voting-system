@@ -42,16 +42,18 @@
                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
-        <div class="grid grid-cols-7 bg-gray-100 border-b border-gray-200 text-xs font-bold text-gray-500 text-center">
-            <div class="py-2">Sen</div>
-            <div class="py-2">Sel</div>
-            <div class="py-2">Rab</div>
-            <div class="py-2">Kam</div>
-            <div class="py-2">Jum</div>
-            <div class="py-2">Sab</div>
-            <div class="py-2">Min</div>
-        </div>
-        <div class="grid grid-cols-7 gap-px bg-gray-200 text-sm">
+        <div class="overflow-x-auto pb-2">
+            <div class="min-w-[700px] lg:min-w-full">
+                <div class="grid grid-cols-7 bg-gray-100 border-b border-gray-200 text-xs font-bold text-gray-500 text-center">
+                    <div class="py-2">Sen</div>
+                    <div class="py-2">Sel</div>
+                    <div class="py-2">Rab</div>
+                    <div class="py-2">Kam</div>
+                    <div class="py-2">Jum</div>
+                    <div class="py-2">Sab</div>
+                    <div class="py-2">Min</div>
+                </div>
+                <div class="grid grid-cols-7 gap-px bg-gray-200 text-sm">
             @for($i = 1; $i < $startDayOfWeek; $i++)
                 <div class="bg-white min-h-[5rem] sm:min-h-[6rem]"></div>
             @endfor
@@ -110,10 +112,10 @@
                         <span class="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full {{ $isToday ? 'bg-sky-600 text-white font-bold shadow-md' : $textColor }} text-xs sm:text-sm">{{ $day }}</span>
                     </div>
                     @if($label)
-                        <div class="mt-1 sm:mt-2 text-[0.6rem] sm:text-xs leading-tight font-semibold {{ $textColor }} px-0.5 break-words" style="word-break: break-word;">
+                        <div title="{{ $label }} - {{ $periodeName }}" class="mt-1 sm:mt-2 text-xs leading-tight font-semibold {{ $textColor }} px-1">
                             {{ $label }}
                         </div>
-                        <div class="text-[0.55rem] sm:text-[0.65rem] {{ $textColor }} opacity-75 px-0.5 mt-0.5 font-medium leading-tight">
+                        <div class="text-[0.65rem] {{ $textColor }} opacity-75 px-1 mt-0.5 font-medium leading-tight truncate" title="{{ $periodeName }}">
                             {{ $periodeName }}
                         </div>
                     @endif
@@ -126,6 +128,8 @@
             @for($i = 0; $i < $remainingCells; $i++)
                 <div class="bg-white min-h-[5rem] sm:min-h-[6rem]"></div>
             @endfor
+                </div>
+            </div>
         </div>
     </div>
 </div>

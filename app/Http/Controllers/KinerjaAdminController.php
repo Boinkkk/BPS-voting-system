@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\PeriodePenilaian;
-use App\Models\KinerjaPegawai;
 use App\Imports\KinerjaImport;
+use App\Models\KinerjaPegawai;
+use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
+use App\Services\KandidatService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\File;
 use Maatwebsite\Excel\Facades\Excel;
 
 class KinerjaAdminController extends Controller
@@ -14,19 +18,19 @@ class KinerjaAdminController extends Controller
     {
         $periode_id = $request->input('periode_id');
         $periodes = PeriodePenilaian::orderBy('tanggal_mulai', 'desc')->get();
-        
-        if (!$periode_id && $periodes->isNotEmpty()) {
+
+        if (! $periode_id && $periodes->isNotEmpty()) {
             $periode_id = $periodes->first()->id;
         }
 
         $kinerja = [];
         if ($periode_id) {
             $kinerja = KinerjaPegawai::with('pegawai')
-                        ->where('periode_id', $periode_id)
-                        ->get();
+                ->where('periode_id', $periode_id)
+                ->get();
         }
 
-        $semuaPegawai = \App\Models\Pegawai::orderBy('nama')->get();
+        $semuaPegawai = Pegawai::orderBy('nama')->get();
 
         return view('admin.kinerja.index', compact('periodes', 'periode_id', 'kinerja', 'semuaPegawai'));
     }
@@ -34,16 +38,18 @@ class KinerjaAdminController extends Controller
     private function resolvePeriodeId($periode_id)
     {
         if ($periode_id === 'sekarang') {
-            $now = \Carbon\Carbon::now()->toDateString();
+            $now = Carbon::now()->toDateString();
             $periode = PeriodePenilaian::where('tanggal_mulai', '<=', $now)
                 ->where('tanggal_selesai', '>=', $now)
                 ->first();
-            
-            if (!$periode) {
+
+            if (! $periode) {
                 throw new \Exception('Tidak ada periode aktif untuk hari ini.');
             }
+
             return $periode->id;
         }
+
         return $periode_id;
     }
 
@@ -51,15 +57,15 @@ class KinerjaAdminController extends Controller
     {
         $request->validate([
             'periode_id' => 'required',
-            'file' => ['required', \Illuminate\Validation\Rules\File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024)],
+            'file' => ['required', File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024), 'mimes:xlsx,xls,csv'],
         ]);
 
         try {
             $realPeriodeId = $this->resolvePeriodeId($request->periode_id);
-            
+
             $periode = PeriodePenilaian::find($realPeriodeId);
             // Validate if realPeriodeId exists
-            if (!$periode) {
+            if (! $periode) {
                 throw new \Exception('Periode tidak valid.');
             }
 
@@ -68,13 +74,13 @@ class KinerjaAdminController extends Controller
             }
 
             Excel::import(new KinerjaImport($realPeriodeId), $request->file('file'));
-            
-            // Trigger otomatis perhitungan 10 kandidat
-            \App\Services\KandidatService::generateTop10Kandidat($realPeriodeId);
-            
-            return redirect()->back()->with('success', 'Data kinerja berhasil diunggah dan diekstrak. 10 Kandidat otomatis dikalkulasi ulang.');
+
+            // Trigger otomatis kalkulasi kandidat setelah excel selesai diproses
+            KandidatService::generateTop10Kandidat($realPeriodeId);
+
+            return redirect()->back()->with('success', 'Data kinerja berhasil diunggah. 10 Kandidat telah otomatis dikalkulasi ulang.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah: '.$e->getMessage());
         }
     }
 
@@ -92,9 +98,9 @@ class KinerjaAdminController extends Controller
 
         try {
             $realPeriodeId = $this->resolvePeriodeId($request->periode_id);
-            
+
             $periode = PeriodePenilaian::find($realPeriodeId);
-            if (!$periode) {
+            if (! $periode) {
                 return redirect()->back()->with('error', 'Periode tidak valid.');
             }
 
@@ -117,12 +123,11 @@ class KinerjaAdminController extends Controller
             );
 
             // Trigger otomatis perhitungan 10 kandidat
-            \App\Services\KandidatService::generateTop10Kandidat($realPeriodeId);
+            KandidatService::generateTop10Kandidat($realPeriodeId);
 
             return redirect()->back()->with('success', 'Data kinerja manual berhasil ditambahkan. 10 Kandidat otomatis dikalkulasi ulang.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
-
 }

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Imports\CkpImport;
 use App\Models\NilaiCkp;
 use App\Models\Pegawai;
 use App\Models\PeriodePenilaian;
-use App\Imports\CkpImport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\DB;
 use App\Services\KandidatService;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\File;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CkpController extends Controller
 {
@@ -17,16 +17,16 @@ class CkpController extends Controller
     {
         $requested_periode_id = $request->input('periode_id');
         $periodeData = PeriodePenilaian::getRecentAndDefault($requested_periode_id);
-        
+
         $periodes = $periodeData['periodes'];
         $periode_id = $periodeData['default_id'];
-        
-        if ($periode_id != $requested_periode_id && !$requested_periode_id) {
+
+        if ($periode_id != $requested_periode_id && ! $requested_periode_id) {
             return redirect()->route('admin.ckp.index', array_merge($request->query(), [
-                'periode_id' => $periode_id
+                'periode_id' => $periode_id,
             ]));
         }
-        
+
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
 
@@ -36,13 +36,13 @@ class CkpController extends Controller
         if ($search) {
             $query->whereHas('pegawai', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nip', 'like', "%{$search}%");
+                    ->orWhere('nip', 'like', "%{$search}%");
             });
         }
 
         $ckps = $query->paginate($perPage)->withQueryString();
 
-        $semuaPegawai = Pegawai::whereHas('role', function($q){
+        $semuaPegawai = Pegawai::whereHas('role', function ($q) {
             $q->where('tipe', 'Pegawai');
         })->get();
 
@@ -84,7 +84,7 @@ class CkpController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => ['required', \Illuminate\Validation\Rules\File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024)],
+            'file' => ['required', File::types(['xlsx', 'xls', 'csv'])->max(10 * 1024), 'mimes:xlsx,xls,csv'],
             'periode_id' => 'required|exists:periode_penilaian,id',
         ]);
 
@@ -95,16 +95,13 @@ class CkpController extends Controller
 
         try {
             Excel::import(new CkpImport($request->periode_id), $request->file('file'));
-            
-            try {
-                KandidatService::generateTop10Kandidat($request->periode_id);
-            } catch (\Exception $e) {
-                // Log error if needed
-            }
 
-            return redirect()->back()->with('success', 'Data CKP berhasil diunggah dan ranking kandidat telah diperbarui.');
+            // Re-kalkulasi 10 kandidat terbaik setelah update CKP
+            KandidatService::generateTop10Kandidat($request->periode_id);
+
+            return redirect()->back()->with('success', 'Data CKP berhasil diunggah. Ranking kandidat telah dikalkulasi ulang.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah file: '.$e->getMessage());
         }
     }
 }
