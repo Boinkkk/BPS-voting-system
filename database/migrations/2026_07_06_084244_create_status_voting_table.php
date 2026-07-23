@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained('pegawai')->cascadeOnDelete();
             $table->boolean('sudah_voting')->default(false);
             $table->timestamp('waktu_voting')->nullable();
-            
+
             $table->unique(['periode_id', 'user_id']);
             $table->index('periode_id');
         });

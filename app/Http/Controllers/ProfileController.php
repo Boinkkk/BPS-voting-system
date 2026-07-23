@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\File;
 
 class ProfileController extends Controller
 {
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'foto_profil' => ['required', \Illuminate\Validation\Rules\File::image()->max(2 * 1024)],
+            'foto_profil' => ['required', File::image()->max(2 * 1024)],
         ]);
 
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
 
         if ($request->hasFile('foto_profil')) {
             $path = $request->file('foto_profil')->store('profiles', 'public');
@@ -30,13 +33,13 @@ class ProfileController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
 
-        if (!\Illuminate\Support\Facades\Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
         }
 
-        $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        $user->password = Hash::make($request->password);
         $user->save();
 
         return redirect()->back()->with('success', 'Password berhasil diubah.');

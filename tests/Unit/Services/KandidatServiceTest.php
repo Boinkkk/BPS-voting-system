@@ -2,20 +2,21 @@
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\KandidatService;
-use App\Models\PeriodePenilaian;
-use App\Models\Role;
+use App\Models\AbsensiPegawai;
+use App\Models\HasilAkhir;
+use App\Models\JawabanSurvei;
+use App\Models\Kandidat;
+use App\Models\NilaiCkp;
 use App\Models\Pegawai;
 use App\Models\PengaturanBobot;
-use App\Models\NilaiCkp;
-use App\Models\AbsensiPegawai;
-use App\Models\Kandidat;
-use App\Models\JawabanSurvei;
-use App\Models\HasilAkhir;
+use App\Models\PeriodePenilaian;
+use App\Models\PertanyaanSurvei;
+use App\Models\Role;
+use App\Services\KandidatService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class KandidatServiceTest extends TestCase
 {
@@ -33,17 +34,18 @@ class KandidatServiceTest extends TestCase
             'nama' => 'P1',
             'tanggal_mulai' => '2026-01-01',
             'tanggal_selesai' => '2026-12-31',
-            'status' => 'voting'
+            'status' => 'voting',
         ], $overrides));
     }
 
     private function createPegawai($roleId, $overrides = [])
     {
         $nip = $overrides['nip'] ?? (string) rand(1000, 9999);
+
         return Pegawai::create(array_merge([
             'id' => (string) Str::uuid(),
             'role_id' => $roleId,
-            'nama' => 'P_' . $nip,
+            'nama' => 'P_'.$nip,
             'nip' => $nip,
             'email' => "email_$nip@test.com",
             'password' => 'secret',
@@ -67,11 +69,11 @@ class KandidatServiceTest extends TestCase
         // Arrange
         $periode = $this->createPeriode();
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $pegawai1 = $this->createPegawai($rolePegawai->id, ['nama' => 'Pegawai A', 'nip' => '111']);
         $pegawai2 = $this->createPegawai($rolePegawai->id, ['nama' => 'Pegawai B', 'nip' => '222']);
-        
-        // Weight: CKP=50, Absensi=25. Total Fase 1 = 75. 
+
+        // Weight: CKP=50, Absensi=25. Total Fase 1 = 75.
         PengaturanBobot::truncate();
         PengaturanBobot::create(['ckp' => 50, 'absensi' => 25, 'bobot_tk' => 5]);
 
@@ -90,7 +92,7 @@ class KandidatServiceTest extends TestCase
 
         // Assert
         $this->assertDatabaseCount('kandidat', 2);
-        
+
         $kandidat1 = Kandidat::where('pegawai_id', $pegawai1->id)->first();
         $this->assertNotNull($kandidat1);
         $this->assertEquals(93.33, round($kandidat1->skor, 2));
@@ -134,7 +136,7 @@ class KandidatServiceTest extends TestCase
             120 => 98,
             121 => 97,
             450 => 97,
-            451 => 96
+            451 => 96,
         ];
 
         foreach ($kjkCases as $kjk => $expectedBase) {
@@ -162,7 +164,7 @@ class KandidatServiceTest extends TestCase
         $periode = $this->createPeriode();
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
         $pegawai = $this->createPegawai($rolePegawai->id, ['nama' => 'Pegawai A', 'nip' => '111']);
-        
+
         PengaturanBobot::truncate();
         PengaturanBobot::create([
             'ckp' => 0, 'absensi' => 100, // isolate absensi
@@ -177,7 +179,7 @@ class KandidatServiceTest extends TestCase
         AbsensiPegawai::create([
             'periode_id' => $periode->id, 'pegawai_id' => $pegawai->id, 'bulan' => 1, 'kjk' => 0,
             'tl1' => 1, 'tl2' => 2, 'tl3' => 1, 'tl4' => 0,
-            'psw1' => 1, 'psw2' => 1, 'psw3' => 0, 'psw4' => 1
+            'psw1' => 1, 'psw2' => 1, 'psw3' => 0, 'psw4' => 1,
         ]);
 
         // Act
@@ -194,7 +196,7 @@ class KandidatServiceTest extends TestCase
         $periode = $this->createPeriode();
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
         $pegawai = $this->createPegawai($rolePegawai->id, ['nama' => 'Naughty', 'nip' => '999']);
-        
+
         PengaturanBobot::truncate();
         PengaturanBobot::create(['ckp' => 0, 'absensi' => 100, 'bobot_tk' => 10]);
 
@@ -231,7 +233,7 @@ class KandidatServiceTest extends TestCase
 
         // Assert
         $this->assertDatabaseCount('kandidat', 10);
-        
+
         // Highest score should be 65, which is Pegawai 15
         $topKandidat = Kandidat::where('periode_id', $periode->id)->orderBy('skor', 'desc')->first();
         $this->assertEquals(65, $topKandidat->skor);
@@ -245,10 +247,10 @@ class KandidatServiceTest extends TestCase
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
         PengaturanBobot::truncate();
         PengaturanBobot::create(['ckp' => 50, 'absensi' => 25, 'survey' => 25]); // Final Weights
-        
-        \App\Models\PertanyaanSurvei::create(['id' => 1, 'pertanyaan' => 'Q1', 'nomor_urut' => 1]);
-        \App\Models\PertanyaanSurvei::create(['id' => 2, 'pertanyaan' => 'Q2', 'nomor_urut' => 2]);
-        
+
+        PertanyaanSurvei::create(['id' => 1, 'pertanyaan' => 'Q1', 'nomor_urut' => 1]);
+        PertanyaanSurvei::create(['id' => 2, 'pertanyaan' => 'Q2', 'nomor_urut' => 2]);
+
         // P1: CKP=100 (50), Absensi KJK=0->100 (25), Survey Avg 5->100 (25). Total = 100
         $pegawai1 = $this->createPegawai($rolePegawai->id, ['nama' => 'P1', 'nip' => '1111']);
         $kandidat1 = Kandidat::create(['periode_id' => $periode->id, 'pegawai_id' => $pegawai1->id]);
@@ -281,7 +283,7 @@ class KandidatServiceTest extends TestCase
 
         // Assert
         $this->assertDatabaseCount('hasil_akhir', 3);
-        
+
         $hasil1 = HasilAkhir::where('kandidat_id', $kandidat1->id)->first();
         $this->assertNotNull($hasil1);
         $this->assertEquals(1, $hasil1->ranking_final);
@@ -289,11 +291,11 @@ class KandidatServiceTest extends TestCase
         $hasil2 = HasilAkhir::where('kandidat_id', $kandidat2->id)->first();
         $this->assertNotNull($hasil2);
         $this->assertEquals(2, $hasil2->ranking_final);
-        
+
         $hasil3 = HasilAkhir::where('kandidat_id', $kandidat3->id)->first();
         $this->assertNotNull($hasil3);
         $this->assertEquals(3, $hasil3->ranking_final);
-        
+
         $this->assertDatabaseMissing('hasil_akhir', ['kandidat_id' => $kandidat4->id]);
     }
 
@@ -307,13 +309,14 @@ class KandidatServiceTest extends TestCase
 
         $createKandidat = function ($nip) use ($periode, $rolePegawai) {
             $pegawai = $this->createPegawai($rolePegawai->id, ['nip' => $nip]);
+
             return Kandidat::create(['periode_id' => $periode->id, 'pegawai_id' => $pegawai->id]);
         };
 
         $k1 = $createKandidat('5001'); // All Zero
-        
+
         $k2 = $createKandidat('5002'); // All Zero (Tie with K1)
-        
+
         $k3 = $createKandidat('5003'); // Will have some score
         NilaiCkp::create(['periode_id' => $periode->id, 'pegawai_id' => $k3->pegawai_id, 'nilai' => 10]);
 
@@ -325,11 +328,11 @@ class KandidatServiceTest extends TestCase
 
         // Assert
         $this->assertDatabaseCount('hasil_akhir', 3);
-        
+
         // Expect K3 and K4 to be in top 2 (ranking 1 and 2), and either K1 or K2 in ranking 3.
         $this->assertDatabaseHas('hasil_akhir', ['kandidat_id' => $k3->id]);
         $this->assertDatabaseHas('hasil_akhir', ['kandidat_id' => $k4->id]);
-        
+
         $remaining = HasilAkhir::whereIn('kandidat_id', [$k1->id, $k2->id])->count();
         $this->assertEquals(1, $remaining, 'Only one of the tied zero-score candidates should be selected for the 3rd spot.');
     }

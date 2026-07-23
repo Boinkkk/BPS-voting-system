@@ -2,8 +2,8 @@
 
 namespace App\Imports;
 
-use App\Models\Pegawai;
 use App\Models\KinerjaPegawai;
+use App\Models\Pegawai;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
@@ -22,7 +22,7 @@ class KinerjaImport implements ToCollection
         $bulanMap = [
             'januari' => 1, 'februari' => 2, 'maret' => 3, 'april' => 4,
             'mei' => 5, 'juni' => 6, 'juli' => 7, 'agustus' => 8,
-            'september' => 9, 'oktober' => 10, 'november' => 11, 'desember' => 12
+            'september' => 9, 'oktober' => 10, 'november' => 11, 'desember' => 12,
         ];
 
         // Temukan baris header utama (yang berisi nama bulan)
@@ -32,28 +32,28 @@ class KinerjaImport implements ToCollection
         $dataStartIndex = 2; // Default jika header di 0 dan 1
 
         foreach ($rows as $index => $row) {
-            $rowValues = array_map(function($val) {
-                return strtolower(trim((string)$val));
+            $rowValues = array_map(function ($val) {
+                return strtolower(trim((string) $val));
             }, $row->toArray());
 
             if (in_array('nama', $rowValues) || in_array('oktober', $rowValues)) {
                 $headerRow = $rowValues;
-                $subHeaderRow = array_map(function($val) {
-                    return strtolower(trim((string)$val));
+                $subHeaderRow = array_map(function ($val) {
+                    return strtolower(trim((string) $val));
                 }, $rows[$index + 1]->toArray());
                 $dataStartIndex = $index + 2;
                 break;
             }
         }
 
-        if (!$headerRow || !$subHeaderRow) {
-            throw new \Exception("Format header Excel tidak dikenali. Pastikan terdapat baris header yang berisi Nama dan Bulan.");
+        if (! $headerRow || ! $subHeaderRow) {
+            throw new \Exception('Format header Excel tidak dikenali. Pastikan terdapat baris header yang berisi Nama dan Bulan.');
         }
 
         // Petakan indeks kolom untuk setiap bulan yang ditemukan di header pertama
         $monthColumns = [];
         $currentMonth = null;
-        
+
         foreach ($headerRow as $colIndex => $val) {
             if (isset($bulanMap[$val])) {
                 $currentMonth = $bulanMap[$val];
@@ -65,7 +65,7 @@ class KinerjaImport implements ToCollection
                     'tl_psw' => null,
                 ];
             }
-            
+
             if ($currentMonth) {
                 // Cek sub-header untuk bulan ini
                 $subVal = $subHeaderRow[$colIndex] ?? '';
@@ -90,9 +90,9 @@ class KinerjaImport implements ToCollection
         // Proses baris data
         for ($i = $dataStartIndex; $i < count($rows); $i++) {
             $row = $rows[$i];
-            
+
             // Skip baris kosong
-            if (!isset($row[$namaIndex]) || trim($row[$namaIndex]) === '') {
+            if (! isset($row[$namaIndex]) || trim($row[$namaIndex]) === '') {
                 continue;
             }
 
@@ -100,7 +100,7 @@ class KinerjaImport implements ToCollection
             $pegawai = Pegawai::where('nama', $nama)->first();
 
             // Sesuai instruksi: abaikan baris yang namanya salah/tidak cocok
-            if (!$pegawai) {
+            if (! $pegawai) {
                 continue;
             }
 
@@ -131,13 +131,13 @@ class KinerjaImport implements ToCollection
                     [
                         'periode_id' => $this->periodeId,
                         'id_pegawai' => $pegawai->id,
-                        'bulan'      => $bulanInt,
+                        'bulan' => $bulanInt,
                     ],
                     [
                         'rata_rata_hasil_kerja' => $hasilKerja,
-                        'rata_rata_perilaku'    => $perilaku,
-                        'nilai_kjk'             => $kjk,
-                        'nilai_tl_psw'          => $tlPsw,
+                        'rata_rata_perilaku' => $perilaku,
+                        'nilai_kjk' => $kjk,
+                        'nilai_tl_psw' => $tlPsw,
                     ]
                 );
             }

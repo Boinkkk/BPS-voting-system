@@ -9,8 +9,8 @@ class AbsensiExport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            new AbsensiDataSheet(),
-            new AbsensiKamusSheet(),
+            new AbsensiDataSheet,
+            new AbsensiKamusSheet,
         ];
     }
 }

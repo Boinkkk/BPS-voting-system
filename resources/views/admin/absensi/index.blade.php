@@ -96,7 +96,7 @@
         <!-- Modal Input Manual -->
         <div id="manualInputModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-bps-bg0 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeManualModal()"></div>
+                <div class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeManualModal()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -205,7 +205,7 @@
         <!-- Modal Detail Absensi -->
         <div id="detailAbsensiModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-bps-bg0 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
+                <div class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 

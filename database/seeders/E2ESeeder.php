@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Role;
 use App\Models\Pegawai;
 use App\Models\PengaturanBobot;
+use App\Models\PeriodePenilaian;
+use App\Models\Role;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class E2ESeeder extends Seeder
@@ -22,7 +23,7 @@ class E2ESeeder extends Seeder
         Pegawai::truncate();
         Role::truncate();
         PengaturanBobot::truncate();
-        \App\Models\PeriodePenilaian::truncate();
+        PeriodePenilaian::truncate();
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // 1. Setup Roles
@@ -52,7 +53,7 @@ class E2ESeeder extends Seeder
         ]);
 
         // 3. Setup Pegawai Khusus untuk E2E Testing
-        
+
         // Admin
         Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -78,7 +79,7 @@ class E2ESeeder extends Seeder
             'tanggal_masuk' => '2005-01-01',
             'status_pegawai' => 'aktif',
         ]);
-        
+
         // Tim Penilai / Kepala Bagian
         Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -104,7 +105,7 @@ class E2ESeeder extends Seeder
             'tanggal_masuk' => '2015-01-01',
             'status_pegawai' => 'aktif',
         ]);
-        
+
         // Pegawai Biasa (2)
         Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -117,7 +118,7 @@ class E2ESeeder extends Seeder
             'tanggal_masuk' => '2016-01-01',
             'status_pegawai' => 'aktif',
         ]);
-        
+
         // Pegawai Biasa (3)
         Pegawai::create([
             'id' => (string) Str::uuid(),

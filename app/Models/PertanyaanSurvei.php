@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 
 class PertanyaanSurvei extends Model
 {
@@ -16,6 +16,6 @@ class PertanyaanSurvei extends Model
         'grup_kategori',
         'kategori',
         'pertanyaan',
-        'bobot'
+        'bobot',
     ];
 }

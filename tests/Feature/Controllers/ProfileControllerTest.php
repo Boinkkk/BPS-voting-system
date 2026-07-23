@@ -2,26 +2,27 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Pegawai;
 use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class ProfileControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $pegawai;
+
     private $password = 'password123';
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $role = Role::create(['tipe' => 'Pegawai']);
         $this->pegawai = Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -32,7 +33,7 @@ class ProfileControllerTest extends TestCase
             'password' => bcrypt($this->password),
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2020-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
@@ -67,7 +68,7 @@ class ProfileControllerTest extends TestCase
             ]);
 
         $response->assertSessionHasErrors(['foto_profil']);
-        
+
         $this->pegawai->refresh();
         $this->assertNull($this->pegawai->foto_profil);
     }

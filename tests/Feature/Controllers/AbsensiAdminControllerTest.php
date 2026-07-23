@@ -2,32 +2,32 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PeriodePenilaian;
-use App\Models\AbsensiPegawai;
-use App\Models\TimPenilai;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Http\UploadedFile;
+use Tests\TestCase;
 
 class AbsensiAdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
+
     private $periode;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -70,9 +70,9 @@ class AbsensiAdminControllerTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.absensi.index', [
             'periode_id' => $this->periode->id,
-            'bulan' => 7
+            'bulan' => 7,
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.absensi.index');
     }
@@ -82,7 +82,7 @@ class AbsensiAdminControllerTest extends TestCase
         Excel::fake();
 
         $response = $this->actingAs($this->admin)->get(route('admin.absensi.template'));
-        
+
         $response->assertStatus(200);
         Excel::assertDownloaded('Template_Rekap_Absensi.xlsx');
     }
@@ -96,12 +96,12 @@ class AbsensiAdminControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->post(route('admin.absensi.upload'), [
             'periode_id' => $this->periode->id,
             'bulan' => 7,
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         Excel::assertImported('absensi.xlsx');
     }
 
@@ -122,7 +122,7 @@ class AbsensiAdminControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->post(route('admin.absensi.upload'), [
             'periode_id' => $this->periode->id,
             'bulan' => 7,
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertRedirect();
@@ -142,11 +142,11 @@ class AbsensiAdminControllerTest extends TestCase
             'tl' => 0,
             'kjk_ht' => 0,
             'kjk_pc' => 0,
-            'kjk' => 0
+            'kjk' => 0,
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.absensi.manual'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
@@ -154,7 +154,7 @@ class AbsensiAdminControllerTest extends TestCase
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai->id,
             'bulan' => 7,
-            'hk' => 20
+            'hk' => 20,
         ]);
     }
 }

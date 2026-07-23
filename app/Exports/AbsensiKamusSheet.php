@@ -3,10 +3,10 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithTitle;
 
-class AbsensiKamusSheet implements FromCollection, WithTitle, WithHeadings
+class AbsensiKamusSheet implements FromCollection, WithHeadings, WithTitle
 {
     public function title(): string
     {
@@ -16,7 +16,7 @@ class AbsensiKamusSheet implements FromCollection, WithTitle, WithHeadings
     public function headings(): array
     {
         return [
-            'Kode', 'Keterangan'
+            'Kode', 'Keterangan',
         ];
     }
 

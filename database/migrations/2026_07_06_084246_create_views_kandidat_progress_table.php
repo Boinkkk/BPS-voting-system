@@ -11,8 +11,8 @@ return new class extends Migration
             return;
         }
 
-        DB::unprepared("DROP VIEW IF EXISTS v_ranking_kandidat_voting;");
-        DB::unprepared("
+        DB::unprepared('DROP VIEW IF EXISTS v_ranking_kandidat_voting;');
+        DB::unprepared('
             CREATE VIEW v_ranking_kandidat_voting AS
             SELECT 
                 k.id AS kandidat_id,
@@ -27,9 +27,9 @@ return new class extends Migration
             LEFT JOIN jawaban_survei js ON k.id = js.kandidat_id AND k.periode_id = js.periode_id
             GROUP BY k.id, k.periode_id, p.nama, p.nip
             ORDER BY rata_rata_kumulatif DESC;
-        ");
+        ');
 
-        DB::unprepared("DROP VIEW IF EXISTS v_progress_voting;");
+        DB::unprepared('DROP VIEW IF EXISTS v_progress_voting;');
         DB::unprepared("
             CREATE VIEW v_progress_voting AS
             SELECT 
@@ -51,7 +51,7 @@ return new class extends Migration
         if (DB::getDriverName() === 'sqlite') {
             return;
         }
-        DB::unprepared("DROP VIEW IF EXISTS v_progress_voting;");
-        DB::unprepared("DROP VIEW IF EXISTS v_ranking_kandidat_voting;");
+        DB::unprepared('DROP VIEW IF EXISTS v_progress_voting;');
+        DB::unprepared('DROP VIEW IF EXISTS v_ranking_kandidat_voting;');
     }
 };

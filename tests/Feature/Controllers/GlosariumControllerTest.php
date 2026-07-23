@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\Glosarium;
+use App\Models\Pegawai;
 use App\Models\PengaturanBobot;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class GlosariumControllerTest extends TestCase
 {
@@ -19,9 +19,9 @@ class GlosariumControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->pegawai = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $rolePegawai->id,
@@ -33,7 +33,7 @@ class GlosariumControllerTest extends TestCase
             'tanggal_masuk' => '2010-01-01',
             'status_pegawai' => 'aktif',
         ]);
-        
+
         PengaturanBobot::create([
             'ckp' => 50,
             'absensi' => 25,
@@ -56,14 +56,14 @@ class GlosariumControllerTest extends TestCase
     {
         Glosarium::create([
             'istilah' => 'CKP',
-            'definisi' => 'Capaian Kinerja Pegawai'
+            'definisi' => 'Capaian Kinerja Pegawai',
         ]);
 
         $response = $this->actingAs($this->pegawai)->get(route('glosarium.index'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('glosarium.index');
-        
+
         $response->assertSee('Capaian Kinerja Pegawai');
         // Check dynamic setting is also displayed
         $response->assertSee('Bobot Keseluruhan Penilaian (Sistem)');

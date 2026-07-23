@@ -2,7 +2,6 @@
 
 namespace App\Imports;
 
-use Illuminate\Support\Collection;
 use App\Models\NilaiCkp;
 use App\Models\Pegawai;
 use Maatwebsite\Excel\Concerns\ToModel;

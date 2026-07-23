@@ -2,27 +2,28 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PertanyaanSurvei;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class SurveyAdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -58,7 +59,7 @@ class SurveyAdminControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)->get(route('admin.survey.index'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.survey.index');
         $response->assertViewHas('pertanyaans');
@@ -73,7 +74,7 @@ class SurveyAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.survey.store'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
@@ -81,7 +82,7 @@ class SurveyAdminControllerTest extends TestCase
             'kategori' => 'Komunikasi',
             'pertanyaan' => 'Bagaimana komunikasinya?',
             'nomor_urut' => 2,
-            'bobot' => 1.0
+            'bobot' => 1.0,
         ]);
     }
 
@@ -101,7 +102,7 @@ class SurveyAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->put(route('admin.survey.update', $pertanyaan->id), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
@@ -123,7 +124,7 @@ class SurveyAdminControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)->delete(route('admin.survey.destroy', $pertanyaan->id));
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 

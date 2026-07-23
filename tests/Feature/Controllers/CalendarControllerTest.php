@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PeriodePenilaian;
-use Illuminate\Support\Str;
+use App\Models\Role;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class CalendarControllerTest extends TestCase
 {
@@ -19,9 +19,9 @@ class CalendarControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->pegawai = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $rolePegawai->id,
@@ -33,7 +33,7 @@ class CalendarControllerTest extends TestCase
             'tanggal_masuk' => '2010-01-01',
             'status_pegawai' => 'aktif',
         ]);
-        
+
         PeriodePenilaian::create([
             'triwulan' => 3,
             'tahun' => 2026,
@@ -52,13 +52,13 @@ class CalendarControllerTest extends TestCase
     {
         $response = $this->actingAs($this->pegawai)->get(route('kalender', [
             'month' => 7,
-            'year' => 2026
+            'year' => 2026,
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('kalender.index');
         $response->assertViewHasAll(['selectedMonth', 'selectedYear', 'periodesInMonth']);
-        
+
         $response->assertSee('Triwulan 3 2026');
     }
 
@@ -68,7 +68,7 @@ class CalendarControllerTest extends TestCase
         $currentYear = Carbon::now()->year;
 
         $response = $this->actingAs($this->pegawai)->get(route('kalender'));
-        
+
         $response->assertStatus(200);
         $response->assertViewHas('selectedMonth', $currentMonth);
         $response->assertViewHas('selectedYear', $currentYear);

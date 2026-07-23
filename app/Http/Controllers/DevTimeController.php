@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DevTimeController extends Controller
 {
@@ -13,15 +14,15 @@ class DevTimeController extends Controller
         }
 
         $request->validate([
-            'test_time' => 'required|date'
+            'test_time' => 'required|date',
         ]);
 
-        \Illuminate\Support\Facades\Cache::put('global_test_time', $request->test_time);
-        
+        Cache::put('global_test_time', $request->test_time);
+
         // Tetap simpan di session sebagai fallback untuk UI widget
         session(['test_time' => $request->test_time]);
 
-        return back()->with('success', 'Waktu aplikasi berhasil diubah secara global ke ' . $request->test_time);
+        return back()->with('success', 'Waktu aplikasi berhasil diubah secara global ke '.$request->test_time);
     }
 
     public function resetTime(Request $request)
@@ -30,7 +31,7 @@ class DevTimeController extends Controller
             abort(403, 'Hanya tersedia di mode development.');
         }
 
-        \Illuminate\Support\Facades\Cache::forget('global_test_time');
+        Cache::forget('global_test_time');
         session()->forget('test_time');
 
         return back()->with('success', 'Waktu aplikasi berhasil dikembalikan ke waktu aktual secara global.');

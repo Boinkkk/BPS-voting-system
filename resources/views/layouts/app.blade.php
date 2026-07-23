@@ -55,11 +55,42 @@
             opacity: 1;
             transform: translateY(-2px);
         }
+        
+        /* Sidebar Locked State Overrides */
+        @media (min-width: 768px) {
+            #sidebar.is-locked {
+                width: 16rem !important; /* 64 * 0.25rem = 16rem */
+            }
+            #sidebar.is-locked .md\:opacity-0 {
+                opacity: 1 !important;
+            }
+            #sidebar.is-locked .md\:w-0 {
+                width: auto !important;
+            }
+            #sidebar.is-locked .md\:justify-center {
+                justify-content: flex-start !important;
+            }
+            #sidebar.is-locked .md\:mx-auto {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            #sidebar.is-locked .md\:px-2 {
+                padding-left: 0.75rem !important; /* px-3 */
+                padding-right: 0.75rem !important;
+            }
+            #sidebar.is-locked .md\:mr-0 {
+                margin-right: 0.75rem !important; /* mr-3 */
+            }
+            #sidebar.is-locked p span.md\:hidden {
+                display: inline !important;
+            }
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>BPS Selection System</title>
+    <title>SIVOTA - Sistem Voting & Penilaian BPS</title>
+    <link rel="icon" href="{{ asset('images/logo.svg') }}" type="image/svg+xml">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-bps-bg antialiased text-bps-text h-screen flex flex-col md:flex-row overflow-hidden">
@@ -67,8 +98,9 @@
 
     <!-- Mobile Header -->
     <div class="md:hidden flex items-center justify-between bg-bps-primary border-b border-bps-primary px-4 py-3 flex-shrink-0 z-30 relative shadow-sm">
-        <div class="bg-white px-2.5 py-1.5 rounded-lg shadow-sm">
+        <div class="bg-white px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-2">
             <img src="{{ asset('images/logo.svg') }}" alt="Logo BPS" class="h-6 w-auto">
+            <span class="font-extrabold text-slate-800 text-sm tracking-wide">SIVOTA</span>
         </div>
         <div class="flex items-center space-x-4">
             <!-- Notification Icon -->
@@ -99,8 +131,22 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="fixed md:relative z-50 md:z-20 transform -translate-x-full md:translate-x-0 w-64 md:w-[80px] group md:hover:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full shadow-sm transition-all duration-300 ease-in-out overflow-x-hidden">
-        <div class="h-16 flex items-center justify-between md:justify-start px-5 md:group-hover:px-6 border-b border-gray-100 transition-all duration-300 overflow-hidden">
-            <img src="{{ asset('images/logo.svg') }}" alt="Logo BPS" class="h-9 max-w-none w-auto flex-shrink-0 transition-all duration-300">
+        <div class="h-16 flex items-center justify-between md:justify-start px-5 md:group-hover:px-5 border-b border-gray-100 transition-all duration-300 overflow-hidden relative">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('images/logo.svg') }}" alt="Logo BPS" class="h-9 max-w-none w-auto flex-shrink-0 transition-all duration-300">
+                <span class="font-extrabold text-slate-800 text-xl tracking-tight opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">SIVOTA</span>
+            </div>
+            
+            <!-- Lock Button (Desktop only) -->
+            <button id="sidebarLockBtn" class="hidden md:flex absolute right-4 text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none p-1.5 rounded-md hover:bg-blue-50 z-10" title="Kunci Sidebar">
+                <svg id="lockIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+                <svg id="unlockIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </button>
+
             <!-- Close button for mobile -->
             <button id="closeMenuBtn" class="md:hidden text-gray-400 hover:text-gray-600 focus:outline-none p-1">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -552,7 +598,7 @@
     </div>
 
     <!-- Mobile More Menu Overlay -->
-    <div id="mobileMoreOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
+    <div id="mobileMoreOverlay" class="fixed inset-0 bg-gray-900/40 z-[60] hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
     <div id="mobileMoreSheet" class="fixed bottom-0 left-0 w-full bg-white rounded-t-3xl shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.1)] z-[70] transform translate-y-full transition-transform duration-300 md:hidden">
         <div class="p-4">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
@@ -698,7 +744,7 @@
     </div>
     
     <!-- Notification Modal -->
-    <div id="notificationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[100] hidden flex justify-center md:justify-end items-start pt-16 md:pt-4 md:pr-4 transition-opacity duration-300 opacity-0">
+    <div id="notificationModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm z-[100] hidden flex justify-center md:justify-end items-start pt-16 md:pt-4 md:pr-4 transition-opacity duration-300 opacity-0">
         <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-95 opacity-0 m-4 md:m-0" id="notificationContent">
             <div class="bg-bps-primary p-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">Notifikasi & Pengumuman</h3>
@@ -866,6 +912,41 @@
         }
 
         if (closeMenuBtn) closeMenuBtn.addEventListener('click', toggleDesktopMenu);
+        
+        // Sidebar Lock Logic
+        const lockBtn = document.getElementById('sidebarLockBtn');
+        const lockIcon = document.getElementById('lockIcon');
+        const unlockIcon = document.getElementById('unlockIcon');
+        
+        if (sidebar && lockBtn) {
+            let isLocked = localStorage.getItem('sidebarLocked') === 'true';
+
+            function updateLockState() {
+                if (isLocked) {
+                    sidebar.classList.add('is-locked');
+                    lockIcon.classList.remove('hidden');
+                    unlockIcon.classList.add('hidden');
+                    lockBtn.classList.add('opacity-100', 'text-red-500', 'hover:text-red-600', 'hover:bg-red-50'); // Keep visible and make red
+                    lockBtn.classList.remove('text-gray-400', 'hover:text-blue-600', 'hover:bg-blue-50');
+                } else {
+                    sidebar.classList.remove('is-locked');
+                    lockIcon.classList.add('hidden');
+                    unlockIcon.classList.remove('hidden');
+                    lockBtn.classList.remove('opacity-100', 'text-red-500', 'hover:text-red-600', 'hover:bg-red-50');
+                    lockBtn.classList.add('text-gray-400', 'hover:text-blue-600', 'hover:bg-blue-50');
+                }
+            }
+            
+            updateLockState();
+            
+            lockBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                isLocked = !isLocked;
+                localStorage.setItem('sidebarLocked', isLocked);
+                updateLockState();
+            });
+        }
     });
 </script>
 

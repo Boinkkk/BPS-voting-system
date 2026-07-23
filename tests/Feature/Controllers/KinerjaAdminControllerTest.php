@@ -2,30 +2,32 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PeriodePenilaian;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Http\UploadedFile;
+use Tests\TestCase;
 
 class KinerjaAdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
+
     private $periode;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -67,9 +69,9 @@ class KinerjaAdminControllerTest extends TestCase
     public function test_admin_can_view_kinerja_index()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.kinerja.index', [
-            'periode_id' => $this->periode->id
+            'periode_id' => $this->periode->id,
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.kinerja.index');
     }
@@ -87,7 +89,7 @@ class KinerjaAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.kinerja.manual'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
@@ -118,7 +120,7 @@ class KinerjaAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.kinerja.manual'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
     }
@@ -131,12 +133,12 @@ class KinerjaAdminControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post(route('admin.kinerja.upload'), [
             'periode_id' => $this->periode->id,
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         Excel::assertImported('kinerja.xlsx');
     }
 
@@ -156,7 +158,7 @@ class KinerjaAdminControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post(route('admin.kinerja.upload'), [
             'periode_id' => $this->periode->id,
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertRedirect();

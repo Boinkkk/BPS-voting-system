@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignUuid('pertanyaan_id')->constrained('pertanyaan_survei')->cascadeOnDelete();
             $table->integer('nilai');
             $table->timestamp('waktu_jawab')->useCurrent();
-            
+
             $table->index(['periode_id', 'kandidat_id']);
         });
     }

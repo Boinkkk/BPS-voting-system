@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Pegawai extends Authenticatable
 {
@@ -49,8 +49,9 @@ class Pegawai extends Authenticatable
     public function getFotoProfilUrlAttribute()
     {
         if ($this->foto_profil) {
-            return asset('storage/' . $this->foto_profil);
+            return asset('storage/'.$this->foto_profil);
         }
+
         return asset('images/default_profile.svg');
     }
 }

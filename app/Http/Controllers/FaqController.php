@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Faq;
 
 class FaqController extends Controller
 {
     public function index()
     {
-        $faqs = \App\Models\Faq::latest()->get();
+        $faqs = Faq::latest()->get();
+
         return view('faq.index', compact('faqs'));
     }
 }

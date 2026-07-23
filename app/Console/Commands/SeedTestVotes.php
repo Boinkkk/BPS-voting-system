@@ -2,31 +2,34 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\PeriodePenilaian;
-use App\Models\Kandidat;
-use App\Models\PertanyaanSurvei;
-use App\Models\Pegawai;
 use App\Models\JawabanSurvei;
+use App\Models\Kandidat;
+use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
+use App\Models\PertanyaanSurvei;
 use App\Models\SurveyProgress;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class SeedTestVotes extends Command
 {
     protected $signature = 'test:seed-votes';
+
     protected $description = 'Seed survey votes for active period for testing purposes';
 
     public function handle()
     {
-        if (!app()->environment('local', 'testing')) {
+        if (! app()->environment('local', 'testing')) {
             $this->error('This command can only be run in local or testing environments.');
+
             return 1;
         }
 
         $periodeAktif = PeriodePenilaian::where('status', 'voting')->first();
-        if (!$periodeAktif) {
+        if (! $periodeAktif) {
             $this->error('Tidak ada periode penilaian yang aktif saat ini.');
+
             return 1;
         }
 
@@ -38,6 +41,7 @@ class SeedTestVotes extends Command
 
         if ($kandidats->isEmpty()) {
             $this->error('Tidak ada kandidat untuk periode aktif.');
+
             return 1;
         }
 
@@ -45,6 +49,7 @@ class SeedTestVotes extends Command
         $pertanyaans = PertanyaanSurvei::all();
         if ($pertanyaans->isEmpty()) {
             $this->error('Tidak ada pertanyaan survei.');
+
             return 1;
         }
 
@@ -64,7 +69,7 @@ class SeedTestVotes extends Command
             $hasFilled = SurveyProgress::where('periode_id', $periodeAktif->id)
                 ->where('user_id', $voter->id)
                 ->exists();
-                
+
             if ($hasFilled) {
                 continue;
             }
@@ -98,12 +103,13 @@ class SeedTestVotes extends Command
         }
 
         if (empty($jawabanData)) {
-            $this->info("Tidak ada data jawaban baru yang perlu di-seed.");
+            $this->info('Tidak ada data jawaban baru yang perlu di-seed.');
+
             return 0;
         }
 
-        $this->info("Menyimpan " . count($jawabanData) . " jawaban dan " . count($progressData) . " progress...");
-        
+        $this->info('Menyimpan '.count($jawabanData).' jawaban dan '.count($progressData).' progress...');
+
         // Chunk insert to prevent memory/query limit issues
         foreach (array_chunk($progressData, 500) as $chunk) {
             SurveyProgress::insert($chunk);
@@ -113,6 +119,7 @@ class SeedTestVotes extends Command
         }
 
         $this->info('Survey votes seeded successfully!');
+
         return 0;
     }
 }

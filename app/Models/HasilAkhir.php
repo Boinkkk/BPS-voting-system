@@ -2,19 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class HasilAkhir extends Model
 {
     use HasFactory, HasUuids;
 
     protected $table = 'hasil_akhir';
-    
+
     // Matikan timestamps bawaan jika tabel ini tidak memiliki created_at / updated_at
-    public $timestamps = false; 
+    public $timestamps = false;
 
     protected $fillable = [
         'periode_id',
@@ -23,7 +22,7 @@ class HasilAkhir extends Model
         'is_terpilih',
         'dipilih_oleh',
         'waktu_penetapan',
-        'catatan_kepala'
+        'catatan_kepala',
     ];
 
     public function periode()

@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Middleware\AutoUpdatePeriodeStatus;
+use App\Http\Middleware\CheckRoleAdmin;
+use App\Http\Middleware\CheckRoleAdminOrKepalaUmum;
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetTestTime;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,13 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
-            \App\Http\Middleware\SetTestTime::class,
-            \App\Http\Middleware\AutoUpdatePeriodeStatus::class,
+            SecurityHeaders::class,
+            SetTestTime::class,
+            AutoUpdatePeriodeStatus::class,
         ]);
         $middleware->alias([
-            'admin' => \App\Http\Middleware\CheckRoleAdmin::class,
-            'admin_or_kepala_umum' => \App\Http\Middleware\CheckRoleAdminOrKepalaUmum::class,
+            'admin' => CheckRoleAdmin::class,
+            'admin_or_kepala_umum' => CheckRoleAdminOrKepalaUmum::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

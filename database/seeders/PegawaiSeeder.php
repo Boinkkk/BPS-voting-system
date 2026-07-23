@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use App\Models\Pegawai;
 use App\Models\Departemen;
+use App\Models\Pegawai;
 use App\Models\Role;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class PegawaiSeeder extends Seeder
 {
@@ -90,20 +89,22 @@ class PegawaiSeeder extends Seeder
         if (file_exists($csvPath)) {
             $file = fopen($csvPath, 'r');
             $header = fgetcsv($file); // Read header: NIP, Nama
-            
+
             $index = 0;
             while (($row = fgetcsv($file)) !== false) {
-                if (count($row) < 2) continue;
-                
+                if (count($row) < 2) {
+                    continue;
+                }
+
                 $nip = trim($row[0]);
                 $nama = trim($row[1]);
                 $jabatan = 'Pelaksana'; // Default jabatan since CSV only has NIP and Nama
-                
+
                 // Map to department
                 $deptId = $deptUmum->id;
 
                 // Generate Email
-                $email = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $nama)[0])) . ($index + 1) . '@bps.go.id';
+                $email = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $nama)[0])).($index + 1).'@bps.go.id';
 
                 Pegawai::updateOrCreate(
                     ['nip' => $nip], // Match by NIP now since it's the real one
@@ -118,12 +119,12 @@ class PegawaiSeeder extends Seeder
                         'status_pegawai' => 'aktif',
                     ]
                 );
-                
+
                 $index++;
             }
             fclose($file);
         } else {
-            $this->command->error('File data_pegawai.csv tidak ditemukan di ' . $csvPath);
+            $this->command->error('File data_pegawai.csv tidak ditemukan di '.$csvPath);
         }
     }
 }

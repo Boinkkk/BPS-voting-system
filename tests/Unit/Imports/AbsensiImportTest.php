@@ -2,26 +2,27 @@
 
 namespace Tests\Unit\Imports;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Imports\AbsensiImport;
 use App\Models\Pegawai;
 use App\Models\PeriodePenilaian;
 use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class AbsensiImportTest extends TestCase
 {
     use RefreshDatabase;
 
     private $periode;
+
     private $pegawai;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $role = Role::create(['tipe' => 'Pegawai']);
         $this->pegawai = Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -40,7 +41,7 @@ class AbsensiImportTest extends TestCase
             'triwulan' => 1,
             'tanggal_mulai' => '2026-01-01',
             'tanggal_selesai' => '2026-12-31',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
     }
 
@@ -117,24 +118,24 @@ class AbsensiImportTest extends TestCase
         $row1 = array_fill(0, 37, '0');
         $row1[0] = '12345678';
         $row1[2] = '20'; // HK
-        
+
         $import->collection(new Collection([$row1]));
-        
+
         $this->assertDatabaseHas('absensi_pegawai', [
             'pegawai_id' => $this->pegawai->id,
-            'hk' => 20
+            'hk' => 20,
         ]);
 
         // Update with new data
         $row2 = array_fill(0, 37, '0');
         $row2[0] = '12345678';
         $row2[2] = '22'; // HK updated
-        
+
         $import->collection(new Collection([$row2]));
 
         $this->assertDatabaseHas('absensi_pegawai', [
             'pegawai_id' => $this->pegawai->id,
-            'hk' => 22
+            'hk' => 22,
         ]);
         $this->assertDatabaseCount('absensi_pegawai', 1);
     }

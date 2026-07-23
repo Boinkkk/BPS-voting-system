@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\PeriodePenilaian;
 use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
 use App\Models\TimPenilai;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TimPenilaiController extends Controller
@@ -13,7 +13,7 @@ class TimPenilaiController extends Controller
     public function index()
     {
         $periodes = PeriodePenilaian::orderBy('created_at', 'desc')->get();
-        $pegawais = Pegawai::whereHas('role', function($q) {
+        $pegawais = Pegawai::whereHas('role', function ($q) {
             $q->where('tipe', 'Pegawai');
         })->get();
 
@@ -40,26 +40,28 @@ class TimPenilaiController extends Controller
             TimPenilai::create([
                 'periode_id' => $periode->id,
                 'pegawai_id' => $request->penanggung_jawab,
-                'peran' => 'Penanggung Jawab'
+                'peran' => 'Penanggung Jawab',
             ]);
 
             TimPenilai::create([
                 'periode_id' => $periode->id,
                 'pegawai_id' => $request->ketua,
-                'peran' => 'Ketua'
+                'peran' => 'Ketua',
             ]);
 
             TimPenilai::create([
                 'periode_id' => $periode->id,
                 'pegawai_id' => $request->anggota,
-                'peran' => 'Anggota'
+                'peran' => 'Anggota',
             ]);
 
             DB::commit();
+
             return redirect()->back()->with('success', 'Tim Penilai Kinerja berhasil ditetapkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -77,7 +79,7 @@ class TimPenilaiController extends Controller
         $anggota = $tim->where('peran', 'Anggota')->first();
 
         // Cari data kepala (yang menetapkan)
-        $kepala = Pegawai::whereHas('role', function($q) {
+        $kepala = Pegawai::whereHas('role', function ($q) {
             $q->where('tipe', 'Kepala Kantor');
         })->first();
 

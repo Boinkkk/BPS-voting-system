@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Pengumuman extends Model
 {
@@ -25,7 +25,7 @@ class Pengumuman extends Model
         'is_sticky',
         'is_popup',
         'kirim_notifikasi',
-        'has_notified'
+        'has_notified',
     ];
 
     protected function casts(): array

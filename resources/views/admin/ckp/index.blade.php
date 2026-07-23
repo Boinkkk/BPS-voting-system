@@ -144,7 +144,7 @@
 </div>
 
 <!-- Manual Input Modal -->
-<div id="manualModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+<div id="manualModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm hidden flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold">Input Data CKP Manual</h3>

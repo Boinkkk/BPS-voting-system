@@ -9,8 +9,8 @@
 </div>
 
 @if(isset($popupPengumuman) && $popupPengumuman)
-<!-- POPUP PENGUMUMAN -->
-<div id="pengumumanPopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+<!-- Pengumuman Popup -->
+<div id="pengumumanPopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/20 backdrop-blur-sm transition-opacity">
     <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform transition-all">
         <div class="bg-blue-600 p-4 text-center">
             <h3 class="text-xl font-bold text-white uppercase tracking-wider">PENGUMUMAN PENTING</h3>
@@ -205,7 +205,7 @@
             @endif
         </div>
 
-            @include('components.calendar-grid')
+            @livewire('calendar-grid')
         </div>
 @endif
 
@@ -337,8 +337,8 @@
                     
                     <div class="relative z-10 flex flex-col items-center">
                         <span class="text-sm text-blue-100 font-bold uppercase tracking-widest mb-1">Jadilah Inspirasi</span>
-                        <span class="text-xs text-blue-300/80 font-medium">BPS Kabupaten Tegal</span>
-                    </div>
+                        <span class="text-xs text-blue-300/80 font-medium">BPS Kabupaten Bangkalan</span>
+                    </div>n
                 </div>
             </div>
 

@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Pengumuman;
 use App\Models\PengumumanRead;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PengumumanController extends Controller
 {
     public function index()
     {
         $pengumumans = Pengumuman::withCount('reads')->orderBy('created_at', 'desc')->get();
+
         return view('admin.pengumuman.index', compact('pengumumans'));
     }
 
@@ -35,11 +36,11 @@ class PengumumanController extends Controller
         ]);
 
         $data = $request->except('lampiran');
-        
+
         $data['is_sticky'] = $request->has('is_sticky');
         $data['is_popup'] = $request->has('is_popup');
         $data['kirim_notifikasi'] = $request->has('kirim_notifikasi');
-        
+
         // Handle file uploads
         $lampiranPaths = [];
         if ($request->hasFile('lampiran')) {
@@ -48,8 +49,8 @@ class PengumumanController extends Controller
                 $lampiranPaths[] = $path;
             }
         }
-        
-        if (!empty($lampiranPaths)) {
+
+        if (! empty($lampiranPaths)) {
             $data['lampiran'] = $lampiranPaths;
         }
 
@@ -79,6 +80,7 @@ class PengumumanController extends Controller
     public function edit(string $id)
     {
         $pengumuman = Pengumuman::findOrFail($id);
+
         return view('admin.pengumuman.edit', compact('pengumuman'));
     }
 
@@ -98,13 +100,13 @@ class PengumumanController extends Controller
         ]);
 
         $data = $request->except(['lampiran', 'remove_lampiran']);
-        
+
         $data['is_sticky'] = $request->has('is_sticky');
         $data['is_popup'] = $request->has('is_popup');
         $data['kirim_notifikasi'] = $request->has('kirim_notifikasi');
 
         $lampiranPaths = is_array($pengumuman->lampiran) ? $pengumuman->lampiran : [];
-        
+
         // Check for removed attachments
         if ($request->has('remove_lampiran')) {
             foreach ($request->remove_lampiran as $index => $remove) {
@@ -145,15 +147,15 @@ class PengumumanController extends Controller
     public function destroy(string $id)
     {
         $pengumuman = Pengumuman::findOrFail($id);
-        
+
         if (is_array($pengumuman->lampiran)) {
             foreach ($pengumuman->lampiran as $path) {
                 Storage::disk('public')->delete($path);
             }
         }
-        
+
         $pengumuman->delete();
-        
+
         return redirect()->route('admin.pengumuman.index')->with('success', 'Pengumuman berhasil dihapus.');
     }
 
@@ -161,14 +163,14 @@ class PengumumanController extends Controller
     {
         $pengumuman = Pengumuman::findOrFail($id);
         $user = Auth::user();
-        
+
         if ($user) {
             PengumumanRead::firstOrCreate([
                 'pengumuman_id' => $pengumuman->id,
-                'pegawai_id' => $user->id
+                'pegawai_id' => $user->id,
             ]);
         }
-        
+
         return response()->json(['success' => true]);
     }
 }

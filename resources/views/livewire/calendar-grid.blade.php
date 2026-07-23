@@ -1,3 +1,4 @@
+<div>
 @php
     $startOfMonth = \Carbon\Carbon::create($selectedYear, $selectedMonth, 1)->startOfDay();
     $daysInMonth = $startOfMonth->daysInMonth;
@@ -8,20 +9,14 @@
     $monthName = $monthsId[$startOfMonth->month] . ' ' . $startOfMonth->year;
     
     $today = \Carbon\Carbon::now()->startOfDay();
-
-    // Setup Prev/Next Month Links
-    $prevMonth = $selectedMonth - 1;
-    $prevYear = $selectedYear;
-    if($prevMonth < 1) { $prevMonth = 12; $prevYear--; }
-
-    $nextMonth = $selectedMonth + 1;
-    $nextYear = $selectedYear;
-    if($nextMonth > 12) { $nextMonth = 1; $nextYear++; }
-
-    $currentUrl = url()->current();
 @endphp
 
-<div class="mt-4 mb-4">
+<div class="mt-4 mb-4 relative" wire:loading.class="opacity-60 transition-opacity duration-200">
+    <!-- Loading overlay -->
+    <div wire:loading.flex class="absolute inset-0 z-10 items-center justify-center bg-white/40 backdrop-blur-sm rounded-xl">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+    </div>
+
     <!-- Legend -->
     <div class="flex flex-wrap gap-4 mb-4 justify-center md:justify-start">
         <div class="flex items-center"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-400 mr-2"></span><span class="text-xs text-gray-600 font-semibold uppercase tracking-wider">Persiapan</span></div>
@@ -32,15 +27,15 @@
 
     <div class="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
         <div class="bg-bps-bg py-3 px-4 border-b border-gray-200 flex justify-between items-center">
-            <a href="{{ $currentUrl }}?month={{ $prevMonth }}&year={{ $prevYear }}" class="p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition-colors">
+            <button wire:click="previousMonth" class="p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition-colors focus:outline-none">
                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
+            </button>
             <span class="font-black text-gray-700 tracking-widest uppercase">
                 {{ $monthName }}
             </span>
-            <a href="{{ $currentUrl }}?month={{ $nextMonth }}&year={{ $nextYear }}" class="p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition-colors">
+            <button wire:click="nextMonth" class="p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition-colors focus:outline-none">
                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </a>
+            </button>
         </div>
         <div class="overflow-x-auto pb-2">
             <div class="min-w-[700px] lg:min-w-full">
@@ -132,4 +127,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

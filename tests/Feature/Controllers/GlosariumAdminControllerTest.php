@@ -2,24 +2,25 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Glosarium;
 use App\Models\Pegawai;
 use App\Models\Role;
-use App\Models\Glosarium;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class GlosariumAdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -30,7 +31,7 @@ class GlosariumAdminControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'jabatan' => 'Admin',
             'tanggal_masuk' => '2010-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
 
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
@@ -43,7 +44,7 @@ class GlosariumAdminControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2010-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
@@ -52,7 +53,7 @@ class GlosariumAdminControllerTest extends TestCase
         Glosarium::create(['istilah' => 'CKP', 'definisi' => 'Capaian Kinerja Pegawai']);
 
         $response = $this->actingAs($this->admin)->get(route('admin.glosarium.index'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.glosarium.index');
         $response->assertSee('CKP');
@@ -61,7 +62,7 @@ class GlosariumAdminControllerTest extends TestCase
     public function test_admin_can_view_glosarium_create_page()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.glosarium.create'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.glosarium.create');
     }
@@ -70,15 +71,15 @@ class GlosariumAdminControllerTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->post(route('admin.glosarium.store'), [
             'istilah' => 'IKP',
-            'definisi' => 'Indeks Kepuasan Pelanggan'
+            'definisi' => 'Indeks Kepuasan Pelanggan',
         ]);
-        
+
         $response->assertRedirect(route('admin.glosarium.index'));
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseHas('glosariums', [
             'istilah' => 'IKP',
-            'definisi' => 'Indeks Kepuasan Pelanggan'
+            'definisi' => 'Indeks Kepuasan Pelanggan',
         ]);
     }
 
@@ -88,9 +89,9 @@ class GlosariumAdminControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post(route('admin.glosarium.store'), [
             'istilah' => 'CKP',
-            'definisi' => 'Baru'
+            'definisi' => 'Baru',
         ]);
-        
+
         $response->assertSessionHasErrors('istilah');
     }
 
@@ -99,7 +100,7 @@ class GlosariumAdminControllerTest extends TestCase
         $glosarium = Glosarium::create(['istilah' => 'CKP', 'definisi' => 'Capaian Kinerja Pegawai']);
 
         $response = $this->actingAs($this->admin)->get(route('admin.glosarium.edit', $glosarium->id));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.glosarium.edit');
         $response->assertSee('CKP');
@@ -111,16 +112,16 @@ class GlosariumAdminControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->put(route('admin.glosarium.update', $glosarium->id), [
             'istilah' => 'CKP Updated',
-            'definisi' => 'Baru'
+            'definisi' => 'Baru',
         ]);
-        
+
         $response->assertRedirect(route('admin.glosarium.index'));
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseHas('glosariums', [
             'id' => $glosarium->id,
             'istilah' => 'CKP Updated',
-            'definisi' => 'Baru'
+            'definisi' => 'Baru',
         ]);
     }
 
@@ -129,12 +130,12 @@ class GlosariumAdminControllerTest extends TestCase
         $glosarium = Glosarium::create(['istilah' => 'CKP', 'definisi' => 'Lama']);
 
         $response = $this->actingAs($this->admin)->delete(route('admin.glosarium.destroy', $glosarium->id));
-        
+
         $response->assertRedirect(route('admin.glosarium.index'));
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseMissing('glosariums', [
-            'id' => $glosarium->id
+            'id' => $glosarium->id,
         ]);
     }
 

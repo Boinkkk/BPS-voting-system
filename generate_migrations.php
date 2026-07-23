@@ -1,6 +1,6 @@
 <?php
 
-$migrationsPath = __DIR__ . '/database/migrations/';
+$migrationsPath = __DIR__.'/database/migrations/';
 
 $migrations = [
     [
@@ -525,14 +525,14 @@ return new class extends Migration
     }
 };
 PHP
-    ]
+    ],
 ];
 
 $currentTime = time();
 
 foreach ($migrations as $index => $migration) {
     $timestamp = date('Y_m_d_His', $currentTime + $index);
-    $filename = $migrationsPath . $timestamp . '_' . $migration['name'] . '.php';
+    $filename = $migrationsPath.$timestamp.'_'.$migration['name'].'.php';
     file_put_contents($filename, $migration['content']);
-    echo "Created: " . basename($filename) . "\n";
+    echo 'Created: '.basename($filename)."\n";
 }

@@ -2,30 +2,32 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Departemen;
 use App\Models\Pegawai;
 use App\Models\Role;
-use App\Models\Departemen;
-use Illuminate\Support\Str;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class PegawaiAdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $rolePegawai;
+
     private $departemen;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $this->rolePegawai = Role::create(['tipe' => 'Pegawai']);
         $this->departemen = Departemen::create([
-            'nama' => 'IT'
+            'nama' => 'IT',
         ]);
 
         $this->admin = Pegawai::create([
@@ -37,14 +39,14 @@ class PegawaiAdminControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'jabatan' => 'Admin',
             'tanggal_masuk' => '2010-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
     public function test_admin_can_view_pegawai_index()
     {
         $response = $this->actingAs($this->admin)->get('/admin/pegawai');
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.pegawai.index');
         $response->assertViewHasAll(['pegawai', 'departemens', 'roles']);
@@ -62,7 +64,7 @@ class PegawaiAdminControllerTest extends TestCase
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2020-01-01',
             'status_pegawai' => 'aktif',
-            'departemen_id' => $this->departemen->id
+            'departemen_id' => $this->departemen->id,
         ]);
 
         // Search by nama
@@ -92,16 +94,16 @@ class PegawaiAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->post('/admin/pegawai', $data);
-        
+
         $response->assertRedirect(route('admin.pegawai.index'));
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseHas('pegawai', [
             'nama' => 'New User',
             'nip' => '12341234',
             'email' => 'newuser@bps.go.id',
             'jabatan' => 'Staff IT',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
@@ -121,7 +123,7 @@ class PegawaiAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->post('/admin/pegawai', $data);
-        
+
         $response->assertSessionHasErrors(['nip', 'email']);
     }
 
@@ -137,7 +139,7 @@ class PegawaiAdminControllerTest extends TestCase
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2020-01-01',
             'status_pegawai' => 'aktif',
-            'departemen_id' => $this->departemen->id
+            'departemen_id' => $this->departemen->id,
         ]);
 
         $updateData = [
@@ -152,15 +154,15 @@ class PegawaiAdminControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->put("/admin/pegawai/{$pegawai->id}", $updateData);
-        
+
         $response->assertRedirect(route('admin.pegawai.index'));
-        
+
         $this->assertDatabaseHas('pegawai', [
             'id' => $pegawai->id,
             'nama' => 'Updated Name',
             'email' => 'updated@bps.go.id',
             'jabatan' => 'Senior Staff',
-            'status_pegawai' => 'nonaktif'
+            'status_pegawai' => 'nonaktif',
         ]);
     }
 
@@ -175,15 +177,15 @@ class PegawaiAdminControllerTest extends TestCase
             'password' => bcrypt('oldpassword'),
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2020-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
 
         $response = $this->actingAs($this->admin)->put("/admin/pegawai/{$pegawai->id}/password", [
-            'password' => 'newpassword123'
+            'password' => 'newpassword123',
         ]);
-        
+
         $response->assertRedirect(route('admin.pegawai.index'));
-        
+
         $pegawai->refresh();
         $this->assertTrue(Hash::check('newpassword123', $pegawai->password));
     }

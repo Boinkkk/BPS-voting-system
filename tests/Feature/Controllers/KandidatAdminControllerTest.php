@@ -2,32 +2,29 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PeriodePenilaian;
-use App\Models\Kandidat;
+use App\Models\Role;
 use App\Models\TimPenilai;
-use App\Models\Departemen;
-use App\Services\KandidatService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
-use Mockery;
+use Tests\TestCase;
 
 class KandidatAdminControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -69,7 +66,7 @@ class KandidatAdminControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)->get(route('admin.kandidat.index'));
-        
+
         // redirect occurs because it redirects to ?periode_id=
         if ($response->status() == 302) {
             $response = $this->actingAs($this->admin)->get(route('admin.kandidat.index', ['periode_id' => $periode->id]));
@@ -97,7 +94,7 @@ class KandidatAdminControllerTest extends TestCase
         TimPenilai::create([
             'periode_id' => $periode->id,
             'pegawai_id' => $this->pegawai->id,
-            'peran' => 'Anggota'
+            'peran' => 'Anggota',
         ]);
 
         $response = $this->actingAs($this->pegawai)->get(route('admin.kandidat.index', ['periode_id' => $periode->id]));
@@ -139,7 +136,7 @@ class KandidatAdminControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)->post(route('admin.kandidat.generate'), [
-            'periode_id' => $periode->id
+            'periode_id' => $periode->id,
         ]);
 
         $response->assertRedirect();
@@ -162,7 +159,7 @@ class KandidatAdminControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)->post(route('admin.kandidat.generateTop3'), [
-            'periode_id' => $periode->id
+            'periode_id' => $periode->id,
         ]);
 
         $response->assertRedirect();

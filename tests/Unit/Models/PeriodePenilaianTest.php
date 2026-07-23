@@ -2,16 +2,16 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\PeriodePenilaian;
-use App\Models\NilaiCkp;
 use App\Models\AbsensiPegawai;
-use App\Models\Role;
+use App\Models\NilaiCkp;
 use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
+use App\Models\Role;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class PeriodePenilaianTest extends TestCase
 {
@@ -26,10 +26,11 @@ class PeriodePenilaianTest extends TestCase
     private function createPegawai($nip = '123')
     {
         $role = Role::create(['tipe' => 'Pegawai']);
+
         return Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $role->id,
-            'nama' => 'P_' . $nip,
+            'nama' => 'P_'.$nip,
             'nip' => $nip,
             'email' => "email_$nip@test.com",
             'password' => 'secret',
@@ -50,7 +51,7 @@ class PeriodePenilaianTest extends TestCase
             'tanggal_selesai_voting' => '2026-07-10',
             'tanggal_review_kepala' => '2026-07-12',
             'tanggal_selesai' => '2026-07-15',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         // Case 1: Belum Dimulai (Now < 2026-07-01)
@@ -115,7 +116,7 @@ class PeriodePenilaianTest extends TestCase
             'tanggal_selesai_voting' => '2026-07-10',
             'tanggal_review_kepala' => '2026-07-12',
             'tanggal_selesai' => '2026-07-15',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         // Masa persiapan
@@ -143,15 +144,15 @@ class PeriodePenilaianTest extends TestCase
             'nama' => 'P1',
             'tanggal_mulai' => '2026-07-01',
             'tanggal_selesai' => '2026-07-15',
-            'status' => 'selesai'
+            'status' => 'selesai',
         ]);
 
         // Date is in the past, meaning it theoretically should be 'penginputan'
         Carbon::setTestNow('2026-07-02 08:00:00');
-        
+
         // Without force, should remain selesai
         $this->assertEquals('selesai', $periode->computeStatusBasedOnDate());
-        
+
         // With force, should re-calculate
         $this->assertEquals('penginputan', $periode->computeStatusBasedOnDate(true));
 
@@ -165,7 +166,7 @@ class PeriodePenilaianTest extends TestCase
             'triwulan' => 1,
             'tanggal_mulai' => '2026-01-01',
             'tanggal_selesai' => '2026-03-31',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         // No CKP and no Absensi
@@ -179,7 +180,7 @@ class PeriodePenilaianTest extends TestCase
             'triwulan' => 2, // expected months: 4, 5, 6
             'tanggal_mulai' => '2026-04-01',
             'tanggal_selesai' => '2026-06-30',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         $pegawai = $this->createPegawai('123');
@@ -201,7 +202,7 @@ class PeriodePenilaianTest extends TestCase
             'triwulan' => 3, // expected months: 7, 8, 9
             'tanggal_mulai' => '2026-07-01',
             'tanggal_selesai' => '2026-09-30',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         $pegawai = $this->createPegawai('456');
@@ -226,7 +227,7 @@ class PeriodePenilaianTest extends TestCase
             'tanggal_selesai' => '2026-03-31',
             'tanggal_mulai_voting' => '2026-03-10',
             'tanggal_selesai_voting' => '2026-03-20',
-            'status' => 'selesai'
+            'status' => 'selesai',
         ]);
 
         $p2 = PeriodePenilaian::create([
@@ -236,7 +237,7 @@ class PeriodePenilaianTest extends TestCase
             'tanggal_selesai' => '2026-09-30',
             'tanggal_mulai_voting' => '2026-08-10',
             'tanggal_selesai_voting' => '2026-08-20', // Currently active voting
-            'status' => 'voting'
+            'status' => 'voting',
         ]);
 
         $p3 = PeriodePenilaian::create([
@@ -246,11 +247,11 @@ class PeriodePenilaianTest extends TestCase
             'tanggal_selesai' => '2026-12-31',
             'tanggal_mulai_voting' => '2026-12-10',
             'tanggal_selesai_voting' => '2026-12-20',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         $result = PeriodePenilaian::getRecentAndDefault();
-        
+
         $this->assertCount(3, $result['periodes']);
         $this->assertEquals($p2->id, $result['default_id']);
 

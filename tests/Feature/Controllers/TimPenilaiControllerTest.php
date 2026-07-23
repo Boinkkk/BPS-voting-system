@@ -2,31 +2,35 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PeriodePenilaian;
+use App\Models\Role;
 use App\Models\TimPenilai;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class TimPenilaiControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $kepala;
+
     private $pegawai1;
+
     private $pegawai2;
+
     private $pegawai3;
+
     private $periode;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleKepala = Role::create(['tipe' => 'Kepala Kantor']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->kepala = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleKepala->id,
@@ -92,7 +96,7 @@ class TimPenilaiControllerTest extends TestCase
     public function test_kepala_can_view_tim_penilai_index()
     {
         $response = $this->actingAs($this->kepala)->get(route('kepala.tim_penilai.index'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('kepala.tim_penilai.index');
         $response->assertViewHasAll(['periodes', 'pegawais']);
@@ -108,26 +112,26 @@ class TimPenilaiControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->kepala)->post(route('kepala.tim_penilai.store'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('tim_penilai', [
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai1->id,
-            'peran' => 'Penanggung Jawab'
+            'peran' => 'Penanggung Jawab',
         ]);
 
         $this->assertDatabaseHas('tim_penilai', [
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai2->id,
-            'peran' => 'Ketua'
+            'peran' => 'Ketua',
         ]);
 
         $this->assertDatabaseHas('tim_penilai', [
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai3->id,
-            'peran' => 'Anggota'
+            'peran' => 'Anggota',
         ]);
     }
 
@@ -138,7 +142,7 @@ class TimPenilaiControllerTest extends TestCase
         TimPenilai::create(['periode_id' => $this->periode->id, 'pegawai_id' => $this->pegawai3->id, 'peran' => 'Anggota']);
 
         $response = $this->actingAs($this->kepala)->get(route('kepala.tim_penilai.cetak', $this->periode->id));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('kepala.tim_penilai.cetak');
         $response->assertViewHasAll(['periode', 'penanggungJawab', 'ketua', 'anggota', 'kepala']);
@@ -147,7 +151,7 @@ class TimPenilaiControllerTest extends TestCase
     public function test_cetak_fails_if_tim_not_set()
     {
         $response = $this->actingAs($this->kepala)->get(route('kepala.tim_penilai.cetak', $this->periode->id));
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
     }

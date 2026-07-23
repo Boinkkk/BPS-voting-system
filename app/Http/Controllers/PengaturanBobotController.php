@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\PengaturanBobot;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PengaturanBobotController extends Controller
 {
     public function index()
     {
         $bobot = PengaturanBobot::first();
-        if (!$bobot) {
+        if (! $bobot) {
             $bobot = PengaturanBobot::create([
                 'ckp' => 50,
                 'absensi' => 25,
                 'survey' => 25,
             ]);
         }
+
         return view('admin.pengaturan-bobot.index', compact('bobot'));
     }
 
@@ -41,23 +43,23 @@ class PengaturanBobotController extends Controller
 
         $total = $request->ckp + $request->absensi + $request->survey;
         if ($total != 100) {
-            return redirect()->back()->with('error', 'Total bobot CKP, Absensi, dan Survei harus tepat 100%. Saat ini totalnya adalah ' . $total . '%.');
+            return redirect()->back()->with('error', 'Total bobot CKP, Absensi, dan Survei harus tepat 100%. Saat ini totalnya adalah '.$total.'%.');
         }
 
         $bobot = PengaturanBobot::first();
         $data = $request->only([
             'ckp', 'absensi', 'survey',
             'bobot_psw', 'bobot_psw1', 'bobot_psw2', 'bobot_psw3', 'bobot_psw4',
-            'bobot_tl', 'bobot_tl1', 'bobot_tl2', 'bobot_tl3', 'bobot_tl4', 'bobot_tk'
+            'bobot_tl', 'bobot_tl1', 'bobot_tl2', 'bobot_tl3', 'bobot_tl4', 'bobot_tk',
         ]);
 
-        if (!$bobot) {
+        if (! $bobot) {
             PengaturanBobot::create($data);
         } else {
             $bobot->update($data);
         }
 
-        \Illuminate\Support\Facades\Cache::forget('pengaturan_bobot_absensi');
+        Cache::forget('pengaturan_bobot_absensi');
 
         return redirect()->back()->with('success', 'Pengaturan bobot berhasil diperbarui!');
     }

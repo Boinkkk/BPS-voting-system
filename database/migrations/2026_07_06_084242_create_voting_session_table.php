@@ -16,7 +16,7 @@ return new class extends Migration
             $table->boolean('sudah_selesai')->default(false);
             $table->timestamp('waktu_mulai')->useCurrent();
             $table->timestamp('waktu_selesai')->nullable();
-            
+
             $table->index('periode_id');
         });
     }

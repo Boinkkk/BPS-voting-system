@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\TimPenilai;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class CheckRoleAdminOrKepalaUmum
 
             // Cek apakah user adalah Tim Penilai Kinerja di periode aktif mana pun
             if ($tipe === 'Pegawai') {
-                $isTimPenilaiAktif = \App\Models\TimPenilai::where('pegawai_id', Auth::user()->id)
+                $isTimPenilaiAktif = TimPenilai::where('pegawai_id', Auth::user()->id)
                     ->whereHas('periode', function ($q) {
                         $q->where('status', '!=', 'selesai');
                     })->exists();

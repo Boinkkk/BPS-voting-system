@@ -194,8 +194,8 @@
         </div>
     </div>
 
-    <!-- Add Modal -->
-    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <!-- Modal Tambah Pegawai -->
+    <div id="addModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm hidden flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold">Tambah Pegawai Baru</h3>
@@ -259,8 +259,8 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <!-- Modal Edit Pegawai -->
+    <div id="editModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm hidden flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold">Edit Pegawai</h3>
@@ -321,8 +321,8 @@
         </div>
     </div>
 
-    <!-- Password Modal -->
-    <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <!-- Modal Reset Password -->
+    <div id="passwordModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm hidden flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold">Ubah Password <span id="pwd_nama" class="text-sky-600"></span></h3>

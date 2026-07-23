@@ -2,24 +2,25 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PengaturanBobot;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class PengaturanBobotControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
@@ -30,7 +31,7 @@ class PengaturanBobotControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'jabatan' => 'Admin',
             'tanggal_masuk' => '2010-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
 
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
@@ -43,22 +44,22 @@ class PengaturanBobotControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2010-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
     public function test_admin_can_view_pengaturan_bobot_index()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.pengaturan-bobot.index'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.pengaturan-bobot.index');
-        
+
         // Pastikan default bobot otomatis terbuat jika belum ada
         $this->assertDatabaseHas('pengaturan_bobots', [
             'ckp' => 50,
             'absensi' => 25,
-            'survey' => 25
+            'survey' => 25,
         ]);
     }
 
@@ -68,7 +69,7 @@ class PengaturanBobotControllerTest extends TestCase
             'ckp' => 50, 'absensi' => 25, 'survey' => 25,
             'bobot_psw' => 1, 'bobot_psw1' => 1, 'bobot_psw2' => 1, 'bobot_psw3' => 1, 'bobot_psw4' => 1,
             'bobot_tl' => 1, 'bobot_tl1' => 1, 'bobot_tl2' => 1, 'bobot_tl3' => 1, 'bobot_tl4' => 1,
-            'bobot_tk' => 1
+            'bobot_tk' => 1,
         ]);
 
         $data = [
@@ -77,19 +78,19 @@ class PengaturanBobotControllerTest extends TestCase
             'survey' => 20,
             'bobot_psw' => 0.5, 'bobot_psw1' => 0.5, 'bobot_psw2' => 0.5, 'bobot_psw3' => 0.5, 'bobot_psw4' => 0.5,
             'bobot_tl' => 0.5, 'bobot_tl1' => 0.5, 'bobot_tl2' => 0.5, 'bobot_tl3' => 0.5, 'bobot_tl4' => 0.5,
-            'bobot_tk' => 2.5
+            'bobot_tk' => 2.5,
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.pengaturan-bobot.update'), $data);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseHas('pengaturan_bobots', [
             'ckp' => 60,
             'absensi' => 20,
             'survey' => 20,
-            'bobot_tk' => 2.5
+            'bobot_tk' => 2.5,
         ]);
     }
 
@@ -101,11 +102,11 @@ class PengaturanBobotControllerTest extends TestCase
             'survey' => 30,
             'bobot_psw' => 0.5, 'bobot_psw1' => 0.5, 'bobot_psw2' => 0.5, 'bobot_psw3' => 0.5, 'bobot_psw4' => 0.5,
             'bobot_tl' => 0.5, 'bobot_tl1' => 0.5, 'bobot_tl2' => 0.5, 'bobot_tl3' => 0.5, 'bobot_tl4' => 0.5,
-            'bobot_tk' => 2.5
+            'bobot_tk' => 2.5,
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.pengaturan-bobot.update'), $data);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
     }

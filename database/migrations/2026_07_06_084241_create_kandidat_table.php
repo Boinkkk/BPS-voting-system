@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('ranking_sistem')->nullable();
             $table->enum('status', ['aktif', 'diskualifikasi'])->default('aktif');
             $table->timestamps();
-            
+
             $table->unique(['periode_id', 'pegawai_id']);
             $table->index('periode_id');
             $table->index(['periode_id', 'skor']);

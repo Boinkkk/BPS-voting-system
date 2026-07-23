@@ -2,30 +2,32 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\PeriodePenilaian;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Http\UploadedFile;
+use Tests\TestCase;
 
 class CkpControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $pegawai;
+
     private $periode;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -67,9 +69,9 @@ class CkpControllerTest extends TestCase
     public function test_admin_can_view_ckp_index()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.ckp.index', [
-            'periode_id' => $this->periode->id
+            'periode_id' => $this->periode->id,
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.ckp.index');
     }
@@ -79,18 +81,18 @@ class CkpControllerTest extends TestCase
         $payload = [
             'periode_id' => $this->periode->id,
             'id_pegawai' => $this->pegawai->id,
-            'nilai' => 85.5
+            'nilai' => 85.5,
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.ckp.manual'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('nilai_ckp', [
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai->id,
-            'nilai' => 85.5
+            'nilai' => 85.5,
         ]);
     }
 
@@ -107,11 +109,11 @@ class CkpControllerTest extends TestCase
         $payload = [
             'periode_id' => $this->periode->id,
             'id_pegawai' => $this->pegawai->id,
-            'nilai' => 85.5
+            'nilai' => 85.5,
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.ckp.manual'), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
     }
@@ -124,12 +126,12 @@ class CkpControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post(route('admin.ckp.upload'), [
             'periode_id' => $this->periode->id,
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         Excel::assertImported('ckp.xlsx');
     }
 
@@ -149,7 +151,7 @@ class CkpControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post(route('admin.ckp.upload'), [
             'periode_id' => $this->periode->id,
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertRedirect();

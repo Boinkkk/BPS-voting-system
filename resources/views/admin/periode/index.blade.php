@@ -113,7 +113,7 @@
     <!-- Add Periode Modal -->
     <div id="addPeriodeModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <!-- Background backdrop -->
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-md mx-auto" style="min-width: min(100%, 400px);">
@@ -181,7 +181,7 @@
     <!-- Edit Periode Modal -->
     <div id="editPeriodeModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <!-- Background backdrop -->
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-md mx-auto" style="min-width: min(100%, 400px);">

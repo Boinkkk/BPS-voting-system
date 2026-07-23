@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('nilai_kjk', 5, 2)->nullable();
             $table->decimal('nilai_tl_psw', 5, 2)->nullable();
             $table->timestamps();
-            
+
             $table->index(['periode_id', 'id_pegawai', 'bulan'], 'kinerja_pegawai_periode_pegawai_bulan_index');
         });
     }

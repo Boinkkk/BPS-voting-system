@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('dipilih_oleh')->nullable()->constrained('pegawai')->restrictOnDelete();
             $table->timestamp('waktu_penetapan')->nullable();
             $table->text('catatan_kepala')->nullable();
-            
+
             $table->unique(['periode_id', 'ranking_final']);
         });
     }

@@ -14,6 +14,6 @@
         </div>
     </div>
 
-    @include('components.calendar-grid')
+    @livewire('calendar-grid')
 </div>
 @endsection

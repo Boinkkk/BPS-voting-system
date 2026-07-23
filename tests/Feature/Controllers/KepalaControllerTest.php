@@ -2,33 +2,37 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Pegawai;
-use App\Models\Role;
-use App\Models\PeriodePenilaian;
-use App\Models\Kandidat;
 use App\Models\HasilAkhir;
+use App\Models\Kandidat;
+use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class KepalaControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $kepala;
+
     private $admin;
+
     private $pegawai;
+
     private $periode;
+
     private $hasilAkhir;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleKepala = Role::create(['tipe' => 'Kepala Kantor']);
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->kepala = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleKepala->id,
@@ -77,12 +81,12 @@ class KepalaControllerTest extends TestCase
             'tanggal_selesai' => '2026-07-30',
             'status' => 'review_kepala',
         ]);
-        
+
         $kandidat = Kandidat::create([
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai->id,
             'skor' => 90,
-            'ranking_sistem' => 1
+            'ranking_sistem' => 1,
         ]);
 
         $this->hasilAkhir = HasilAkhir::create([
@@ -96,7 +100,7 @@ class KepalaControllerTest extends TestCase
     public function test_kepala_can_view_review_index()
     {
         $response = $this->actingAs($this->kepala)->get(route('kepala.review.index'));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('kepala.review.index');
         $response->assertViewHasAll(['periodeReview', 'kandidats']);
@@ -105,18 +109,18 @@ class KepalaControllerTest extends TestCase
     public function test_admin_cannot_view_review_index()
     {
         $response = $this->actingAs($this->admin)->get(route('kepala.review.index'));
-        
+
         $response->assertStatus(403);
     }
 
     public function test_kepala_can_pilih_pemenang()
     {
         $payload = [
-            'catatan' => 'Kerja bagus'
+            'catatan' => 'Kerja bagus',
         ];
 
         $response = $this->actingAs($this->kepala)->post(route('kepala.review.pilih', $this->hasilAkhir->id), $payload);
-        
+
         $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('success');
 
@@ -124,7 +128,7 @@ class KepalaControllerTest extends TestCase
             'id' => $this->hasilAkhir->id,
             'is_terpilih' => 1,
             'dipilih_oleh' => $this->kepala->id,
-            'catatan_kepala' => 'Kerja bagus'
+            'catatan_kepala' => 'Kerja bagus',
         ]);
     }
 
@@ -140,14 +144,14 @@ class KepalaControllerTest extends TestCase
         ]);
 
         $payload = [
-            'catatan' => 'Kerja bagus'
+            'catatan' => 'Kerja bagus',
         ];
 
         $response = $this->actingAs($this->kepala)->post(route('kepala.review.pilih', $this->hasilAkhir->id), $payload);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
-        
+
         $this->assertDatabaseHas('hasil_akhir', [
             'id' => $this->hasilAkhir->id,
             'is_terpilih' => 0,

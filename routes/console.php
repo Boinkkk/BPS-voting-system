@@ -7,8 +7,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-use Illuminate\Support\Facades\Schedule;
 use App\Models\Pengumuman;
+use Illuminate\Support\Facades\Schedule;
 
 Schedule::call(function () {
     // Draft -> Published
@@ -26,4 +26,3 @@ Schedule::call(function () {
 
 // Database Backup Schedule
 Schedule::command('backup:run --only-db')->dailyAt('23:00');
-

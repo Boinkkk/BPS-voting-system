@@ -78,7 +78,7 @@
     </div>
 
     <!-- Modal Tambah -->
-    <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
+    <div id="addModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm flex justify-center items-center hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-bps-bg">
                 <h3 class="text-lg font-bold text-gray-900">Tambah Pertanyaan Survey</h3>
@@ -109,7 +109,7 @@
     </div>
 
     <!-- Modal Edit -->
-    <div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
+    <div id="editModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm flex justify-center items-center hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-bps-bg">
                 <h3 class="text-lg font-bold text-gray-900">Edit Pertanyaan Survey</h3>
@@ -141,7 +141,7 @@
     </div>
 
     <!-- Modal Delete -->
-    <div id="deleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
+    <div id="deleteModal" class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm flex justify-center items-center hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
             <div class="p-6">
                 <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">

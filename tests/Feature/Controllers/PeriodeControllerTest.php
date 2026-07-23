@@ -2,13 +2,14 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Http\Controllers\KandidatAdminController;
+use App\Models\Pegawai;
 use App\Models\PeriodePenilaian;
 use App\Models\Role;
-use App\Models\Pegawai;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class PeriodeControllerTest extends TestCase
 {
@@ -19,9 +20,9 @@ class PeriodeControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -38,13 +39,13 @@ class PeriodeControllerTest extends TestCase
     public function test_index_auto_creates_four_quarters_for_current_year()
     {
         $currentYear = date('Y');
-        
+
         $this->assertEquals(0, PeriodePenilaian::where('tahun', $currentYear)->count());
 
         $this->actingAs($this->admin)
-             ->get(route('admin.periode.index'))
-             ->assertStatus(200)
-             ->assertViewHas('periodes');
+            ->get(route('admin.periode.index'))
+            ->assertStatus(200)
+            ->assertViewHas('periodes');
 
         // Verify 4 quarters are created
         $this->assertEquals(4, PeriodePenilaian::where('tahun', $currentYear)->count());
@@ -68,9 +69,9 @@ class PeriodeControllerTest extends TestCase
         ];
 
         $this->actingAs($this->admin)
-             ->post(route('admin.periode.store'), $payload)
-             ->assertRedirect(route('admin.periode.index'))
-             ->assertSessionHas('success');
+            ->post(route('admin.periode.store'), $payload)
+            ->assertRedirect(route('admin.periode.index'))
+            ->assertSessionHas('success');
 
         // Verify it was created and status is correctly computed
         $periode = PeriodePenilaian::where('tahun', 2026)->where('triwulan', 2)->first();
@@ -92,8 +93,8 @@ class PeriodeControllerTest extends TestCase
         ];
 
         $this->actingAs($this->admin)
-             ->post(route('admin.periode.store'), $payload)
-             ->assertSessionHasErrors(['tanggal_selesai_persiapan']);
+            ->post(route('admin.periode.store'), $payload)
+            ->assertSessionHasErrors(['tanggal_selesai_persiapan']);
     }
 
     public function test_update_modifies_periode_and_triggers_generate_top3()
@@ -110,14 +111,14 @@ class PeriodeControllerTest extends TestCase
             'tanggal_selesai_voting' => '2026-01-10',
             'tanggal_review_kepala' => '2026-01-11',
             'tanggal_selesai' => '2026-01-15',
-            'status' => 'voting' // initial status
+            'status' => 'voting', // initial status
         ]);
 
         // Mocking the KandidatAdminController to avoid needing full DB setup for generateTop3
-        $this->mock(\App\Http\Controllers\KandidatAdminController::class, function ($mock) use ($periode) {
+        $this->mock(KandidatAdminController::class, function ($mock) use ($periode) {
             $mock->shouldReceive('generateTop3ForPeriode')
-                 ->once()
-                 ->with($periode->id);
+                ->once()
+                ->with($periode->id);
         });
 
         $payload = [
@@ -132,9 +133,9 @@ class PeriodeControllerTest extends TestCase
         ];
 
         $this->actingAs($this->admin)
-             ->put(route('admin.periode.update', $periode->id), $payload)
-             ->assertRedirect(route('admin.periode.index'))
-             ->assertSessionHas('success');
+            ->put(route('admin.periode.update', $periode->id), $payload)
+            ->assertRedirect(route('admin.periode.index'))
+            ->assertSessionHas('success');
 
         $periode->refresh();
         $this->assertEquals('review_kepala', $periode->status);
@@ -152,13 +153,13 @@ class PeriodeControllerTest extends TestCase
             'tanggal_selesai_voting' => '2026-01-10',
             'tanggal_review_kepala' => '2026-01-11',
             'tanggal_selesai' => '2026-01-15',
-            'status' => 'penginputan'
+            'status' => 'penginputan',
         ]);
 
         $this->actingAs($this->admin)
-             ->delete(route('admin.periode.destroy', $periode->id))
-             ->assertRedirect(route('admin.periode.index'))
-             ->assertSessionHas('success');
+            ->delete(route('admin.periode.destroy', $periode->id))
+            ->assertRedirect(route('admin.periode.index'))
+            ->assertSessionHas('success');
 
         $this->assertDatabaseMissing('periode_penilaian', ['id' => $periode->id]);
     }

@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
 use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $pegawai;
+
     private $password = 'password123';
 
     protected function setUp(): void
@@ -29,7 +30,7 @@ class AuthControllerTest extends TestCase
             'password' => bcrypt($this->password),
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2020-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
@@ -87,9 +88,9 @@ class AuthControllerTest extends TestCase
     public function test_pegawai_can_logout()
     {
         $this->actingAs($this->pegawai);
-        
+
         $response = $this->post('/logout');
-        
+
         $this->assertGuest();
         $response->assertRedirect('/login');
     }

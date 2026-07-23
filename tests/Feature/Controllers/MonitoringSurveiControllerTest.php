@@ -2,36 +2,34 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Pegawai;
-use App\Models\Role;
-use App\Models\PeriodePenilaian;
 use App\Models\Kandidat;
-use App\Models\JawabanSurvei;
-use App\Models\SurveyProgress;
-use App\Models\PertanyaanSurvei;
-use App\Models\NilaiCkp;
-use App\Models\AbsensiPegawai;
+use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
+use App\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class MonitoringSurveiControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private $admin;
+
     private $kepala;
+
     private $pegawai;
+
     private $periode;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $roleKepala = Role::create(['tipe' => 'Kepala Kantor']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);
-        
+
         $this->admin = Pegawai::create([
             'id' => (string) Str::uuid(),
             'role_id' => $roleAdmin->id,
@@ -80,21 +78,21 @@ class MonitoringSurveiControllerTest extends TestCase
             'tanggal_selesai' => '2026-07-30',
             'status' => 'voting',
         ]);
-        
+
         $this->kandidat = Kandidat::create([
             'periode_id' => $this->periode->id,
             'pegawai_id' => $this->pegawai->id,
             'skor' => 90,
-            'ranking_sistem' => 1
+            'ranking_sistem' => 1,
         ]);
     }
 
     public function test_admin_can_view_monitoring_index()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.monitoring.index', [
-            'periode_id' => $this->periode->id
+            'periode_id' => $this->periode->id,
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.monitoring.index');
         $response->assertViewHasAll(['kandidats', 'progressPegawai']);
@@ -103,9 +101,9 @@ class MonitoringSurveiControllerTest extends TestCase
     public function test_kepala_can_view_monitoring_index()
     {
         $response = $this->actingAs($this->kepala)->get(route('admin.monitoring.index', [
-            'periode_id' => $this->periode->id
+            'periode_id' => $this->periode->id,
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.monitoring.index');
     }
@@ -113,9 +111,9 @@ class MonitoringSurveiControllerTest extends TestCase
     public function test_pegawai_cannot_view_monitoring_index()
     {
         $response = $this->actingAs($this->pegawai)->get(route('admin.monitoring.index', [
-            'periode_id' => $this->periode->id
+            'periode_id' => $this->periode->id,
         ]));
-        
+
         $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('error');
     }
@@ -124,9 +122,9 @@ class MonitoringSurveiControllerTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.monitoring.download_txt', [
             'periode_id' => $this->periode->id,
-            'filter' => 'semua'
+            'filter' => 'semua',
         ]));
-        
+
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
     }
@@ -134,24 +132,24 @@ class MonitoringSurveiControllerTest extends TestCase
     public function test_admin_can_update_status()
     {
         $response = $this->actingAs($this->admin)->put(route('admin.monitoring.update_status', $this->periode->id), [
-            'status' => 'review_kepala'
+            'status' => 'review_kepala',
         ]);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseHas('periode_penilaian', [
             'id' => $this->periode->id,
-            'status' => 'review_kepala'
+            'status' => 'review_kepala',
         ]);
     }
 
     public function test_kepala_cannot_update_status()
     {
         $response = $this->actingAs($this->kepala)->put(route('admin.monitoring.update_status', $this->periode->id), [
-            'status' => 'review_kepala'
+            'status' => 'review_kepala',
         ]);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
     }

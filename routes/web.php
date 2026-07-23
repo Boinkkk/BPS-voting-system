@@ -1,22 +1,49 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AbsensiAdminController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CkpController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DevTimeController;
+use App\Http\Controllers\FaqAdminController;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\GlosariumAdminController;
+use App\Http\Controllers\GlosariumController;
+use App\Http\Controllers\KandidatAdminController;
+use App\Http\Controllers\KepalaController;
+use App\Http\Controllers\KinerjaAdminController;
+use App\Http\Controllers\MonitoringSurveiController;
+use App\Http\Controllers\PanduanController;
+use App\Http\Controllers\PegawaiAdminController;
+use App\Http\Controllers\PengaturanBobotController;
+use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\ProfileController;
-Route::get('/faq', [\App\Http\Controllers\FaqController::class, 'index'])->name('faq.index');
+use App\Http\Controllers\SurveyAdminController;
+use App\Http\Controllers\SurveyPegawaiController;
+use App\Http\Controllers\TimPenilaiController;
+use App\Http\Middleware\CheckRoleKepala;
+use App\Models\HasilAkhir;
+use App\Models\Pegawai;
+use App\Models\PeriodePenilaian;
+use App\Models\SurveyProgress;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {
-        $pemenangTerbaru = \App\Models\HasilAkhir::with(['kandidat.pegawai', 'periode'])
+        $pemenangTerbaru = HasilAkhir::with(['kandidat.pegawai', 'periode'])
             ->where('is_terpilih', 1)
             ->orderBy('waktu_penetapan', 'desc')
             ->first();
-            
-        $statPegawai = \App\Models\Pegawai::where('status_pegawai', 'Aktif')->count();
-        $statVoting = \App\Models\SurveyProgress::count();
-        $statPeriode = \App\Models\PeriodePenilaian::count();
-            
+
+        $statPegawai = Pegawai::where('status_pegawai', 'Aktif')->count();
+        $statVoting = SurveyProgress::count();
+        $statPeriode = PeriodePenilaian::count();
+
         return view('welcome', compact('pemenangTerbaru', 'statPegawai', 'statVoting', 'statPeriode'));
     })->name('beranda');
 
@@ -28,61 +55,60 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/kalender', [\App\Http\Controllers\CalendarController::class, 'index'])->name('kalender');
+    Route::get('/kalender', [CalendarController::class, 'index'])->name('kalender');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo')->middleware('throttle:10,1');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-    Route::get('/glosarium', [\App\Http\Controllers\GlosariumController::class, 'index'])->name('glosarium.index');
-    Route::get('/panduan', [\App\Http\Controllers\PanduanController::class, 'index'])->name('panduan.index');
+    Route::get('/glosarium', [GlosariumController::class, 'index'])->name('glosarium.index');
+    Route::get('/panduan', [PanduanController::class, 'index'])->name('panduan.index');
     // ==========================
     // ADMIN
     // ==========================
     Route::middleware('admin')->group(function () {
 
         // Survey
-        Route::get('/admin/survey', [\App\Http\Controllers\SurveyAdminController::class, 'index'])->name('admin.survey.index');
-        Route::post('/admin/survey', [\App\Http\Controllers\SurveyAdminController::class, 'store'])->name('admin.survey.store');
-        Route::put('/admin/survey/{id}', [\App\Http\Controllers\SurveyAdminController::class, 'update'])->name('admin.survey.update');
-        Route::delete('/admin/survey/{id}', [\App\Http\Controllers\SurveyAdminController::class, 'destroy'])->name('admin.survey.destroy');
+        Route::get('/admin/survey', [SurveyAdminController::class, 'index'])->name('admin.survey.index');
+        Route::post('/admin/survey', [SurveyAdminController::class, 'store'])->name('admin.survey.store');
+        Route::put('/admin/survey/{id}', [SurveyAdminController::class, 'update'])->name('admin.survey.update');
+        Route::delete('/admin/survey/{id}', [SurveyAdminController::class, 'destroy'])->name('admin.survey.destroy');
 
         // Pegawai
-        Route::get('/admin/pegawai', [\App\Http\Controllers\PegawaiAdminController::class, 'index'])->name('admin.pegawai.index');
-        Route::post('/admin/pegawai', [\App\Http\Controllers\PegawaiAdminController::class, 'store'])->name('admin.pegawai.store');
-        Route::put('/admin/pegawai/{id}', [\App\Http\Controllers\PegawaiAdminController::class, 'update'])->name('admin.pegawai.update');
-        Route::put('/admin/pegawai/{id}/password', [\App\Http\Controllers\PegawaiAdminController::class, 'updatePassword'])->name('admin.pegawai.password');
+        Route::get('/admin/pegawai', [PegawaiAdminController::class, 'index'])->name('admin.pegawai.index');
+        Route::post('/admin/pegawai', [PegawaiAdminController::class, 'store'])->name('admin.pegawai.store');
+        Route::put('/admin/pegawai/{id}', [PegawaiAdminController::class, 'update'])->name('admin.pegawai.update');
+        Route::put('/admin/pegawai/{id}/password', [PegawaiAdminController::class, 'updatePassword'])->name('admin.pegawai.password');
 
         // Audit Log
-        Route::get('/admin/audit-log', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('admin.audit.index');
-
+        Route::get('/admin/audit-log', [AuditLogController::class, 'index'])->name('admin.audit.index');
 
         // Periode
-        Route::get('/admin/periode', [\App\Http\Controllers\PeriodeController::class, 'index'])->name('admin.periode.index');
-        Route::post('/admin/periode', [\App\Http\Controllers\PeriodeController::class, 'store'])->name('admin.periode.store');
-        Route::put('/admin/periode/{id}', [\App\Http\Controllers\PeriodeController::class, 'update'])->name('admin.periode.update');
-        Route::delete('/admin/periode/{id}', [\App\Http\Controllers\PeriodeController::class, 'destroy'])->name('admin.periode.destroy');
+        Route::get('/admin/periode', [PeriodeController::class, 'index'])->name('admin.periode.index');
+        Route::post('/admin/periode', [PeriodeController::class, 'store'])->name('admin.periode.store');
+        Route::put('/admin/periode/{id}', [PeriodeController::class, 'update'])->name('admin.periode.update');
+        Route::delete('/admin/periode/{id}', [PeriodeController::class, 'destroy'])->name('admin.periode.destroy');
 
         // Pengaturan Bobot
-        Route::get('/admin/pengaturan-bobot', [\App\Http\Controllers\PengaturanBobotController::class, 'index'])->name('admin.pengaturan-bobot.index');
-        Route::post('/admin/pengaturan-bobot', [\App\Http\Controllers\PengaturanBobotController::class, 'update'])->name('admin.pengaturan-bobot.update');
+        Route::get('/admin/pengaturan-bobot', [PengaturanBobotController::class, 'index'])->name('admin.pengaturan-bobot.index');
+        Route::post('/admin/pengaturan-bobot', [PengaturanBobotController::class, 'update'])->name('admin.pengaturan-bobot.update');
 
         // Glosarium Admin
-        Route::get('/admin/glosarium', [\App\Http\Controllers\GlosariumAdminController::class, 'index'])->name('admin.glosarium.index');
-        Route::get('/admin/glosarium/create', [\App\Http\Controllers\GlosariumAdminController::class, 'create'])->name('admin.glosarium.create');
-        Route::post('/admin/glosarium', [\App\Http\Controllers\GlosariumAdminController::class, 'store'])->name('admin.glosarium.store');
-        Route::get('/admin/glosarium/{id}/edit', [\App\Http\Controllers\GlosariumAdminController::class, 'edit'])->name('admin.glosarium.edit');
-        Route::put('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'update'])->name('admin.glosarium.update');
-        Route::delete('/admin/glosarium/{id}', [\App\Http\Controllers\GlosariumAdminController::class, 'destroy'])->name('admin.glosarium.destroy');
+        Route::get('/admin/glosarium', [GlosariumAdminController::class, 'index'])->name('admin.glosarium.index');
+        Route::get('/admin/glosarium/create', [GlosariumAdminController::class, 'create'])->name('admin.glosarium.create');
+        Route::post('/admin/glosarium', [GlosariumAdminController::class, 'store'])->name('admin.glosarium.store');
+        Route::get('/admin/glosarium/{id}/edit', [GlosariumAdminController::class, 'edit'])->name('admin.glosarium.edit');
+        Route::put('/admin/glosarium/{id}', [GlosariumAdminController::class, 'update'])->name('admin.glosarium.update');
+        Route::delete('/admin/glosarium/{id}', [GlosariumAdminController::class, 'destroy'])->name('admin.glosarium.destroy');
 
         // FAQ Admin
-        Route::resource('/admin/faq', \App\Http\Controllers\FaqAdminController::class)->names('admin.faq');
+        Route::resource('/admin/faq', FaqAdminController::class)->names('admin.faq');
 
         // Pengumuman
-        Route::resource('/admin/pengumuman', \App\Http\Controllers\PengumumanController::class)->names('admin.pengumuman');
-        
+        Route::resource('/admin/pengumuman', PengumumanController::class)->names('admin.pengumuman');
+
         // Dev Time Control
-        if (!app()->environment('production')) {
-            Route::post('/dev/time/set', [\App\Http\Controllers\DevTimeController::class, 'setTime'])->name('dev.time.set');
-            Route::post('/dev/time/reset', [\App\Http\Controllers\DevTimeController::class, 'resetTime'])->name('dev.time.reset');
+        if (! app()->environment('production')) {
+            Route::post('/dev/time/set', [DevTimeController::class, 'setTime'])->name('dev.time.set');
+            Route::post('/dev/time/reset', [DevTimeController::class, 'resetTime'])->name('dev.time.reset');
         }
     });
 
@@ -92,62 +118,62 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin_or_kepala_umum')->group(function () {
 
         // Kinerja
-        Route::get('/admin/kinerja', [\App\Http\Controllers\KinerjaAdminController::class, 'index'])->name('admin.kinerja.index');
-        Route::post('/admin/kinerja/upload', [\App\Http\Controllers\KinerjaAdminController::class, 'upload'])->name('admin.kinerja.upload')->middleware('throttle:10,1');
-        Route::post('/admin/kinerja/manual', [\App\Http\Controllers\KinerjaAdminController::class, 'storeManual'])->name('admin.kinerja.manual');
+        Route::get('/admin/kinerja', [KinerjaAdminController::class, 'index'])->name('admin.kinerja.index');
+        Route::post('/admin/kinerja/upload', [KinerjaAdminController::class, 'upload'])->name('admin.kinerja.upload')->middleware('throttle:10,1');
+        Route::post('/admin/kinerja/manual', [KinerjaAdminController::class, 'storeManual'])->name('admin.kinerja.manual');
 
         // Absensi
-        Route::get('/admin/absensi', [\App\Http\Controllers\AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
-        Route::get('/admin/absensi/template', [\App\Http\Controllers\AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
-        Route::post('/admin/absensi/upload', [\App\Http\Controllers\AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload')->middleware('throttle:10,1');
-        Route::post('/admin/absensi/manual', [\App\Http\Controllers\AbsensiAdminController::class, 'storeManual'])->name('admin.absensi.manual');
-        Route::post('/admin/absensi/bobot', [\App\Http\Controllers\AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
+        Route::get('/admin/absensi', [AbsensiAdminController::class, 'index'])->name('admin.absensi.index');
+        Route::get('/admin/absensi/template', [AbsensiAdminController::class, 'downloadTemplate'])->name('admin.absensi.template');
+        Route::post('/admin/absensi/upload', [AbsensiAdminController::class, 'upload'])->name('admin.absensi.upload')->middleware('throttle:10,1');
+        Route::post('/admin/absensi/manual', [AbsensiAdminController::class, 'storeManual'])->name('admin.absensi.manual');
+        Route::post('/admin/absensi/bobot', [AbsensiAdminController::class, 'updateBobot'])->name('admin.absensi.bobot');
 
         // Nilai CKP
-        Route::get('/admin/ckp', [\App\Http\Controllers\CkpController::class, 'index'])->name('admin.ckp.index');
-        Route::post('/admin/ckp/upload', [\App\Http\Controllers\CkpController::class, 'upload'])->name('admin.ckp.upload')->middleware('throttle:10,1');
-        Route::post('/admin/ckp/manual', [\App\Http\Controllers\CkpController::class, 'manual'])->name('admin.ckp.manual');
+        Route::get('/admin/ckp', [CkpController::class, 'index'])->name('admin.ckp.index');
+        Route::post('/admin/ckp/upload', [CkpController::class, 'upload'])->name('admin.ckp.upload')->middleware('throttle:10,1');
+        Route::post('/admin/ckp/manual', [CkpController::class, 'manual'])->name('admin.ckp.manual');
     });
 
     // ==========================
     // MONITORING SURVEI (ADMIN & KEPALA)
     // ==========================
-    Route::get('/admin/monitoring', [\App\Http\Controllers\MonitoringSurveiController::class, 'index'])->name('admin.monitoring.index');
-    Route::get('/admin/monitoring/download-txt', [\App\Http\Controllers\MonitoringSurveiController::class, 'downloadTxt'])->name('admin.monitoring.download_txt');
-    Route::put('/admin/monitoring/{id}/status', [\App\Http\Controllers\MonitoringSurveiController::class, 'updateStatus'])->name('admin.monitoring.update_status');
+    Route::get('/admin/monitoring', [MonitoringSurveiController::class, 'index'])->name('admin.monitoring.index');
+    Route::get('/admin/monitoring/download-txt', [MonitoringSurveiController::class, 'downloadTxt'])->name('admin.monitoring.download_txt');
+    Route::put('/admin/monitoring/{id}/status', [MonitoringSurveiController::class, 'updateStatus'])->name('admin.monitoring.update_status');
 
     // ==========================
     // KANDIDAT (SEMUA ROLE LOGIN)
     // ==========================
-    Route::get('/admin/kandidat', [\App\Http\Controllers\KandidatAdminController::class, 'index'])->name('admin.kandidat.index');
+    Route::get('/admin/kandidat', [KandidatAdminController::class, 'index'])->name('admin.kandidat.index');
 
     Route::middleware('admin')->group(function () {
-        Route::post('/admin/kandidat/generate', [\App\Http\Controllers\KandidatAdminController::class, 'generate'])->name('admin.kandidat.generate');
-        Route::post('/admin/kandidat/generate-top3', [\App\Http\Controllers\KandidatAdminController::class, 'generateTop3'])->name('admin.kandidat.generateTop3');
+        Route::post('/admin/kandidat/generate', [KandidatAdminController::class, 'generate'])->name('admin.kandidat.generate');
+        Route::post('/admin/kandidat/generate-top3', [KandidatAdminController::class, 'generateTop3'])->name('admin.kandidat.generateTop3');
     });
 
     // ==========================
     // KEPALA BAGIAN
     // ==========================
-    Route::middleware([\App\Http\Middleware\CheckRoleKepala::class])->group(function () {
+    Route::middleware([CheckRoleKepala::class])->group(function () {
 
-        Route::get('/kepala/review', [\App\Http\Controllers\KepalaController::class, 'index'])->name('kepala.review.index');
-        Route::post('/kepala/review/{id}/pilih', [\App\Http\Controllers\KepalaController::class, 'pilihPemenang'])->name('kepala.review.pilih');
+        Route::get('/kepala/review', [KepalaController::class, 'index'])->name('kepala.review.index');
+        Route::post('/kepala/review/{id}/pilih', [KepalaController::class, 'pilihPemenang'])->name('kepala.review.pilih');
 
-        Route::get('/kepala/tim-penilai', [\App\Http\Controllers\TimPenilaiController::class, 'index'])->name('kepala.tim_penilai.index');
-        Route::post('/kepala/tim-penilai', [\App\Http\Controllers\TimPenilaiController::class, 'store'])->name('kepala.tim_penilai.store');
-        Route::get('/kepala/tim-penilai/{periode_id}/cetak', [\App\Http\Controllers\TimPenilaiController::class, 'cetak'])->name('kepala.tim_penilai.cetak');
+        Route::get('/kepala/tim-penilai', [TimPenilaiController::class, 'index'])->name('kepala.tim_penilai.index');
+        Route::post('/kepala/tim-penilai', [TimPenilaiController::class, 'store'])->name('kepala.tim_penilai.store');
+        Route::get('/kepala/tim-penilai/{periode_id}/cetak', [TimPenilaiController::class, 'cetak'])->name('kepala.tim_penilai.cetak');
     });
 
     // ==========================
     // SURVEY PEGAWAI
     // ==========================
-    Route::get('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'index'])->name('pegawai.survey.index');
-    Route::post('/survey', [\App\Http\Controllers\SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store')->middleware('throttle:10,1');
+    Route::get('/survey', [SurveyPegawaiController::class, 'index'])->name('pegawai.survey.index');
+    Route::post('/survey', [SurveyPegawaiController::class, 'store'])->name('pegawai.survey.store')->middleware('throttle:10,1');
 
     // ==========================
     // PENGUMUMAN READ
     // ==========================
-    Route::post('/pengumuman/{id}/read', [\App\Http\Controllers\PengumumanController::class, 'markAsRead'])->name('pengumuman.read');
+    Route::post('/pengumuman/{id}/read', [PengumumanController::class, 'markAsRead'])->name('pengumuman.read');
 
 }); // <-- auth

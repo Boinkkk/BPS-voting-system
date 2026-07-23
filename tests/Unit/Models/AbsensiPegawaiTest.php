@@ -5,8 +5,8 @@ namespace Tests\Unit\Models;
 use App\Models\AbsensiPegawai;
 use App\Models\PengaturanBobot;
 use Illuminate\Support\Facades\Cache;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class AbsensiPegawaiTest extends TestCase
 {
@@ -17,7 +17,7 @@ class AbsensiPegawaiTest extends TestCase
     }
 
     #[Test]
-    public function shouldCalculatePenaltyBasedOnTkTlPswAndKjk()
+    public function should_calculate_penalty_based_on_tk_tl_psw_and_kjk()
     {
         // Arrange
         Cache::shouldReceive('rememberForever')
@@ -32,7 +32,7 @@ class AbsensiPegawaiTest extends TestCase
                 'PSW3' => 1.0,
                 'PSW4' => 2.5,
                 'TK' => 2.5,
-                'KJK_PER_JAM' => 0.5
+                'KJK_PER_JAM' => 0.5,
             ]);
 
         $absensi = new AbsensiPegawai([
@@ -51,7 +51,7 @@ class AbsensiPegawaiTest extends TestCase
     }
 
     #[Test]
-    public function shouldCalculateNilaiPresensiCorrectlyWithZeroKjk()
+    public function should_calculate_nilai_presensi_correctly_with_zero_kjk()
     {
         // Arrange
         Cache::shouldReceive('rememberForever')
@@ -68,7 +68,7 @@ class AbsensiPegawaiTest extends TestCase
     }
 
     #[Test]
-    public function shouldCalculateNilaiPresensiCorrectlyWithPenalties()
+    public function should_calculate_nilai_presensi_correctly_with_penalties()
     {
         // Arrange
         $mockBobot = new PengaturanBobot([
@@ -81,8 +81,8 @@ class AbsensiPegawaiTest extends TestCase
             'bobot_psw2' => 1,
             'bobot_psw3' => 2,
             'bobot_psw4' => 3,
-            'bobot_tl' => 0, 
-            'bobot_psw' => 0, 
+            'bobot_tl' => 0,
+            'bobot_psw' => 0,
         ]);
 
         Cache::shouldReceive('rememberForever')
@@ -106,7 +106,7 @@ class AbsensiPegawaiTest extends TestCase
     }
 
     #[Test]
-    public function shouldCalculateNilaiPresensiCorrectlyWithLegacyPenalties()
+    public function should_calculate_nilai_presensi_correctly_with_legacy_penalties()
     {
         // Arrange
         $mockBobot = new PengaturanBobot([
@@ -119,8 +119,8 @@ class AbsensiPegawaiTest extends TestCase
             'bobot_psw2' => 0,
             'bobot_psw3' => 0,
             'bobot_psw4' => 0,
-            'bobot_tl' => 5, 
-            'bobot_psw' => 5, 
+            'bobot_tl' => 5,
+            'bobot_psw' => 5,
         ]);
 
         Cache::shouldReceive('rememberForever')
@@ -142,9 +142,9 @@ class AbsensiPegawaiTest extends TestCase
         // 96 - 4 - 5 - 5 = 82
         $this->assertEquals(82, $nilai);
     }
-    
+
     #[Test]
-    public function shouldNotReturnNegativeNilaiPresensi()
+    public function should_not_return_negative_nilai_presensi()
     {
         // Arrange
         $mockBobot = new PengaturanBobot([

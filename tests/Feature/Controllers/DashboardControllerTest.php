@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Pegawai;
-use App\Models\Role;
 use App\Models\Pengumuman;
 use App\Models\PeriodePenilaian;
-use Illuminate\Support\Str;
+use App\Models\Role;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class DashboardControllerTest extends TestCase
 {
@@ -31,14 +31,14 @@ class DashboardControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'jabatan' => 'Staff',
             'tanggal_masuk' => '2020-01-01',
-            'status_pegawai' => 'aktif'
+            'status_pegawai' => 'aktif',
         ]);
     }
 
     public function test_dashboard_renders_successfully()
     {
         $response = $this->actingAs($this->pegawai)->get('/dashboard');
-        
+
         $response->assertStatus(200);
         $response->assertViewIs('dashboard');
     }
@@ -54,7 +54,7 @@ class DashboardControllerTest extends TestCase
             'prioritas' => 'Medium',
             'is_sticky' => true,
             'is_popup' => false,
-            'target' => null
+            'target' => null,
         ]);
 
         $regular = Pengumuman::create([
@@ -65,17 +65,17 @@ class DashboardControllerTest extends TestCase
             'prioritas' => 'Low',
             'is_sticky' => false,
             'is_popup' => false,
-            'target' => null
+            'target' => null,
         ]);
 
         // Belum dibaca
         $this->assertDatabaseMissing('pengumuman_reads', [
             'pengumuman_id' => $sticky->id,
-            'pegawai_id' => $this->pegawai->id
+            'pegawai_id' => $this->pegawai->id,
         ]);
 
         $response = $this->actingAs($this->pegawai)->get('/dashboard');
-        
+
         $response->assertStatus(200);
         $response->assertViewHas('stickyPengumumans');
         $response->assertViewHas('regularPengumumans');
@@ -83,11 +83,11 @@ class DashboardControllerTest extends TestCase
         // Pastikan setelah load dashboard, otomatis masuk ke read
         $this->assertDatabaseHas('pengumuman_reads', [
             'pengumuman_id' => $sticky->id,
-            'pegawai_id' => $this->pegawai->id
+            'pegawai_id' => $this->pegawai->id,
         ]);
         $this->assertDatabaseHas('pengumuman_reads', [
             'pengumuman_id' => $regular->id,
-            'pegawai_id' => $this->pegawai->id
+            'pegawai_id' => $this->pegawai->id,
         ]);
     }
 
@@ -105,16 +105,16 @@ class DashboardControllerTest extends TestCase
             'tanggal_selesai_voting' => '2026-06-20',
             'tanggal_review_kepala' => '2026-06-25',
             'tanggal_selesai' => '2026-06-30',
-            'status' => 'voting'
+            'status' => 'voting',
         ]);
 
         $response = $this->actingAs($this->pegawai)->get('/dashboard');
-        
+
         $response->assertStatus(200);
         $response->assertViewHas('activePeriode', function ($viewPeriode) use ($periode) {
             return $viewPeriode->id === $periode->id;
         });
-        
+
         // Quorum warning should be true since percentVoting is 0 (< 50%) and status is 'voting'
         $response->assertViewHas('quorumWarning', true);
     }

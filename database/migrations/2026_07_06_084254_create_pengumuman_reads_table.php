@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->dateTime('read_at')->useCurrent();
             $table->timestamps();
-            
+
             $table->unique(['pengumuman_id', 'pegawai_id']);
         });
     }

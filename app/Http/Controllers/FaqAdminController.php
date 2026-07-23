@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faq;
 use Illuminate\Http\Request;
 
 class FaqAdminController extends Controller
 {
     public function index()
     {
-        $faqs = \App\Models\Faq::latest()->get();
+        $faqs = Faq::latest()->get();
+
         return view('admin.faq.index', compact('faqs'));
     }
 
@@ -24,14 +26,15 @@ class FaqAdminController extends Controller
             'jawaban' => 'required|string',
         ]);
 
-        \App\Models\Faq::create($request->all());
+        Faq::create($request->all());
 
         return redirect()->route('admin.faq.index')->with('success', 'FAQ berhasil ditambahkan.');
     }
 
     public function edit(string $id)
     {
-        $faq = \App\Models\Faq::findOrFail($id);
+        $faq = Faq::findOrFail($id);
+
         return view('admin.faq.edit', compact('faq'));
     }
 
@@ -42,7 +45,7 @@ class FaqAdminController extends Controller
             'jawaban' => 'required|string',
         ]);
 
-        $faq = \App\Models\Faq::findOrFail($id);
+        $faq = Faq::findOrFail($id);
         $faq->update($request->all());
 
         return redirect()->route('admin.faq.index')->with('success', 'FAQ berhasil diperbarui.');
@@ -50,7 +53,7 @@ class FaqAdminController extends Controller
 
     public function destroy(string $id)
     {
-        $faq = \App\Models\Faq::findOrFail($id);
+        $faq = Faq::findOrFail($id);
         $faq->delete();
 
         return redirect()->route('admin.faq.index')->with('success', 'FAQ berhasil dihapus.');

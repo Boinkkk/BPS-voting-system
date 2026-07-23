@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('periode_id')->constrained('periode_penilaian')->cascadeOnDelete();
             $table->foreignUuid('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->integer('bulan');
-            
+
             $table->integer('hk')->default(0)->comment('Hari Kerja');
             $table->integer('hd')->default(0)->comment('Hadir');
             $table->integer('tk')->default(0)->comment('Tanpa Kabar');
@@ -22,19 +22,19 @@ return new class extends Migration
             $table->integer('pd')->default(0)->comment('Perjalanan Dinas');
             $table->integer('dk')->default(0)->comment('Diklat/Pelatihan');
             $table->integer('kn')->default(0)->comment('Konsinyasi');
-            
+
             $table->integer('psw')->default(0);
             $table->integer('psw1')->default(0);
             $table->integer('psw2')->default(0);
             $table->integer('psw3')->default(0);
             $table->integer('psw4')->default(0);
-            
+
             $table->integer('ht')->default(0);
             $table->integer('tl1')->default(0);
             $table->integer('tl2')->default(0);
             $table->integer('tl3')->default(0);
             $table->integer('tl4')->default(0);
-            
+
             $table->integer('cb')->default(0);
             $table->integer('cl')->default(0);
             $table->integer('cm')->default(0);
@@ -43,14 +43,14 @@ return new class extends Migration
             $table->integer('ct10')->default(0);
             $table->integer('ct11')->default(0);
             $table->integer('ct12')->default(0);
-            
+
             $table->integer('cst1')->default(0);
             $table->integer('cst2')->default(0);
             $table->integer('cs1')->default(0);
             $table->integer('cp1')->default(0);
             $table->integer('cm1')->default(0);
             $table->integer('cb1')->default(0);
-            
+
             $table->integer('kjk_ht')->default(0)->comment('KJK HT dalam menit');
             $table->integer('kjk_pc')->default(0)->comment('KJK PC dalam menit');
             $table->integer('kjk')->default(0)->comment('Total KJK dalam menit');
