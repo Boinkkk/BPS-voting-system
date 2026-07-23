@@ -87,6 +87,7 @@
                 <!-- Dropdown Menu -->
                 <div id="mobileProfileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100">
                     <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil Saya</a>
+                    <a href="{{ route('panduan.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buku Panduan</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</button>
@@ -272,6 +273,13 @@
                     <p class="text-xs text-gray-500 truncate">{{ Auth::user()->role->tipe ?? 'Role' }}</p>
                     <p class="text-[10px] text-gray-400 font-mono mt-0.5 truncate" id="sidebar-clock"></p>
                 </div>
+            </a>
+            
+            <a href="{{ route('panduan.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300 text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-2 -ml-2 mt-2 rounded-md" title="Buku Panduan">
+                <svg class="w-5 h-5 flex-shrink-0 mx-0 md:mx-auto md:group-hover:mx-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <span class="ml-3 text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden text-left w-auto md:w-0 md:group-hover:w-auto">
+                    Buku Panduan
+                </span>
             </a>
             
             <script>

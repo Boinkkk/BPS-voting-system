@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo')->middleware('throttle:10,1');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::get('/glosarium', [\App\Http\Controllers\GlosariumController::class, 'index'])->name('glosarium.index');
+    Route::get('/panduan', [\App\Http\Controllers\PanduanController::class, 'index'])->name('panduan.index');
     // ==========================
     // ADMIN
     // ==========================

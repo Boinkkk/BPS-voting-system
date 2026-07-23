@@ -1,0 +1,5 @@
+﻿C:\BPS\voting\web\README.md
+C:\BPS\voting\web\error.txt
+C:\BPS\voting\web\public\robots.txt
+C:\BPS\voting\web\top_error.txt
+C:\BPS\voting\web\public\images\cubes.png
