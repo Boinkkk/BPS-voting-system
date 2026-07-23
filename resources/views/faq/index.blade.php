@@ -23,32 +23,7 @@
     </div>
 </div>
 
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm w-full">
-    <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($faqs as $item)
-                <div onclick="openFaqModal('{{ htmlspecialchars($item->pertanyaan, ENT_QUOTES, 'UTF-8') }}', `{{ htmlspecialchars(nl2br(e($item->jawaban)), ENT_QUOTES, 'UTF-8') }}`)" class="bg-bps-bg p-5 rounded-lg border border-gray-100 hover:border-bps-secondary/50 hover:shadow-md cursor-pointer transition-all duration-200 flex flex-col h-full">
-                    <h3 class="text-lg font-semibold text-bps-secondary mb-2">{{ $item->pertanyaan }}</h3>
-                    <div class="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                        {{ \Illuminate\Support\Str::limit($item->jawaban, 150) }}
-                    </div>
-                    @if(strlen($item->jawaban) > 150)
-                    <div class="mt-auto pt-4 text-xs font-medium text-blue-600 flex items-center">
-                        Baca selengkapnya
-                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    @else
-                    <div class="mt-auto pt-4"></div>
-                    @endif
-                </div>
-            @empty
-                <div class="col-span-full py-8 text-center text-gray-500">
-                    <p>Belum ada FAQ yang ditambahkan.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
-</div>
+@livewire('faq-search')
 
 @if(!Auth::check())
 </main>
