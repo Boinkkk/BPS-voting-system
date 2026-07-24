@@ -112,11 +112,16 @@ Panduan ini ditujukan bagi Administrator IT / Programmer yang ingin mendeploy at
    php artisan storage:link
    ```
 
-7. **Konfigurasi Cron Job (Penting)**
+7. **Konfigurasi Cron Job (Opsional jika testing/ skip bagian inij ika presenasi saja)** 
    Sistem SIVOTA memiliki pergantian *Timeline* (Fase) otomatis dan fungsi *Auto-Backup*. Buka *cron editor* di server Linux Anda (`crontab -e`) dan tambahkan baris berikut:
    ```text
    * * * * * cd /path-ke-project/voting-web && php artisan schedule:run >> /dev/null 2>&1
    ```
+8. **Jalankan Server**
+   ```bash
+   php artisan serve
+   ```
+
 
 ---
 
