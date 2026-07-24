@@ -155,7 +155,7 @@ Panduan ini ditujukan bagi Administrator IT / Programmer yang ingin mendeploy at
 2. **Memberikan Suara / Voting (Fase Voting)**
    - Setelah masuk fase voting, menu **Vote Sekarang** akan terbuka.
    - Pegawai dapat melihat profil singkat dan skor prestasi 10 Kandidat Terbaik.
-   - Pegawai hanya dapat **memilih 1 Kandidat**. Pemilihan bersifat **rahasia** (Admin tidak bisa melihat siapa memilih siapa, sistem hanya mencatat total suaranya saja).
+   - Pegawai memberikan rating ke setiap kandidat Pemilihan bersifat **rahasia** (Admin tidak bisa melihat siapa memilih siapa, sistem hanya mencatat total suaranya saja).
 
 ### C. Panduan Untuk KEPALA BPS (Pimpinan)
 
