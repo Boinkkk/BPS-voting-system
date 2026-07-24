@@ -73,6 +73,22 @@
     outline-offset: 2px;
     border-radius: 9999px;
 }
+
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+.success-card {
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.success-icon-wrapper {
+    animation: pulseGlow 2s infinite;
+}
 </style>
 
 <div class="py-6">
@@ -126,14 +142,24 @@
                 <p class="text-gray-500">Pemilihan untuk periode <strong>{{ $periodeAktif->nama }}</strong> sedang ditunda karena Kepala Umum belum menyelesaikan kelengkapan data (Nilai CKP atau Absensi 3 bulan). Harap kembali lagi nanti.</p>
             </div>
         @elseif($sudahIsi)
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-10 text-center">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                    <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-12 text-center success-card relative">
+                <!-- Decorative background shapes -->
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-green-100 rounded-full opacity-50 blur-xl"></div>
+                <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-blue-100 rounded-full opacity-50 blur-xl"></div>
+                
+                <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6 success-icon-wrapper relative z-10">
+                    <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Terima Kasih!</h3>
-                <p class="text-gray-500">Anda sudah menyelesaikan penilaian untuk periode <strong>{{ $periodeAktif->nama }}</strong>.</p>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3 relative z-10">Terima Kasih!</h3>
+                <p class="text-gray-500 text-lg relative z-10">Anda sudah menyelesaikan penilaian untuk periode <strong>{{ $periodeAktif->nama }}</strong>.</p>
+                
+                <div class="mt-8">
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center px-6 py-3 bg-white border border-gray-300 rounded-md font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm">
+                        Kembali ke Beranda
+                    </a>
+                </div>
             </div>
         @elseif($kandidats->isEmpty())
              <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border p-6 text-center text-gray-500">
@@ -153,11 +179,6 @@
                         </span>
                     </div>
                 </div>
-                
-                <!-- Progress Bar Utama -->
-                <div class="w-full bg-gray-200 h-2">
-                    <div id="main-progress-bar" class="bg-[#0091d5] h-2 transition-all duration-300 ease-in-out" style="width: 0%"></div>
-                </div>
             </div>
 
             <form id="surveyForm" action="{{ route('pegawai.survey.store') }}" method="POST">
@@ -165,18 +186,25 @@
                 
                 @foreach($pertanyaans as $index => $p)
                 <div class="step-section" id="step-{{ $loop->iteration }}" style="{{ $loop->iteration == 1 ? '' : 'display: none;' }} transition: opacity 0.3s ease;">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border mb-6">
+                    <div class="bg-white shadow-sm sm:rounded-lg border mb-6">
                         
-                        <div class="p-6 border-b bg-sky-50 flex flex-col md:flex-row md:items-start justify-between">
-                            <div class="flex items-start">
-                                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#0091d5] text-white text-sm font-bold mr-4 mt-0.5 shadow">{{ $loop->iteration }}</span>
-                                <div>
-                                    <div class="font-bold text-[#0091d5] text-sm tracking-wider uppercase mb-1">{{ $p->kategori }}</div>
-                                    <div class="text-gray-900 text-lg font-medium">{{ $p->pertanyaan }}</div>
+                        <div class="sticky md:relative -top-4 md:top-auto z-40 shadow-sm bg-white/95 backdrop-blur-sm border-b border-gray-200 sm:rounded-t-lg">
+                            <div class="p-3 md:p-6 bg-sky-50/80 flex flex-col md:flex-row md:items-start justify-between sm:rounded-t-lg">
+                                <div class="flex items-start">
+                                    <span class="inline-flex items-center justify-center h-6 w-6 md:h-8 md:w-8 rounded-full bg-[#0091d5] text-white text-xs md:text-sm font-bold mr-3 md:mr-4 mt-0.5 shadow shrink-0">{{ $loop->iteration }}</span>
+                                    <div>
+                                        <div class="hidden md:block font-bold text-[#0091d5] text-xs md:text-sm tracking-wider uppercase mb-1">{{ $p->kategori }}</div>
+                                        <div class="text-gray-900 text-sm md:text-lg font-medium leading-snug max-h-[20vh] overflow-y-auto pr-2">{{ $p->pertanyaan }}</div>
+                                    </div>
+                                </div>
+                                <div class="hidden md:block mt-4 md:mt-0 whitespace-nowrap text-right">
+                                    <span class="text-xs md:text-sm font-bold text-gray-500">Pertanyaan {{ $loop->iteration }} dari {{ count($pertanyaans) }}</span>
                                 </div>
                             </div>
-                            <div class="mt-4 md:mt-0 whitespace-nowrap text-right">
-                                <span class="text-sm font-bold text-gray-500">Pertanyaan {{ $loop->iteration }} dari {{ count($pertanyaans) }}</span>
+                            
+                            <!-- Progress Bar per Step -->
+                            <div class="w-full bg-gray-200 h-1.5">
+                                <div class="main-progress-bar bg-[#0091d5] h-1.5 transition-all duration-300 ease-in-out" style="width: 0%"></div>
                             </div>
                         </div>
                         
@@ -255,7 +283,7 @@
 
                             @if($loop->last)
                                 @if(in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']))
-                                <button type="submit" class="w-full md:w-auto justify-center px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-bps-secondary shadow-md transition-colors flex items-center">
+                                <button type="submit" id="submitBtn" class="w-full md:w-auto justify-center px-8 py-3 bg-[#0091d5] text-white font-bold rounded-md hover:bg-bps-secondary shadow-md transition-colors flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Kirim Semua Penilaian
                                 </button>
@@ -321,7 +349,9 @@
         }
 
         const progress = (currentStep / totalSteps) * 100;
-        document.getElementById('main-progress-bar').style.width = progress + '%';
+        document.querySelectorAll('.main-progress-bar').forEach(el => {
+            el.style.width = progress + '%';
+        });
     }
 
     const isReadOnly = {{ !in_array(Auth::user()->role->tipe, ['Pegawai', 'Kepala Umum', 'Kepala_Umum']) ? 'true' : 'false' }};
@@ -400,13 +430,20 @@
                 showAlertModal('Silakan lengkapi penilaian terakhir sebelum mengirim.');
             } else {
                 clearLocalDrafts();
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                    submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...';
+                }
             }
         });
     });
 </script>
 
+@push('modals')
 <!-- Alert Modal -->
-<div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="background-color: rgba(17, 24, 39, 0.5);">
+<div id="alertModal" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="background-color: rgba(17, 24, 39, 0.5);">
     <div class="bg-white rounded-xl shadow-xl relative overflow-hidden transition-transform duration-300" style="width: 90%; max-width: 400px; transform: scale(0.95);">
         <div class="bg-red-500 h-2 w-full absolute top-0 left-0"></div>
         <div class="p-6 text-center">
@@ -423,6 +460,7 @@
         </div>
     </div>
 </div>
+@endpush
 
 <script>
     function showAlertModal(message) {

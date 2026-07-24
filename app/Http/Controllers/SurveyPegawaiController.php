@@ -56,25 +56,43 @@ class SurveyPegawaiController extends Controller
             return redirect()->route('pegawai.survey.index')->with('error', 'Pemilihan sedang ditunda. Data kandidat belum lengkap.');
         }
 
-        // 1. Simpan nilai ke jawaban_survei tanpa id user atau session (100% anonim)
+        // 1. Simpan status validasi (SurveyProgress) secara sinkron (langsung)
+        $kandidatIds = [];
         foreach ($request->jawaban as $pertanyaan_id => $kandidatScores) {
             foreach ($kandidatScores as $kandidat_id => $nilai) {
-                JawabanSurvei::create([
-                    'periode_id' => $periodeAktif->id,
-                    'kandidat_id' => $kandidat_id,
-                    'pertanyaan_id' => $pertanyaan_id,
-                    'nilai' => $nilai,
-                    'waktu_jawab' => now(),
-                ]);
+                $kandidatIds[$kandidat_id] = true;
+            }
+        }
+        $kandidatIds = array_keys($kandidatIds);
 
-                // Catat progress untuk setiap kandidat
-                SurveyProgress::updateOrCreate([
+        $progressData = [];
+        $now = now();
+        
+        // Ambil data progress yang sudah ada agar tidak duplikat
+        $existingProgress = SurveyProgress::where('periode_id', $periodeAktif->id)
+            ->where('user_id', $user->id)
+            ->whereIn('kandidat_id', $kandidatIds)
+            ->pluck('kandidat_id')
+            ->toArray();
+
+        foreach ($kandidatIds as $kandidat_id) {
+            if (!in_array($kandidat_id, $existingProgress)) {
+                $progressData[] = [
                     'periode_id' => $periodeAktif->id,
                     'user_id' => $user->id,
                     'kandidat_id' => $kandidat_id,
-                ]);
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
         }
+
+        if (!empty($progressData)) {
+            SurveyProgress::insert($progressData);
+        }
+
+        // 2. Antrekan pemrosesan JawabanSurvei (skor 100% anonim) ke Job
+        \App\Jobs\ProcessSurveyVotes::dispatch($periodeAktif->id, $request->jawaban);
 
         activity()->causedBy($user)->withProperties([
             'ip' => $request->ip(),
@@ -85,6 +103,6 @@ class SurveyPegawaiController extends Controller
             'nama_periode' => $periodeAktif->nama,
         ])->log('Pegawai telah mensubmit evaluasi/voting');
 
-        return redirect()->route('pegawai.survey.index')->with('success', 'Survey berhasil disimpan!');
+        return redirect()->route('pegawai.survey.index')->with('success', 'Survey berhasil dikirim! Data penilaian Anda sedang diproses oleh sistem secara asinkron.');
     }
 }

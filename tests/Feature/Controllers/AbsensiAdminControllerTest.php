@@ -24,6 +24,7 @@ class AbsensiAdminControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        \Carbon\Carbon::setTestNow('2026-07-16');
 
         $roleAdmin = Role::create(['tipe' => 'Admin']);
         $rolePegawai = Role::create(['tipe' => 'Pegawai']);

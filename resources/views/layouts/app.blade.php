@@ -415,8 +415,8 @@
         </div>
 
         <!-- Main Workspace -->
-        <main class="flex-1 overflow-y-auto p-8 relative">
-            <div class="max-w-5xl mx-auto page-transition">
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+            <div class="max-w-5xl mx-auto page-transition pb-36 md:pb-0">
                 @if(isset($globalSticky) && count($globalSticky) > 0)
                 <div class="space-y-4 mb-6 sticky top-0 z-40 bg-bps-bg/90 backdrop-blur-sm py-2">
                     @foreach($globalSticky as $sticky)
@@ -1029,6 +1029,7 @@
         window.onkeypress = resetTimer;
     </script>
 
+    @stack('modals')
     @stack('scripts')
 </body>
 </html>

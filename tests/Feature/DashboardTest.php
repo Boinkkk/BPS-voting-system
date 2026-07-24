@@ -3,18 +3,31 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      */
     public function test_dashboard_does_not_500()
     {
-        $user = User::first();
+        $user = \App\Models\Pegawai::first();
         if (! $user) {
-            $user = User::factory()->create();
+            $role = \App\Models\Role::firstOrCreate(['tipe' => 'Pegawai']);
+            $user = \App\Models\Pegawai::create([
+                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'role_id' => $role->id,
+                'nama' => 'Pegawai Test',
+                'nip' => '33333333',
+                'email' => 'pegawai@test.com',
+                'password' => bcrypt('password123'),
+                'jabatan' => 'Staff',
+                'tanggal_masuk' => '2010-01-01',
+                'status_pegawai' => 'aktif',
+            ]);
         }
         $response = $this->actingAs($user)->get('/dashboard?month=9&year=2026');
 

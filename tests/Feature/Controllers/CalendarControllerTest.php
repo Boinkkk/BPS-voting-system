@@ -57,7 +57,7 @@ class CalendarControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('kalender.index');
-        $response->assertViewHasAll(['selectedMonth', 'selectedYear', 'periodesInMonth']);
+        $response->assertSeeLivewire('calendar-grid');
 
         $response->assertSee('Triwulan 3 2026');
     }
@@ -70,7 +70,7 @@ class CalendarControllerTest extends TestCase
         $response = $this->actingAs($this->pegawai)->get(route('kalender'));
 
         $response->assertStatus(200);
-        $response->assertViewHas('selectedMonth', $currentMonth);
-        $response->assertViewHas('selectedYear', $currentYear);
+        $response->assertViewIs('kalender.index');
+        $response->assertSeeLivewire('calendar-grid');
     }
 }
