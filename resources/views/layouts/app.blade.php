@@ -34,6 +34,49 @@
             border-bottom-right-radius: 4px;
             box-shadow: 1px 0 6px color-mix(in srgb, var(--color-bps-secondary) 40%, transparent);
         }
+        
+        /* SVG icon inside active link uses parent color — no JS needed for icon */
+        .sidebar-link-active > svg {
+            color: var(--color-bps-secondary) !important;
+        }
+
+        /* Skeleton loader overlay */
+        #page-skeleton {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 80px; /* Mobile: leave space for fixed bottom nav (h-20 = 80px) */
+            z-index: 200;
+            background-color: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(4px);
+            padding: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            #page-skeleton {
+                bottom: 0; /* Desktop: stretch to bottom */
+            }
+        }
+        #page-skeleton.active {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: 0.5rem;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         /* SVG Magic Indicator logic handled in HTML/Tailwind classes */
 
         .nav-item .icon-wrapper {
@@ -118,8 +161,8 @@
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="mobileProfileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100">
-                    <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil Saya</a>
-                    <a href="{{ route('panduan.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buku Panduan</a>
+                    <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" wire:navigate>Profil Saya</a>
+                    <a href="{{ route('panduan.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" wire:navigate>Buku Panduan</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</button>
@@ -130,7 +173,7 @@
     </div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed md:relative z-50 md:z-20 transform -translate-x-full md:translate-x-0 w-64 md:w-[80px] group md:hover:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full shadow-sm transition-all duration-300 ease-in-out overflow-x-hidden">
+    <aside id="sidebar" wire:persist="sidebar" class="fixed md:relative z-50 md:z-20 transform -translate-x-full md:translate-x-0 w-64 md:w-[80px] group md:hover:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full shadow-sm transition-all duration-300 ease-in-out overflow-x-hidden">
         <div class="h-16 flex items-center justify-between md:justify-start px-5 md:group-hover:px-5 border-b border-gray-100 transition-all duration-300 overflow-hidden relative">
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo.svg') }}" alt="Logo BPS" class="h-9 max-w-none w-auto flex-shrink-0 transition-all duration-300">
@@ -156,35 +199,35 @@
         </div>
         
         <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-            <a href="{{ route('dashboard') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}">
+            <a href="{{ route('dashboard') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}" wire:navigate>
                 <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('dashboard') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
                 <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Dashboard</span>
             </a>
 
-            <a href="{{ route('kalender') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('kalender') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}">
+            <a href="{{ route('kalender') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('kalender') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}" wire:navigate>
                 <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('kalender') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Kalender Pemilihan</span>
             </a>
 
-            <a href="{{ route('glosarium.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('glosarium.*') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}">
+            <a href="{{ route('glosarium.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('glosarium.*') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}" wire:navigate>
                 <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('glosarium.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
                 <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Glosarium</span>
             </a>
 
-            <a href="{{ route('faq.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('faq.*') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}">
+            <a href="{{ route('faq.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('faq.*') ? 'sidebar-link-active' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}" wire:navigate>
                 <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('faq.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">FAQ (Bantuan)</span>
             </a>
 
-            <a href="{{ route('admin.kandidat.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kandidat.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+            <a href="{{ route('admin.kandidat.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kandidat.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                 <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.kandidat.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                 <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Kandidat Terbaik</span>
             </a>
@@ -192,15 +235,15 @@
             @if(Auth::user() && Auth::user()->role && Auth::user()->role->tipe == 'Admin')
             <div class="mb-2 mt-4">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Administrator</span></p>
-                <a href="{{ route('admin.pegawai.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pegawai.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.pegawai.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pegawai.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.pegawai.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Data Pegawai</span>
                 </a>
-                <a href="{{ route('admin.pengumuman.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pengumuman.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.pengumuman.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pengumuman.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.pengumuman.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Pengumuman</span>
                 </a>
-                <a href="{{ route('admin.audit.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.audit.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.audit.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.audit.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.audit.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Audit Log</span>
                 </a>
@@ -226,19 +269,19 @@
             @if($isAdmin)
             <div class="mb-2">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Master Data</span></p>
-                <a href="{{ route('admin.periode.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.periode.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.periode.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.periode.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.periode.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Manajemen Periode</span>
                 </a>
-                <a href="{{ route('admin.pengaturan-bobot.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pengaturan-bobot.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.pengaturan-bobot.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pengaturan-bobot.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.pengaturan-bobot.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Manajemen Bobot</span>
                 </a>
-                <a href="{{ route('admin.glosarium.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.glosarium.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.glosarium.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.glosarium.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.glosarium.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Glosarium</span>
                 </a>
-                <a href="{{ route('admin.faq.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.faq.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.faq.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.faq.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.faq.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Manajemen FAQ</span>
                 </a>
@@ -250,24 +293,24 @@
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">
                     {{ $isAdmin ? 'Admin Menu' : ($isKepalaUmum ? 'Kepala Umum Menu' : 'Tim Penilai Menu') }}
                 </span></p>
-                <a href="{{ route('admin.kinerja.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kinerja.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }} hidden">
+                <a href="{{ route('admin.kinerja.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.kinerja.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }} hidden" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.kinerja.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Penilaian Kinerja</span>
                 </a>
-                <a href="{{ route('admin.absensi.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.absensi.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.absensi.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.absensi.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.absensi.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Input Presensi</span>
                 </a>
-                <a href="{{ route('admin.ckp.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.ckp.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.ckp.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.ckp.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.ckp.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Input CKP</span>
                 </a>
                 @if($isAdmin || $isTimPenilai)
-                <a href="{{ route('admin.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.survey.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Manajemen Survey</span>
                 </a>
-                <a href="{{ route('admin.monitoring.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.monitoring.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('admin.monitoring.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.monitoring.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('admin.monitoring.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Monitoring Survei</span>
                 </a>
@@ -278,7 +321,7 @@
             @if(Auth::user() && Auth::user()->role && in_array(Auth::user()->role->tipe, ['Admin', 'Pegawai', 'Kepala Umum', 'Kepala_Umum']))
             <div class="mb-2 mt-4">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Menu Pegawai</span></p>
-                <a href="{{ route('pegawai.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('pegawai.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('pegawai.survey.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Voting Kandidat Terbaik</span>
                 </a>
@@ -289,17 +332,17 @@
             <div class="mb-2">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Kepala Bagian</span></p>
                 
-                <a href="{{ route('kepala.tim_penilai.index') }}" class="flex items-center hidden justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('kepala.tim_penilai.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('kepala.tim_penilai.index') }}" class="flex items-center hidden justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('kepala.tim_penilai.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('kepala.tim_penilai.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Tim Penilai & Surat Tugas</span>
                 </a>
-                <a href="{{ route('kepala.review.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('kepala.review.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('kepala.review.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('kepala.review.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('kepala.review.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Review Nominasi</span>
                 </a>
                 
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2 px-3"><span class="inline md:hidden md:group-hover:inline">Menu Pegawai</span></p>
-                <a href="{{ route('pegawai.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}">
+                <a href="{{ route('pegawai.survey.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start px-3 md:px-2 md:group-hover:px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('pegawai.survey.*') ? 'sidebar-link-active' : 'text-gray-600 hover:bg-bps-bg hover:text-gray-900' }}" wire:navigate>
                     <svg class="w-5 h-5 flex-shrink-0 mr-3 md:mr-0 md:group-hover:mr-3 transition-all duration-300 mx-0 md:mx-auto md:group-hover:mx-0 {{ request()->routeIs('pegawai.survey.*') ? 'text-bps-secondary' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     <span class="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap ml-1 overflow-hidden">Voting Kandidat</span>
                 </a>
@@ -310,7 +353,7 @@
         </nav>
         
         <div class="p-4 border-t border-gray-200 flex flex-col space-y-4 items-start md:items-center md:group-hover:items-start transition-all duration-300">
-            <a href="{{ route('profile') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300" title="Profil">
+            <a href="{{ route('profile') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300" title="Profil" wire:navigate>
                 <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex-shrink-0">
                     <img src="{{ Auth::user()->foto_profil_url }}" alt="User avatar" class="h-full w-full object-cover">
                 </div>
@@ -321,7 +364,7 @@
                 </div>
             </a>
             
-            <a href="{{ route('panduan.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300 text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-2 -ml-2 mt-2 rounded-md" title="Buku Panduan">
+            <a href="{{ route('panduan.index') }}" class="flex items-center justify-start md:justify-center md:group-hover:justify-start w-full transition-all duration-300 text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-2 -ml-2 mt-2 rounded-md" title="Buku Panduan" wire:navigate>
                 <svg class="w-5 h-5 flex-shrink-0 mx-0 md:mx-auto md:group-hover:mx-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 <span class="ml-3 text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden text-left w-auto md:w-0 md:group-hover:w-auto">
                     Buku Panduan
@@ -354,8 +397,22 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col h-full overflow-hidden bg-bps-bg/50">
-        
+    <div class="flex-1 flex flex-col h-full overflow-hidden bg-bps-bg/50 relative z-10">
+        <!-- Skeleton Loader: absolute inside flex-1, won't overlap sidebar or bottom nav -->
+        <div id="page-skeleton" role="status" aria-label="Memuat halaman...">
+            <div class="mx-auto" style="width: 100%; max-width: 64rem; padding-top: 1rem;">
+                <div class="skeleton-shimmer h-8 w-1/3 mb-6"></div>
+                <div class="skeleton-shimmer h-32 w-full mb-4"></div>
+                <div class="skeleton-shimmer h-6 w-full mb-2"></div>
+                <div class="skeleton-shimmer h-6 w-5/6 mb-2"></div>
+                <div class="skeleton-shimmer h-6 w-4/6 mb-6"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="skeleton-shimmer h-24 w-full"></div>
+                    <div class="skeleton-shimmer h-24 w-full"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Main Workspace -->
         <main class="flex-1 overflow-y-auto p-8 relative">
@@ -467,25 +524,25 @@
             </div>
 
             @if($tipe == 'Pegawai')
-                <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0">
+                <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Dashboard</span>
                 </a>
-                <a href="{{ route('admin.kandidat.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
+                <a href="{{ route('admin.kandidat.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Kandidat</span>
                 </a>
-                <a href="{{ route('pegawai.survey.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
+                <a href="{{ route('pegawai.survey.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Voting</span>
                 </a>
-                <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
+                <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
@@ -499,25 +556,25 @@
                 </button>
 
             @elseif($tipe == 'Admin')
-                <a href="{{ route('admin.periode.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0">
+                <a href="{{ route('admin.periode.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Periode</span>
                 </a>
-                <a href="{{ route('admin.pegawai.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
+                <a href="{{ route('admin.pegawai.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Pegawai</span>
                 </a>
-                <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
+                <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Dashboard</span>
                 </a>
-                <a href="{{ route('admin.monitoring.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
+                <a href="{{ route('admin.monitoring.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                     </div>
@@ -531,25 +588,25 @@
                 </button>
 
             @elseif($tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
-                <a href="{{ route('admin.ckp.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0">
+                <a href="{{ route('admin.ckp.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Input CKP</span>
                 </a>
-                <a href="{{ route('admin.absensi.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
+                <a href="{{ route('admin.absensi.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Input Absen</span>
                 </a>
-                <a href="{{ route('pegawai.survey.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
+                <a href="{{ route('pegawai.survey.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Voting</span>
                 </a>
-                <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
+                <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
@@ -563,25 +620,25 @@
                 </button>
 
             @elseif($tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
-                <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0">
+                <a href="{{ route('dashboard') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 0 ? 'active' : '' }}" data-index="0" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Dashboard</span>
                 </a>
-                <a href="{{ route('admin.kandidat.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1">
+                <a href="{{ route('admin.kandidat.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 1 ? 'active' : '' }}" data-index="1" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Kandidat</span>
                 </a>
-                <a href="{{ route('kepala.review.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2">
+                <a href="{{ route('kepala.review.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 2 ? 'active' : '' }}" data-index="2" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
                     </div>
                     <span class="text-label absolute bottom-3 text-[10px] font-semibold text-white">Review</span>
                 </a>
-                <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3">
+                <a href="{{ route('glosarium.index') }}" class="nav-item w-1/5 h-full flex flex-col items-center justify-center relative z-20 {{ $activeIndex == 3 ? 'active' : '' }}" data-index="3" wire:navigate>
                     <div class="icon-wrapper transition-all duration-500 ease-in-out">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
@@ -606,7 +663,7 @@
             
             <div class="grid grid-cols-4 gap-4 pb-4">
                 <!-- 1. Kalender (Semua Role) -->
-                <a href="{{ route('kalender') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                <a href="{{ route('kalender') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                     <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
@@ -614,7 +671,7 @@
                 </a>
 
                 <!-- 2. FAQ Bantuan (Semua Role) -->
-                <a href="{{ route('faq.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                <a href="{{ route('faq.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                     <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
@@ -623,7 +680,7 @@
                 
                 <!-- 3. Dashboard (Khusus Kepala Umum, karena yang lain sudah ada di navbar bawah utama) -->
                 @if($tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
-                <a href="{{ route('dashboard') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                <a href="{{ route('dashboard') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                     <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </div>
@@ -633,7 +690,7 @@
 
                 <!-- 4. Kandidat Terbaik (Admin & Kepala Umum) -->
                 @if($tipe == 'Admin' || $tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
-                <a href="{{ route('admin.kandidat.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                <a href="{{ route('admin.kandidat.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                     <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                     </div>
@@ -643,7 +700,7 @@
 
                 <!-- 5. Glosarium (Admin) -->
                 @if($tipe == 'Admin')
-                <a href="{{ route('glosarium.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                <a href="{{ route('glosarium.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                     <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                     </div>
@@ -653,7 +710,7 @@
 
                 <!-- 6. Voting (Admin, Kepala Kantor, Kepala Bagian) -->
                 @if($tipe == 'Admin' || $tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
-                <a href="{{ route('pegawai.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                <a href="{{ route('pegawai.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                     <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     </div>
@@ -663,13 +720,13 @@
 
                 <!-- ADMIN EXCLUSIVE -->
                 @if($tipe == 'Admin')
-                    <a href="{{ route('admin.pengumuman.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.pengumuman.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Pengumuman</span>
                     </a>
-                    <a href="{{ route('admin.audit.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.audit.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         </div>
@@ -681,37 +738,37 @@
                         </div>
                         <span class="text-[10px] text-center leading-tight">Monitor</span>
                     </a>
-                    <a href="{{ route('admin.pengaturan-bobot.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.pengaturan-bobot.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Manajemen Bobot</span>
                     </a>
-                    <a href="{{ route('admin.glosarium.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.glosarium.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Kelola Glosarium</span>
                     </a>
-                    <a href="{{ route('admin.faq.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.faq.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Kelola FAQ</span>
                     </a>
-                    <a href="{{ route('admin.absensi.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.absensi.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Presensi</span>
                     </a>
-                    <a href="{{ route('admin.ckp.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.ckp.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <span class="text-[10px] text-center leading-tight">Input CKP</span>
                     </a>
-                    <a href="{{ route('admin.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.survey.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                         </div>
@@ -721,7 +778,7 @@
 
                 <!-- Kinerja (Admin, Kepala Umum) -->
                 @if($tipe == 'Admin' || $tipe == 'Kepala Umum' || $tipe == 'Kepala_Umum')
-                    <a href="{{ route('admin.kinerja.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('admin.kinerja.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                         </div>
@@ -731,7 +788,7 @@
                 
                 <!-- Tim Penilai (Kepala Kantor / Bagian) -->
                 @if($tipe == 'Kepala Kantor' || $tipe == 'Kepala Bagian')
-                    <a href="{{ route('kepala.tim_penilai.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary">
+                    <a href="{{ route('kepala.tim_penilai.index') }}" class="flex flex-col items-center text-gray-600 hover:text-bps-secondary" wire:navigate>
                         <div class="w-12 h-12 rounded-2xl bg-bps-bg flex items-center justify-center mb-1 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         </div>
@@ -763,7 +820,7 @@
                                 elseif($notif->prioritas == 'High') { $color = 'orange'; }
                                 elseif($notif->kategori == 'Hasil') { $color = 'green'; }
                             @endphp
-                            <a href="{{ route('dashboard') }}" class="block p-4 hover:bg-gray-50 transition-colors {{ $bg }}">
+                            <a href="{{ route('dashboard') }}" class="block p-4 hover:bg-gray-50 transition-colors {{ $bg }}" wire:navigate>
                                 <div class="flex justify-between items-start mb-1">
                                     <span class="text-xs font-bold uppercase tracking-wider text-{{ $color }}-600">{{ $notif->kategori }}</span>
                                     <span class="text-[10px] text-gray-400">{{ $notif->publish_at ? $notif->publish_at->diffForHumans() : $notif->created_at->diffForHumans() }}</span>
@@ -781,7 +838,7 @@
                 @endif
             </div>
             <div class="border-t border-gray-100 p-3 bg-gray-50 text-center">
-                <a href="{{ route('dashboard') }}" class="text-xs font-semibold text-bps-secondary hover:text-bps-primary uppercase tracking-wider">Lihat Semua di Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-xs font-semibold text-bps-secondary hover:text-bps-primary uppercase tracking-wider" wire:navigate>Lihat Semua di Dashboard</a>
             </div>
         </div>
     </div>
@@ -912,41 +969,6 @@
         }
 
         if (closeMenuBtn) closeMenuBtn.addEventListener('click', toggleDesktopMenu);
-        
-        // Sidebar Lock Logic
-        const lockBtn = document.getElementById('sidebarLockBtn');
-        const lockIcon = document.getElementById('lockIcon');
-        const unlockIcon = document.getElementById('unlockIcon');
-        
-        if (sidebar && lockBtn) {
-            let isLocked = localStorage.getItem('sidebarLocked') === 'true';
-
-            function updateLockState() {
-                if (isLocked) {
-                    sidebar.classList.add('is-locked');
-                    lockIcon.classList.remove('hidden');
-                    unlockIcon.classList.add('hidden');
-                    lockBtn.classList.add('opacity-100', 'text-red-500', 'hover:text-red-600', 'hover:bg-red-50'); // Keep visible and make red
-                    lockBtn.classList.remove('text-gray-400', 'hover:text-blue-600', 'hover:bg-blue-50');
-                } else {
-                    sidebar.classList.remove('is-locked');
-                    lockIcon.classList.add('hidden');
-                    unlockIcon.classList.remove('hidden');
-                    lockBtn.classList.remove('opacity-100', 'text-red-500', 'hover:text-red-600', 'hover:bg-red-50');
-                    lockBtn.classList.add('text-gray-400', 'hover:text-blue-600', 'hover:bg-blue-50');
-                }
-            }
-            
-            updateLockState();
-            
-            lockBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                isLocked = !isLocked;
-                localStorage.setItem('sidebarLocked', isLocked);
-                updateLockState();
-            });
-        }
     });
 </script>
 

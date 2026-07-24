@@ -36,6 +36,13 @@ document.addEventListener('click', function (e) {
     const link = e.target.closest('a[wire\\:navigate]');
     if (link && link.href && link.href !== window.location.href) {
         showSkeleton();
+        
+        try {
+            const targetPath = new URL(link.href, window.location.origin).pathname;
+            updateSidebarActiveState(targetPath);
+        } catch(err) {
+            // ignore
+        }
     }
 });
 
@@ -62,8 +69,8 @@ function getInactiveClasses(linkPathname) {
     return ['text-gray-600', 'hover:bg-bps-bg', 'hover:text-gray-900'];
 }
 
-function updateSidebarActiveState() {
-    const currentPath = window.location.pathname;
+function updateSidebarActiveState(targetPath = null) {
+    const currentPath = targetPath || window.location.pathname;
     // Only target links inside <nav> inside #sidebar — excludes profile/panduan/logout
     const links = document.querySelectorAll('#sidebar nav a[href]');
 
@@ -97,10 +104,12 @@ function updateSidebarActiveState() {
     });
 }
 
-// Run on every Livewire navigation completion
-document.addEventListener('livewire:navigated', updateSidebarActiveState);
+// Run instantly when navigation starts (if URL already changed)
+document.addEventListener('livewire:navigating', () => updateSidebarActiveState());
+// Also run on completion just to be safe if there are redirects
+document.addEventListener('livewire:navigated', () => updateSidebarActiveState());
 // Run on first hard load to sync state (in case PHP and JS differ)
-document.addEventListener('DOMContentLoaded', updateSidebarActiveState);
+document.addEventListener('DOMContentLoaded', () => updateSidebarActiveState());
 
 // ─────────────────────────────────────────────────────────────
 // Sidebar Lock Logic
